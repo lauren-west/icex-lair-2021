@@ -19,16 +19,9 @@ for line in lines:
             
     line = [s[s.find("=")+1:].strip() for s in line]
 
-    # for s in line:
-    #     print(s)
-    #     try:
-    #         s = float(s)
-    #     except:
-    #         print(s, "not a float")
-
     for s in line:
         try:
-            s = float(s)
+            s = float(s)    # print statement showed this didn't its job?
         except:
             print(s, "not a float")
     
