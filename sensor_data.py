@@ -8,7 +8,12 @@ with open('CO_Preliminary_Test_Data.txt') as f:
 data_list = []
 
 for line in lines:
-    data_list.append(line.split(','))
+    line = line.split(',')
+    line = [s[s.find("=")+1:].strip() for s in line]
+    data_list.append(line)
+
+print(data_list)
+
 
 with open("output.csv", "w") as f:
     writer = csv.writer(f)
