@@ -9,7 +9,29 @@ data_list = []
 
 for line in lines:
     line = line.split(',')
+    # for s in line:
+    #     if s.find("=") != -1:
+    #         s = s[s.find("=")+1:].strip()
+    #         try:
+    #             s= float(s)
+    #         except:
+    #             print(s, " not a float.")
+            
     line = [s[s.find("=")+1:].strip() for s in line]
+
+    # for s in line:
+    #     print(s)
+    #     try:
+    #         s = float(s)
+    #     except:
+    #         print(s, "not a float")
+
+    for s in line:
+        try:
+            s = float(s)
+        except:
+            print(s, "not a float")
+    
     data_list.append(line)
 
 print(data_list)
