@@ -6,21 +6,33 @@ with open('CO_Preliminary_Test_Data.txt') as f:
 # data_list is 2D array of strings of data
 # rows are lines, and cols are the specific measurements
 data_list = []
+data_list.append(["Receiver Serial Number", "Three-Digit Line-Counter", "Date/Time", "Transmitter Code-Space", "Transmitter ID Number", "Signal Level (dB)", "Noise-Level (dB)", "Channel"])
+
+summaries_list = []
 
 for line in lines:
     line = line.split(',')
-
     line = [s[s.find("=")+1:].strip() for s in line]
 
     for s in line:
         try:
-            s = float(s)    # print statement showed this didn't its job?
+            s = float(s)
         except:
             pass
     
-    data_list.append(line)
+    if len(line) < 14:
+        data_list.append(line)
+    else:
+        summaries_list.append(line)
+    
+print(data_list)
+print(summaries_list)
 
-with open("output.csv", "w") as f:
+with open("data.csv", "w") as f:
     writer = csv.writer(f)
     writer.writerows(data_list)
+
+with open("summaries.csv", "w") as f:
+    writer = csv.writer(f)
+    writer.writerows(summaries_list)
 
