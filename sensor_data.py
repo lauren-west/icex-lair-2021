@@ -9,26 +9,16 @@ data_list = []
 
 for line in lines:
     line = line.split(',')
-    # for s in line:
-    #     if s.find("=") != -1:
-    #         s = s[s.find("=")+1:].strip()
-    #         try:
-    #             s= float(s)
-    #         except:
-    #             print(s, " not a float.")
-            
+
     line = [s[s.find("=")+1:].strip() for s in line]
 
     for s in line:
         try:
             s = float(s)    # print statement showed this didn't its job?
         except:
-            print(s, "not a float")
+            pass
     
     data_list.append(line)
-
-print(data_list)
-
 
 with open("output.csv", "w") as f:
     writer = csv.writer(f)
