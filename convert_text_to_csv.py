@@ -1,5 +1,19 @@
 import csv
 
+# Using pySerial to Read Serial Data Output from Arduino
+# import serial
+# ser = serial.Serial('/dev/ttyACM0')
+# ser.flushInput()
+
+# while True:
+#     try:
+#         ser_bytes = ser.readline()
+#         decoded_bytes = float(ser_bytes[0:len(ser_bytes)-2].decode("utf-8"))
+#         print(decoded_bytes)
+#     except:
+#         print("Keyboard Interrupt")
+#         break
+
 with open('06_18_2021_Tag_77_pHake_Lake_Data.txt') as f:
     lines = f.readlines()
 
