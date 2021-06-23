@@ -2,6 +2,8 @@ import csv
 
 # Using pySerial to Read Serial Data Output from Arduino
 import serial
+# ser = serial.Serial('/dev/tty.usbserial-AB0L7DSC') # port on Lauren's Mac: /dev/tty.usbserial-AB0L7DSC
+# ser = serial.Serial(port = "COM5", baudrate=9600, bytesize=8) # port on Caitlyn's Windows: COM5
 ser = serial.Serial('/dev/tty.usbserial-AB0L7DSC') # change as needed
 ser.flushInput()
 
