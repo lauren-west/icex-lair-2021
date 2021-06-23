@@ -2,7 +2,7 @@ import csv
 
 # Using pySerial to Read Serial Data Output from Arduino
 import serial
-ser = serial.Serial('/dev/ttyACM0') # change as needed
+ser = serial.Serial('/dev/tty.usbserial-AB0L7DSC') # change as needed
 ser.flushInput()
 
 
