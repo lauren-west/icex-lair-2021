@@ -41,7 +41,7 @@ t1_start = time.perf_counter()
 output = []
 
 # 15 minutes = (10**11)*9) nanoseconds
-while time.perf_counter() - t1_start < 140:
+while time.perf_counter() - t1_start < 65:
     if serialInst.in_waiting:
         packet = serialInst.readline()
         print(packet.decode('utf').rstrip('\n'))
@@ -75,19 +75,21 @@ for line in output:
 
 ## histogram stuff ##
 delta_t_list = []
-for i in range(1, len(data_list)):
+for i in range(2, len(data_list)):
+    print(data_list[i-1][2])
+    print(data_list[i][2])
     past_datetime = datetime.datetime.strptime(data_list[i-1][2], '%Y-%m-%d %H:%M:%S.%f')
     current_datatime = datetime.datetime.strptime(data_list[i][2], '%Y-%m-%d %H:%M:%S.%f')
     total_seconds = (current_datatime - past_datetime).total_seconds()
     delta_t_list.append(total_seconds)
 
-plt.hist(delta_t_list, 10)  # 10 is our number of "bins"
+plt.hist(delta_t_list, 50)  # 10 is our number of "bins"
 plt.show()
 plt.savefig("histogram.png")
 ######################
 
-print(data_list)
-print(summaries_list)
+# print(data_list)
+# print(summaries_list)
 
 with open("data.csv", "w") as f:
     writer = csv.writer(f)
