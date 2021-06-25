@@ -1,6 +1,8 @@
 # libraries
 import numpy as np
 import pandas as pd
+import datetime
+
 
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -48,6 +50,7 @@ while time.perf_counter() - t1_start < 140:
 print(output)
 # data_list is 2D array of strings of data
 # rows are lines, and cols are the specific measurements
+
 data_list = []
 data_list.append(["Receiver Serial Number", "Three-Digit Line-Counter", "Date/Time", "Transmitter Code-Space", "Transmitter ID Number", "Signal Level (dB)", "Noise-Level (dB)", "Channel"])
 
@@ -62,12 +65,25 @@ for line in output:
         try:
             s = float(s)
         except:
-            pass
+            pass  
 
     if len(line) < 14:
         data_list.append(line)
     else:
         summaries_list.append(line)
+
+
+## histogram stuff ##
+delta_t_list = []
+for i in range(1, len(data_list)):
+    past_datetime = datetime.datetime.strptime(data_list[i-1][2], '%Y-%m-%d %H:%M:%S.%f')
+    current_datatime = datetime.datetime.strptime(data_list[i][2], '%Y-%m-%d %H:%M:%S.%f')
+    total_seconds = (current_datatime - past_datetime).total_seconds()
+    delta_t_list.append(total_seconds)
+
+plt.hist(delta_t_list, 10)  # 10 is our number of "bins"
+plt.show()
+######################
 
 print(data_list)
 print(summaries_list)
@@ -79,7 +95,6 @@ with open("data.csv", "w") as f:
 with open("summaries.csv", "w") as f:
     writer = csv.writer(f)
     writer.writerows(summaries_list)
-
 
 ################ Taking in CSV and Plotting ################
 # Read in the data
