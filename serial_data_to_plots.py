@@ -12,6 +12,8 @@ import csv
 import serial.tools.list_ports
 import time
 
+#from geopy import distance
+
 ################ Taking in Inputs and Converting into CSV ################
 ports = serial.tools.list_ports.comports()
 serialInst = serial.Serial()
@@ -25,7 +27,9 @@ for onePort in ports:
 val = input("select Port: COM")
 
 # Add GPS question for distance calculation
-iteration = "data_" + str(input("Iteration of data collection (Enter a number): "))
+gps = input("Input gps coord: ")
+distance = input("What is the distance? (Can enter 1, 2, ..., 10, 11 for now): ")
+iteration = "data_" + str(input("Iteration of data collection (Enter a number to not overwrite files): "))
 
 for x in range(0,len(portList)):
   if portList[x].startswith("COM" + str(val)):
@@ -54,7 +58,7 @@ while time.perf_counter() - t1_start < TIME_TO_RUN:
 # rows are lines, and cols are the specific measurements
 
 data_list = []
-data_list.append(["Receiver Serial Number", "Three-Digit Line-Counter", "Date/Time", "Transmitter Code-Space", "Transmitter ID Number", "Signal Level (dB)", "Noise-Level (dB)", "Channel"])
+data_list.append(["Receiver Serial Number", "Three-Digit Line-Counter", "Date/Time", "Transmitter Code-Space", "Transmitter ID Number", "Signal Level (dB)", "Noise-Level (dB)", "Channel", "Distance (m)", "GPS Coords"])  #Added distance and GPS for now
 
 summaries_list = []
 summaries_list.append(["Receiver Serial Number", "Three-Digit Line-Counter", "Date/Time", "Scheduled Status (STS)", "Detection Count (DC)", "Ping Count (PC)", "Line Voltage (LV) [V]", "Internal Receiver Temperature", "Detection Memory Used", "Raw Memory Used", "Tilt Information [G]", "Output Noise", "Output PPM Noise"])
@@ -62,6 +66,8 @@ summaries_list.append(["Receiver Serial Number", "Three-Digit Line-Counter", "Da
 for line in output:
     line = line.split(',')
     line = [s[s.find("=")+1:].strip() for s in line]
+    line.append(distance)   #Adds a fake distance for now
+    
 
     for s in line:
         try:
@@ -107,7 +113,7 @@ for i in range(1, len(predicted_times_of_transmission)):
     error_delta_ts.append(predicted_times_of_transmission[i] - prior_sum)
     prior_sum += delta_t[i+1]
     real_time_of_transmission.append(prior_sum)
-    
+
     # error_delta_ts.append(predicted_times_of_transmission[1:i] - sum(delta_t[1:i]))
 
 times_list = [delta_t, real_time_of_transmission, predicted_times_of_transmission, error_delta_ts]
