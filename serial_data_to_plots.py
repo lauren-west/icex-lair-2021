@@ -24,6 +24,8 @@ for onePort in ports:
 
 val = input("select Port: COM")
 
+iteration = "data_" + str(input("Iteration of data collection (Enter a number): "))
+
 for x in range(0,len(portList)):
   if portList[x].startswith("COM" + str(val)):
       portVar = "COM" + str(val)
@@ -69,8 +71,6 @@ for line in output:
         data_list.append(line)
     else:
         summaries_list.append(line)
-
-iteration = "data_" + str(input("Iteration of data collection (Enter a number): "))
 
 ## histogram stuff ##
 delta_t = []
