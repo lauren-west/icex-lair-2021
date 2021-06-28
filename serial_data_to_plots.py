@@ -75,7 +75,6 @@ for line in output:
 ## histogram stuff ##
 delta_t = []
 delta_t.append("Times of Transmission")
-
 for i in range(2, len(data_list)):
     print(data_list[i-1][2])
     print(data_list[i][2])
@@ -83,20 +82,16 @@ for i in range(2, len(data_list)):
     current_datatime = datetime.datetime.strptime(data_list[i][2], '%Y-%m-%d %H:%M:%S.%f')
     total_seconds = (current_datatime - past_datetime).total_seconds()
     delta_t.append(total_seconds)
-
 plt.hist(delta_t, 50)  # 50 is our number of "bins"
 plt.show()
 plt.savefig(iteration + "_histogram.png")
-
 ######################
 
 ## error stuff ##
 t0 = delta_t[1]
 delta_t_avg  = sum(delta_t) / len(delta_t)
-
 for ind in range(len(delta_t)):
     delta_t_estimates = t0 + ind * delta_t_avg
-
 error_delta_ts = []
 error_delta_ts.append("Error")
 error_delta_ts += [tp - treal for tp, treal in zip(delta_t_estimates, delta_t)]
