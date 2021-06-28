@@ -73,7 +73,7 @@ for line in output:
         summaries_list.append(line)
 
 ## histogram stuff ##
-delta_t = []
+delta_t = [] # [8, 8, 8, 8,8 ,8, 8, ... , 8.001, 8.002]
 delta_t.append("Times of Transmission")
 for i in range(2, len(data_list)):
     print(data_list[i-1][2])
@@ -91,10 +91,13 @@ plt.savefig(iteration + "_histogram.png")
 t0 = delta_t[1]
 delta_t_avg  = sum(delta_t) / len(delta_t)
 for ind in range(len(delta_t)):
-    delta_t_estimates = t0 + ind * delta_t_avg
+    delta_t_estimates = t0 + ind * delta_t_avg # [8, 16, 32, ... , ]
 error_delta_ts = []
 error_delta_ts.append("Error")
-error_delta_ts += [tp - treal for tp, treal in zip(delta_t_estimates, delta_t)]
+
+for ind in range(1, len(delta_t)):
+    error_delta_ts.append(delta_t_estimates[ind] - sum(delta_t[1:ind]))
+# error_delta_ts += [tp - treal for tp, treal in zip(delta_t_estimates, delta_t)]
 ######################
 
 # print(data_list)
