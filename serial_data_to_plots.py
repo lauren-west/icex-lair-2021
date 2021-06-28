@@ -45,7 +45,7 @@ t1_start = time.perf_counter()
 
 output = []
 
-TIME_TO_RUN = 66
+TIME_TO_RUN = 2700
 while time.perf_counter() - t1_start < TIME_TO_RUN:
     if serialInst.in_waiting:
         packet = serialInst.readline()
@@ -92,10 +92,16 @@ for i in range(2, len(data_list)):
     total_seconds = (current_datatime - past_datetime).total_seconds()
     delta_t.append(total_seconds)
 
+
+delta_t_np = np.array(delta_t[1:])
+
 NUM_OF_BINS = 20 # Anywhere from 5-20 with 20 being with at least 1000 data points
-plt.hist(delta_t[1:], NUM_OF_BINS)
-plt.show()
+plt.hist(delta_t_np, NUM_OF_BINS)
+plt.title("Time of Transmission Histogram")
+plt.xlabel("time (s)")
+plt.ylabel("Frequency")
 plt.savefig(iteration + "_histogram.png")
+plt.show()
 ######################
 
 ## error stuff ##
@@ -141,30 +147,30 @@ with open(iteration + "_calculated_error_values.csv", "w") as f:
 # 
 # for read_csv, use header=0 when row 0 is a header row 
 
-# filename = iteration + '.csv'     # TODO: Change name to reflect other half
-# df = pd.read_csv(filename, header=0)   # read the file w/header row #0
-# print(f"{filename} : file read into a pandas dataframe.")
+filename = iteration + '.csv'     # TODO: Change name to reflect other half
+df = pd.read_csv(filename, header=0)   # read the file w/header row #0
+print(f"{filename} : file read into a pandas dataframe.")
 
-# #df_clean = df.dropna()
-# df_clean = df
+#df_clean = df.dropna()
+df_clean = df
 
-# # Plot using Seaborn
-# sns.lmplot(x='Distance (m)', y='Signal Level (dB)', fit_reg=True, data=df_clean, hue='Transmitter ID Number')
+# Plot using Seaborn
+sns.lmplot(x='Distance (m)', y='Signal Level (dB)', fit_reg=True, data=df_clean, hue='Transmitter ID Number')
  
-# # Tweak these limits
-# plt.ylim(30, None)
-# plt.xlim(0, 58)
-# plt.savefig("signal_plot.png")    # TODO: Change name
+# Tweak these limits
+plt.ylim(30, None)
+plt.xlim(0, 58)
+plt.savefig(iteration + "_signal_plot.png")    # TODO: Change name
 
-# # Plot using Seaborn
-# sns.lmplot(x='Distance (m)', y='Noise-Level (dB)', fit_reg = True, data=df_clean, hue='Transmitter ID Number')
+# Plot using Seaborn
+sns.lmplot(x='Distance (m)', y='Noise-Level (dB)', fit_reg = True, data=df_clean, hue='Transmitter ID Number')
  
-# # Tweak these limits
-# plt.ylim(18, None)
-# plt.xlim(0, 58)
-# plt.savefig('noise_plot.png')  # TODO: Change name
+# Tweak these limits
+plt.ylim(18, None)
+plt.xlim(0, 58)
+plt.savefig(iteration + '_noise_plot.png')  # TODO: Change name
 
 # ADD TO PLOT OTHER STUFF
-# filename = iteration + '_calculated_values.csv'     # TODO: Change name to reflect other half
+# filename = iteration + '_calculated_error_values.csv'     # TODO: Change name to reflect other half
 # df = pd.read_csv(filename, header=0)   # read the file w/header row #0
 # print(f"{filename} : file read into a pandas dataframe.")
