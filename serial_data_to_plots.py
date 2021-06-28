@@ -45,7 +45,7 @@ t1_start = time.perf_counter()
 
 output = []
 
-TIME_TO_RUN = 65
+TIME_TO_RUN = 66
 while time.perf_counter() - t1_start < TIME_TO_RUN:
     if serialInst.in_waiting:
         packet = serialInst.readline()
@@ -67,6 +67,7 @@ for line in output:
     line = line.split(',')
     line = [s[s.find("=")+1:].strip() for s in line]
     line.append(distance)   #Adds a fake distance for now
+    line.append(gps)   #Adds a fake distance for now
     
 
     for s in line:
@@ -92,7 +93,7 @@ for i in range(2, len(data_list)):
     delta_t.append(total_seconds)
 
 NUM_OF_BINS = 20 # Anywhere from 5-20 with 20 being with at least 1000 data points
-plt.hist(delta_t, NUM_OF_BINS)
+plt.hist(delta_t[1:], NUM_OF_BINS)
 plt.show()
 plt.savefig(iteration + "_histogram.png")
 ######################
@@ -103,16 +104,17 @@ error_delta_ts = ["Error"]
 t0 = 0
 delta_t_avg  = sum(delta_t[1:]) / (len(delta_t) - 1)
 
-for i in range(1, len(delta_t) + 1):
+for i in range(1, len(delta_t)):
     predicted_times_of_transmission.append(t0 + i * delta_t_avg)  # [8, 16, 24, ..., 64]
 
 prior_sum = delta_t[1]
-real_time_of_transmission = ["Real Time of Transmission", prior_sum]
+real_time_of_transmission = ["Real Time of Transmission"]
 
 for i in range(1, len(predicted_times_of_transmission)):
-    error_delta_ts.append(predicted_times_of_transmission[i] - prior_sum)
-    prior_sum += delta_t[i+1]
     real_time_of_transmission.append(prior_sum)
+    error_delta_ts.append(predicted_times_of_transmission[i] - prior_sum)
+    prior_sum += delta_t[i]
+    
 
     # error_delta_ts.append(predicted_times_of_transmission[1:i] - sum(delta_t[1:i]))
 
@@ -130,7 +132,7 @@ with open(iteration + "_summaries.csv", "w") as f:
     writer = csv.writer(f)
     writer.writerows(summaries_list)
 
-with open(iteration + "_calculated_values.csv", "w") as f:
+with open(iteration + "_calculated_error_values.csv", "w") as f:
     writer = csv.writer(f)
     writer.writerows(times_list)
 
@@ -139,27 +141,28 @@ with open(iteration + "_calculated_values.csv", "w") as f:
 # 
 # for read_csv, use header=0 when row 0 is a header row 
 
-filename = iteration + '.csv'     # TODO: Change name to reflect other half
-df = pd.read_csv(filename, header=0)   # read the file w/header row #0
-print(f"{filename} : file read into a pandas dataframe.")
+# filename = iteration + '.csv'     # TODO: Change name to reflect other half
+# df = pd.read_csv(filename, header=0)   # read the file w/header row #0
+# print(f"{filename} : file read into a pandas dataframe.")
 
-df_clean = df.dropna()
+# #df_clean = df.dropna()
+# df_clean = df
 
-# Plot using Seaborn
-sns.lmplot(x='Distance (m)', y='Signal Level (dB)', fit_reg=True, data=df_clean, hue='Transmitter ID Number')
+# # Plot using Seaborn
+# sns.lmplot(x='Distance (m)', y='Signal Level (dB)', fit_reg=True, data=df_clean, hue='Transmitter ID Number')
  
-# Tweak these limits
-plt.ylim(30, None)
-plt.xlim(0, 58)
-plt.savefig("signal_plot.png")    # TODO: Change name
+# # Tweak these limits
+# plt.ylim(30, None)
+# plt.xlim(0, 58)
+# plt.savefig("signal_plot.png")    # TODO: Change name
 
-# Plot using Seaborn
-sns.lmplot(x='Distance (m)', y='Noise-Level (dB)', fit_reg = True, data=df_clean, hue='Transmitter ID Number')
+# # Plot using Seaborn
+# sns.lmplot(x='Distance (m)', y='Noise-Level (dB)', fit_reg = True, data=df_clean, hue='Transmitter ID Number')
  
-# Tweak these limits
-plt.ylim(18, None)
-plt.xlim(0, 58)
-plt.savefig('noise_plot.png')  # TODO: Change name
+# # Tweak these limits
+# plt.ylim(18, None)
+# plt.xlim(0, 58)
+# plt.savefig('noise_plot.png')  # TODO: Change name
 
 # ADD TO PLOT OTHER STUFF
 # filename = iteration + '_calculated_values.csv'     # TODO: Change name to reflect other half
