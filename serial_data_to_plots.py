@@ -24,6 +24,7 @@ for onePort in ports:
 
 val = input("select Port: COM")
 
+# Add GPS question for distance calculation
 iteration = "data_" + str(input("Iteration of data collection (Enter a number): "))
 
 for x in range(0,len(portList)):
@@ -40,14 +41,15 @@ t1_start = time.perf_counter()
 
 output = []
 
-# 15 minutes = (10**11)*9) nanoseconds
-while time.perf_counter() - t1_start < 65:
+TIME_TO_RUN = 65
+while time.perf_counter() - t1_start < TIME_TO_RUN:
     if serialInst.in_waiting:
         packet = serialInst.readline()
         print(packet.decode('utf').rstrip('\n'))
         output.append(packet.decode('utf').rstrip('\n'))
     
-print(output)
+# print(output)
+
 # data_list is 2D array of strings of data
 # rows are lines, and cols are the specific measurements
 
@@ -73,8 +75,8 @@ for line in output:
         summaries_list.append(line)
 
 ## histogram stuff ##
-delta_t = [] # [8, 8, 8, 8,8 ,8, 8, ... , 8.001, 8.002]
-delta_t.append("Times of Transmission")
+delta_t = ["Times of Transmission"] # [8, 8, 8, 8,8 ,8, 8, ... , 8.001, 8.002]
+
 for i in range(2, len(data_list)):
     print(data_list[i-1][2])
     print(data_list[i][2])
@@ -82,22 +84,33 @@ for i in range(2, len(data_list)):
     current_datatime = datetime.datetime.strptime(data_list[i][2], '%Y-%m-%d %H:%M:%S.%f')
     total_seconds = (current_datatime - past_datetime).total_seconds()
     delta_t.append(total_seconds)
-plt.hist(delta_t, 50)  # 50 is our number of "bins"
+
+NUM_OF_BINS = 20 # Anywhere from 5-20 with 20 being with at least 1000 data points
+plt.hist(delta_t, NUM_OF_BINS)
 plt.show()
 plt.savefig(iteration + "_histogram.png")
 ######################
 
 ## error stuff ##
-t0 = delta_t[1]
-delta_t_avg  = sum(delta_t) / len(delta_t)
-for ind in range(len(delta_t)):
-    delta_t_estimates = t0 + ind * delta_t_avg # [8, 16, 32, ... , ]
-error_delta_ts = []
-error_delta_ts.append("Error")
+predicted_times_of_transmission = ["Predicted Times of Transmission"]
+error_delta_ts = ["Error"]
+t0 = 0
+delta_t_avg  = sum(delta_t[1:]) / (len(delta_t) - 1)
 
-for ind in range(1, len(delta_t)):
-    error_delta_ts.append(delta_t_estimates[ind] - sum(delta_t[1:ind]))
-# error_delta_ts += [tp - treal for tp, treal in zip(delta_t_estimates, delta_t)]
+for i in range(1, len(delta_t) + 1):
+    predicted_times_of_transmission.append(t0 + i * delta_t_avg)  # [8, 16, 24, ..., 64]
+
+prior_sum = delta_t[1]
+real_time_of_transmission = ["Real Time of Transmission", prior_sum]
+
+for i in range(1, len(predicted_times_of_transmission)):
+    error_delta_ts.append(predicted_times_of_transmission[i] - prior_sum)
+    prior_sum += delta_t[i+1]
+    real_time_of_transmission.append(prior_sum)
+    
+    # error_delta_ts.append(predicted_times_of_transmission[1:i] - sum(delta_t[1:i]))
+
+times_list = [delta_t, real_time_of_transmission, predicted_times_of_transmission, error_delta_ts]
 ######################
 
 # print(data_list)
@@ -110,6 +123,10 @@ with open(iteration + ".csv", "w") as f:
 with open(iteration + "_summaries.csv", "w") as f:
     writer = csv.writer(f)
     writer.writerows(summaries_list)
+
+with open(iteration + "_calculated_values.csv", "w") as f:
+    writer = csv.writer(f)
+    writer.writerows(times_list)
 
 ################ Taking in CSV and Plotting ################
 # Read in the data
