@@ -70,6 +70,7 @@ for line in output:
     else:
         summaries_list.append(line)
 
+iteration = "data_" + str(input("Iteration of data collection (Enter a number): "))
 
 ## histogram stuff ##
 delta_t = []
@@ -85,7 +86,7 @@ for i in range(2, len(data_list)):
 
 plt.hist(delta_t, 50)  # 50 is our number of "bins"
 plt.show()
-plt.savefig("histogram.png")
+plt.savefig(iteration + "_histogram.png")
 
 ######################
 
@@ -103,13 +104,12 @@ error_delta_ts += [tp - treal for tp, treal in zip(delta_t_estimates, delta_t)]
 
 # print(data_list)
 # print(summaries_list)
-data_csv_name = "data_" + str(input("Iteration of data collection (Enter a number): "))
 
-with open(data_csv_name + ".csv", "w") as f:
+with open(iteration + ".csv", "w") as f:
     writer = csv.writer(f)
     writer.writerows(data_list)
 
-with open(data_csv_name + "_summaries.csv", "w") as f:
+with open(iteration + "_summaries.csv", "w") as f:
     writer = csv.writer(f)
     writer.writerows(summaries_list)
 
