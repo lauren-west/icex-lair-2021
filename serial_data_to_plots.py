@@ -139,24 +139,29 @@ with open(iteration + "_calculated_values.csv", "w") as f:
 # 
 # for read_csv, use header=0 when row 0 is a header row 
 
-# filename = 'data.csv'     # TODO: Change name to reflect other half
+filename = iteration + '.csv'     # TODO: Change name to reflect other half
+df = pd.read_csv(filename, header=0)   # read the file w/header row #0
+print(f"{filename} : file read into a pandas dataframe.")
+
+df_clean = df.dropna()
+
+# Plot using Seaborn
+sns.lmplot(x='Distance (m)', y='Signal Level (dB)', fit_reg=True, data=df_clean, hue='Transmitter ID Number')
+ 
+# Tweak these limits
+plt.ylim(30, None)
+plt.xlim(0, 58)
+plt.savefig("signal_plot.png")    # TODO: Change name
+
+# Plot using Seaborn
+sns.lmplot(x='Distance (m)', y='Noise-Level (dB)', fit_reg = True, data=df_clean, hue='Transmitter ID Number')
+ 
+# Tweak these limits
+plt.ylim(18, None)
+plt.xlim(0, 58)
+plt.savefig('noise_plot.png')  # TODO: Change name
+
+# ADD TO PLOT OTHER STUFF
+# filename = iteration + '_calculated_values.csv'     # TODO: Change name to reflect other half
 # df = pd.read_csv(filename, header=0)   # read the file w/header row #0
 # print(f"{filename} : file read into a pandas dataframe.")
-
-# df_clean = df.dropna()
-
-# # Plot using Seaborn
-# sns.lmplot(x='Distance (m)', y='Signal Level (dB)', fit_reg=True, data=df_clean, hue='Transmitter ID Number')
- 
-# # Tweak these limits
-# plt.ylim(30, None)
-# plt.xlim(0, 58)
-# plt.savefig("signal_plot.png")    # TODO: Change name
-
-# # Plot using Seaborn
-# sns.lmplot(x='Distance (m)', y='Noise-Level (dB)', fit_reg = True, data=df_clean, hue='Transmitter ID Number')
- 
-# # Tweak these limits
-# plt.ylim(18, None)
-# plt.xlim(0, 58)
-# plt.savefig('noise_plot.png')  # TODO: Change name 
