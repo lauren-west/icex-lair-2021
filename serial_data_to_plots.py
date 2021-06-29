@@ -12,7 +12,7 @@ import csv
 import serial.tools.list_ports
 import time
 
-#from geopy import distance
+
 
 ################ Taking in Inputs and Converting into CSV ################
 ports = serial.tools.list_ports.comports()
@@ -26,9 +26,29 @@ for onePort in ports:
 
 val = input("select Port: COM")
 
-# Add GPS question for distance calculation
-gps = input("Input gps coord: ")
-distance = input("What is the distance? (Can enter 1, 2, ..., 10, 11 for now): ")
+############ GPS Stuff ############
+
+from geopy import distance
+
+distance = 0
+
+sensor_latitude = 'X'
+sensor_longitude = 'X'
+sensor_coords = (sensor_latitude, sensor_longitude)
+
+tag_latitude = 12.00006   
+tag_longitude = -12.0001
+tag_coords = (tag_latitude, tag_longitude)
+
+if input("Are you using distance or GPS coordinates? (Type distance or GPS): ").lower() == distance:
+    distance = input("What is the distance? (Can enter placeholders 1, 2, ..., 10, 11 for now): ")
+else:
+    # latitude = input("Input GPS latitude: ")
+    # longitude = input("Input GPS longitude: ")
+    distance = distance.distance(tag_coords, sensor_coords)
+
+###################################
+
 iteration = "data_" + str(input("Iteration of data collection (Enter a number to not overwrite files): "))
 
 for x in range(0,len(portList)):
@@ -58,7 +78,7 @@ while time.perf_counter() - t1_start < TIME_TO_RUN:
 # rows are lines, and cols are the specific measurements
 
 data_list = []
-data_list.append(["Receiver Serial Number", "Three-Digit Line-Counter", "Date/Time", "Transmitter Code-Space", "Transmitter ID Number", "Signal Level (dB)", "Noise-Level (dB)", "Channel", "Distance (m)", "GPS Coords"])  #Added distance and GPS for now
+data_list.append(["Receiver Serial Number", "Three-Digit Line-Counter", "Date/Time", "Transmitter Code-Space", "Transmitter ID Number", "Signal Level (dB)", "Noise-Level (dB)", "Channel", "Distance (m)", "Sensor GPS Coords", "Tag GPS Coords"])  #Added distance and GPS for now
 
 summaries_list = []
 summaries_list.append(["Receiver Serial Number", "Three-Digit Line-Counter", "Date/Time", "Scheduled Status (STS)", "Detection Count (DC)", "Ping Count (PC)", "Line Voltage (LV) [V]", "Internal Receiver Temperature", "Detection Memory Used", "Raw Memory Used", "Tilt Information [G]", "Output Noise", "Output PPM Noise"])
@@ -66,8 +86,9 @@ summaries_list.append(["Receiver Serial Number", "Three-Digit Line-Counter", "Da
 for line in output:
     line = line.split(',')
     line = [s[s.find("=")+1:].strip() for s in line]
-    line.append(distance)   #Adds a fake distance for now
-    line.append(gps)   #Adds a fake distance for now
+    line.append(distance)   #Adds distance for now
+    line.append(sensor_coords)   #Adds coords for now
+    line.append(tag_coords)
     
 
     for s in line:
@@ -124,7 +145,7 @@ for i in range(1, len(predicted_times_of_transmission)):
 
     # error_delta_ts.append(predicted_times_of_transmission[1:i] - sum(delta_t[1:i]))
 
-times_list = [delta_t, real_time_of_transmission, predicted_times_of_transmission, error_delta_ts]
+times_list = zip([delta_t, real_time_of_transmission, predicted_times_of_transmission, error_delta_ts])
 ######################
 
 # print(data_list)
@@ -158,16 +179,16 @@ df_clean = df
 sns.lmplot(x='Distance (m)', y='Signal Level (dB)', fit_reg=True, data=df_clean, hue='Transmitter ID Number')
  
 # Tweak these limits
-plt.ylim(30, None)
-plt.xlim(0, 58)
+plt.ylim(None, None)
+plt.xlim(None, None)
 plt.savefig(iteration + "_signal_plot.png")    # TODO: Change name
 
 # Plot using Seaborn
 sns.lmplot(x='Distance (m)', y='Noise-Level (dB)', fit_reg = True, data=df_clean, hue='Transmitter ID Number')
  
 # Tweak these limits
-plt.ylim(18, None)
-plt.xlim(0, 58)
+plt.ylim(None, None)
+plt.xlim(None, None)
 plt.savefig(iteration + '_noise_plot.png')  # TODO: Change name
 
 # ADD TO PLOT OTHER STUFF
