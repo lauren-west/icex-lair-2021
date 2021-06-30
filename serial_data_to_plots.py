@@ -28,24 +28,26 @@ val = input("select Port: COM")
 
 ############ GPS Stuff ############
 
-from geopy import distance
+# from geopy import distance
 
-distance = 0
+# distance = 0
 
-sensor_latitude = 'X'
-sensor_longitude = 'X'
+sensor_latitude = 33.75230
+sensor_longitude = -118.12829
 sensor_coords = (sensor_latitude, sensor_longitude)
 
-tag_latitude = 12.00006   
-tag_longitude = -12.0001
+tag_latitude = 33.75227  
+tag_longitude = -118.12857
 tag_coords = (tag_latitude, tag_longitude)
 
-if input("Are you using distance or GPS coordinates? (Type distance or GPS): ").lower() == distance:
-    distance = input("What is the distance? (Can enter placeholders 1, 2, ..., 10, 11 for now): ")
-else:
-    # latitude = input("Input GPS latitude: ")
-    # longitude = input("Input GPS longitude: ")
-    distance = distance.distance(tag_coords, sensor_coords)
+distance = input("What is the distance? (Can enter placeholders 1, 2, ..., 10, 11 for now): ")
+
+# if input("Are you using distance or GPS coordinates? (Type distance or GPS): ").lower() == distance:
+#     distance = input("What is the distance? (Can enter placeholders 1, 2, ..., 10, 11 for now): ")
+# else:
+#     # latitude = input("Input GPS latitude: ")
+#     # longitude = input("Input GPS longitude: ")
+#     distance = distance.distance(tag_coords, sensor_coords)
 
 ###################################
 
@@ -65,7 +67,7 @@ t1_start = time.perf_counter()
 
 output = []
 
-TIME_TO_RUN = 2700
+TIME_TO_RUN = 120 # seconds
 while time.perf_counter() - t1_start < TIME_TO_RUN:
     if serialInst.in_waiting:
         packet = serialInst.readline()
