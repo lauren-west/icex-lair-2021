@@ -112,8 +112,11 @@ for i in range(2, len(data_list)):
     print(data_list[i][2])
     past_datetime = datetime.datetime.strptime(data_list[i-1][2], '%Y-%m-%d %H:%M:%S.%f')
     current_datatime = datetime.datetime.strptime(data_list[i][2], '%Y-%m-%d %H:%M:%S.%f')
-    total_seconds = (current_datatime - past_datetime).total_seconds()
-    delta_t.append(total_seconds)
+    if (current_datatime - past_datetime).total_seconds() > 10:
+        pass
+    else:
+        total_seconds = (current_datatime - past_datetime).total_seconds()
+        delta_t.append(total_seconds)
 
 
 delta_t_np = np.array(delta_t[1:])
