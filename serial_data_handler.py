@@ -224,4 +224,4 @@ if __name__ == '__main__':
 
     # create csvs and plot
     handler.create_csvs(iteration, data_list, summaries_list, times_list)
-    handler.creat_plots(iteration)
+    handler.create_plots(iteration)
