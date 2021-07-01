@@ -9,6 +9,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 sns.set(style="darkgrid")
 
+from geopy.distance import geodesic
+
 
 class Serial_Data_Handler():
 
@@ -57,8 +59,6 @@ class Serial_Data_Handler():
           tag gps coordinates (tuple): (lattitude, longitude)
           distance (double): dist in meters
         """
-        # from geopy import distance
-        # distance = 0
         sensor_latitude = 33.75230
         sensor_longitude = -118.12829
         sensor_coords = (sensor_latitude, sensor_longitude)
@@ -69,13 +69,13 @@ class Serial_Data_Handler():
 
         distance = 50
 
-        # if input("Are you using distance or GPS coordinates? (Type distance or GPS): ").lower() == distance:
-        #     distance = input("What is the distance? (Can enter placeholders 1, 2, ..., 10, 11 for now): ")
-        # else:
-        #     # latitude = input("Input GPS latitude: ")
-        #     # longitude = input("Input GPS longitude: ")
-        #     distance = distance.distance(tag_coords, sensor_coords)
-        
+        if input("Are you using distance or GPS coordinates? (Type distance or GPS): ").lower() == distance:
+            distance = input("What is the distance? (Can enter placeholders 1, 2, ..., 10, 11 for now): ")
+        else:
+            latitude = input("Input GPS latitude: ")
+            longitude = input("Input GPS longitude: ")
+            distance = distance.distance(tag_coords, sensor_coords)
+
         return sensor_coords, tag_coords, distance
 
     def make_data_and_summaries_lists(self, output, distance, sensor_gps_coords, tag_gps_coords):
