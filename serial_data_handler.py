@@ -74,7 +74,7 @@ class Serial_Data_Handler():
         else:
             latitude = input("Input GPS latitude: ")
             longitude = input("Input GPS longitude: ")
-            distance = distance.distance(tag_coords, sensor_coords)
+            distance = distance.distance(tag_coords, sensor_coords).km
 
         return sensor_coords, tag_coords, distance
 
