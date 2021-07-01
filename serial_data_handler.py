@@ -44,7 +44,7 @@ class Serial_Data_Handler():
         serialInst.port = portVar
         serialInst.open()
 
-    def get_gps_location(self):
+    def get_distance_from_gps_locations(self):
         """ Returns:
           sensor gps coordinates (tuple): (lattitude, longitude)
           tag gps coordinates (tuple): (lattitude, longitude)
@@ -194,7 +194,7 @@ if __name__ == '__main__':
     # TIME_TO_RUN, sensor_gps_coords, tag_gps_coords, distance = handler.get_settings()
 
     serial_port = handler.get_serial_data(ports, serialInst)
-    distance = handler.get_gps_location()
+    distance = handler.get_distance_from_gps_locations()
 
     iteration = "data_" + str(input("Iteration of data collection (Enter a number to not overwrite files): "))
 
