@@ -118,7 +118,7 @@ class Serial_Data_Handler():
 
         return predicted_times_of_transmission
 
-    def get_real_time(self, delta_t):
+    def get_real_times(self, delta_t):
         prior_sum = delta_t[1]
         real_times_of_transmission = ["Real Time of Transmission"]
 
