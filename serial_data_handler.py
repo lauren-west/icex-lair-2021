@@ -16,20 +16,11 @@ class Serial_Data_Handler():
 
     TIME_TO_RUN = 120 # seconds
 
-    # consider making these global
-    # SENSOR_GPS_COORDS = (lat, longit)
-    # TAG_GPS_COORDS = (lat, longit)
-
+    TAG_COORDINATES = (0,0)
+    SENSOR_COORDINATES = (0,0) 
 
     def __init__(self) -> None:
         pass
-
-    def get_settings(self):
-        TIME_TO_RUN = input("Time to run in seconds")
-        SENSOR_GPS_COORDS = (input("Enter sensor latitude"), input("Enter sensor longitude"))
-        TAG_GPS_COORDS = (input("Enter tag latitude"), input("Enter tag longitude"))
-
-        return TIME_TO_RUN, SENSOR_GPS_COORDS, TAG_GPS_COORDS
 
     def get_serial_data(self, ports, serialInst):
 
@@ -59,26 +50,9 @@ class Serial_Data_Handler():
           tag gps coordinates (tuple): (lattitude, longitude)
           distance (double): dist in meters
         """
-        sensor_latitude = 33.75230
-        sensor_longitude = -118.12829
-        sensor_coords = (sensor_latitude, sensor_longitude)
+        return geodesic(self.TAG_COORDINATES, self.SENSOR_COORDINATES).km
 
-        tag_latitude = 33.75227  
-        tag_longitude = -118.12857
-        tag_coords = (tag_latitude, tag_longitude)
-
-        distance = 50
-
-        if input("Are you using distance or GPS coordinates? (Type distance or GPS): ").lower() == distance:
-            distance = input("What is the distance? (Can enter placeholders 1, 2, ..., 10, 11 for now): ")
-        else:
-            latitude = input("Input GPS latitude: ")
-            longitude = input("Input GPS longitude: ")
-            distance = geodesic(tag_coords, sensor_coords).km
-
-        return sensor_coords, tag_coords, distance
-
-    def make_data_and_summaries_lists(self, output, distance, sensor_gps_coords, tag_gps_coords):
+    def make_data_and_summaries_lists(self, output, distance):
         data_list = []
         data_list.append(["Receiver Serial Number", "Three-Digit Line-Counter", "Date/Time", "Transmitter Code-Space", "Transmitter ID Number", "Signal Level (dB)", "Noise-Level (dB)", "Channel", "Distance (m)", "Sensor GPS Coords", "Tag GPS Coords"])  #Added distance and GPS for now
 
@@ -89,8 +63,8 @@ class Serial_Data_Handler():
             line = line.split(',')
             line = [s[s.find("=")+1:].strip() for s in line]
             line.append(distance)   #Adds distance for now
-            line.append(sensor_gps_coords)   #Adds coords for now
-            line.append(tag_gps_coords)
+            line.append(self.TAG_COORDINATES)   #Adds coords for now
+            line.append(self.SENSOR_COORDINATES)
             
             for s in line:
                 try:
@@ -220,7 +194,7 @@ if __name__ == '__main__':
     # TIME_TO_RUN, sensor_gps_coords, tag_gps_coords, distance = handler.get_settings()
 
     serial_port = handler.get_serial_data(ports, serialInst)
-    sensor_gps_coords, tag_gps_coords, distance = handler.get_gps_location()
+    distance = handler.get_gps_location()
 
     iteration = "data_" + str(input("Iteration of data collection (Enter a number to not overwrite files): "))
 
@@ -237,7 +211,7 @@ if __name__ == '__main__':
         
     # data_list is 2D array of strings of data
     # rows are lines, and cols are the specific measurements
-    data_list, summaries_list = handler.make_data_and_summaries_lists(output, distance, sensor_gps_coords, tag_gps_coords)
+    data_list, summaries_list = handler.make_data_and_summaries_lists(output, distance)
 
     delta_t = handler.make_delta_t(data_list)
     handler.create_histogram(iteration, delta_t)
