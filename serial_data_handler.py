@@ -14,9 +14,9 @@ from geopy.distance import geodesic
 
 class Serial_Data_Handler():
 
-    TIME_TO_RUN = 120 # seconds
+    TIME_TO_RUN = 30 # seconds
 
-    TAG_COORDINATES = (0,0)
+    TAG_COORDINATES = (33.57676,-43.52746)
     SENSOR_COORDINATES = (0,0) 
 
     def __init__(self) -> None:
@@ -50,7 +50,7 @@ class Serial_Data_Handler():
           tag gps coordinates (tuple): (lattitude, longitude)
           distance (double): dist in meters
         """
-        return geodesic(self.TAG_COORDINATES, self.SENSOR_COORDINATES).km
+        return geodesic(self.TAG_COORDINATES, self.SENSOR_COORDINATES).m
 
     def make_data_and_summaries_lists(self, output, distance):
         data_list = []
