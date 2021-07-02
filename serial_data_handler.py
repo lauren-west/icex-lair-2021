@@ -111,8 +111,12 @@ class Serial_Data_Handler():
     def get_predicted_times(self, delta_t):
         predicted_times_of_transmission = ["Predicted Times of Transmission"]
         t0 = 0
+        # dilemma: What should delta t avg be?
         # delta_t_avg  = sum(delta_t[1:]) / (len(delta_t) - 1)
-        delta_t_avg = 8.179
+        # delta_t_avg = 8.179
+        delta_t_avg  = sum(delta_t[1:10]) / (len(delta_t[1:10]))
+        print("avg: ", delta_t_avg)
+        
 
         for i in range(1, len(delta_t)):
             predicted_times_of_transmission.append(t0 + i * delta_t_avg)
