@@ -1,16 +1,9 @@
 import csv
 import serial.tools.list_ports
-import time
-import datetime
-import statistics
-
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-sns.set(style="darkgrid")
 
 distance = 50
+# TAG_COORDINATES = (33.57676,-43.52746)
+# SENSOR_COORDINATES = (0,0)
 ports = serial.tools.list_ports.comports()
 serialInst = serial.Serial()
 
@@ -46,9 +39,9 @@ summaries_list.append(["Receiver Serial Number", "Three-Digit Line-Counter", "Da
 for line in output:
     line = line.split(',')
     line = [s[s.find("=")+1:].strip() for s in line]
-    line.append(distance)   #Adds distance for now
-    line.append(self.TAG_COORDINATES)   #Adds coords for now
-    line.append(self.SENSOR_COORDINATES)
+    line.append(distance)
+    # line.append(TAG_COORDINATES)   #Adds coords for now
+    # line.append(SENSOR_COORDINATES)
     
     for s in line:
         try:
