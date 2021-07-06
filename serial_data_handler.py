@@ -3,6 +3,8 @@ import serial.tools.list_ports
 import time
 import datetime
 import statistics
+import os
+import os.path
 
 import numpy as np
 import pandas as pd
@@ -210,6 +212,25 @@ class Serial_Data_Handler():
         # filename = iteration + '_calculated_error_values.csv'     # TODO: Change name to reflect other half
         # df = pd.read_csv(filename, header=0)   # read the file w/header row #0
         # print(f"{filename} : file read into a pandas dataframe.")
+    
+    def  create_final_plots(self, foldername):
+        AllFiles = list(os.walk("./" + foldername))  #Walks everything inside current directory
+
+        df_list = []
+
+        for item in AllFiles:
+            #print("item is", item, "\n")    
+            foldername, LoDirs, LoFiles = item 
+
+            for filename in LoFiles:
+                if filename[-3:] == "csv" and (len(filename) == 10 or len(filename) == 11):    
+                    path = os.getcwd() + foldername + filename 
+                    df = pd.read_csv(path, engine='python', header=0, index_col=False)
+                    df_list.append(df)
+        
+        final_df = pd.concat(df_list)
+
+
 
 
 if __name__ == '__main__':
@@ -252,8 +273,13 @@ if __name__ == '__main__':
     predicted_times_of_transmission  = handler.get_predicted_times(delta_t)
     real_times_of_transmission  = handler.get_real_times(delta_t)
     error_tot = handler.get_error_tot(predicted_times_of_transmission, real_times_of_transmission)
-    times_list = zip([delta_t, real_times_of_transmission, predicted_times_of_transmission, error_tot])
+    times_list = list(zip([delta_t, real_times_of_transmission, predicted_times_of_transmission, error_tot]))
 
     # create csvs and plot
     handler.create_csvs(iteration, data_list, summaries_list, times_list)
     handler.create_plots(iteration)
+
+    finished = input("Are you finished collecting data for the day? (Y or N): ")
+    if finished.upper == "Y" or finished.upper == "YES":
+        handler.create_final_plots()
+
