@@ -2,6 +2,7 @@ import csv
 import serial.tools.list_ports
 import time
 import datetime
+import statistics
 
 import numpy as np
 import pandas as pd
@@ -23,6 +24,10 @@ class Serial_Data_Handler():
         pass
 
     def get_serial_data(self, ports, serialInst):
+        """ 
+        get_serial_data opens com port on PC in vs code
+        returns: None
+        """
 
         portList = []
 
@@ -46,13 +51,17 @@ class Serial_Data_Handler():
 
     def get_distance_from_gps_locations(self):
         """ Returns:
-          sensor gps coordinates (tuple): (lattitude, longitude)
-          tag gps coordinates (tuple): (lattitude, longitude)
-          distance (double): dist in meters
+          distance (double): dist in meters between tag and sensor gps coords
         """
         return geodesic(self.TAG_COORDINATES, self.SENSOR_COORDINATES).m
 
     def make_data_and_summaries_lists(self, output, distance):
+        """ Returns:
+          data_list (list of lists): rows are serial data lines, columns are 
+            features (example: Receiver Serial Number)
+          summaries_list (list of lists): contains rows that are data "summaries," 
+            features include "Ping Count (PC)", "Line Voltage (LV) [V]"
+        """
         data_list = []
         data_list.append(["Receiver Serial Number", "Three-Digit Line-Counter", "Date/Time", "Transmitter Code-Space", "Transmitter ID Number", "Signal Level (dB)", "Noise-Level (dB)", "Channel", "Distance (m)", "Sensor GPS Coords", "Tag GPS Coords"])  #Added distance and GPS for now
 
@@ -80,11 +89,14 @@ class Serial_Data_Handler():
         return data_list, summaries_list
 
     def make_delta_t(self, data_list):
+        """ Returns:
+          delta_t (list): delta_t contains doubles, each one indicating the time difference
+          from a present ping to the adjacent past ping in data_list. This is called
+          the Time of Transmission
+        """
         delta_t = ["Times of Transmission"] # [8, 8, 8, 8,8 ,8, 8, ... , 8.001, 8.002]
 
         for i in range(2, len(data_list)):
-            print(data_list[i-1][2])
-            print(data_list[i][2])
             past_datetime = datetime.datetime.strptime(data_list[i-1][2], '%Y-%m-%d %H:%M:%S.%f')
             current_datatime = datetime.datetime.strptime(data_list[i][2], '%Y-%m-%d %H:%M:%S.%f')
             if (current_datatime - past_datetime).total_seconds() > 10:
@@ -109,26 +121,42 @@ class Serial_Data_Handler():
         plt.show()
 
     def get_predicted_times(self, delta_t):
+        """ Returns:
+          predicted_times_of_transmission (list): contains doubles, each predicted 
+          time calculated by using an average tot (average delta_t) before drift.
+          t_predicted = t0 + (k * delta_t_avg)
+
+          Note: there may be a better way to get delta_t_avg than the method below
+        """
         predicted_times_of_transmission = ["Predicted Times of Transmission"]
         t0 = 0
-        delta_t_avg  = sum(delta_t[1:]) / (len(delta_t) - 1)
-
+        # dilemma: What should delta t avg be?
+        # delta_t_avg  = sum(delta_t[1:]) / (len(delta_t) - 1)
+        # delta_t_avg = 8.179
+        delta_t_avg  = sum(delta_t[1:10]) / (len(delta_t[1:10]))
+        print("avg: ", delta_t_avg)
+        
         for i in range(1, len(delta_t)):
             predicted_times_of_transmission.append(t0 + i * delta_t_avg)
 
         return predicted_times_of_transmission
 
     def get_real_times(self, delta_t):
-        prior_sum = delta_t[1]
+        """ Returns:
+            real_times_of_transmission (list): real times (seconds) as doubles
+            continuous record of ping times in seconds, starting with the first ping
+            example: (8, 16, 24, 32)
+        """
         real_times_of_transmission = ["Real Time of Transmission"]
-
+        prior_sum = 0
         for i in range(1, len(delta_t)):
-            real_times_of_transmission.append(prior_sum)
             prior_sum += delta_t[i]
+            real_times_of_transmission.append(prior_sum)
 
         return real_times_of_transmission
 
     def get_error_tot(self, predicted_times_of_transmission, real_times_of_transmission):
+
         error_tot = ["Error"]
         
         for i in range(1, len(predicted_times_of_transmission)):
@@ -214,6 +242,10 @@ if __name__ == '__main__':
     data_list, summaries_list = handler.make_data_and_summaries_lists(output, distance)
 
     delta_t = handler.make_delta_t(data_list)
+    # get std dev, statistics.stdev(sample_set, x_bar)
+    std_dev_delta_t = statistics.stdev(delta_t, statistics.mean(delta_t))
+    print("Standard Deviation of sample is % s " % (std_dev_delta_t))
+
     handler.create_histogram(iteration, delta_t)
 
     # lists to get projected &  real tot & error between them
