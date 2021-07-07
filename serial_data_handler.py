@@ -230,6 +230,18 @@ class Serial_Data_Handler():
         
         final_df = pd.concat(df_list)
 
+        # Plot using Seaborn
+        sns.lmplot(x='Distance (m)', y='Signal Level (dB)', fit_reg=True, data=final_df, hue='Transmitter ID Number')
+        plt.ylim(None, None)
+        plt.xlim(45, 160)
+        plt.savefig("all_data_signal_plot.png")
+
+
+        sns.lmplot(x='Distance (m)', y='Noise-Level (dB)', fit_reg = True, data=df_clean, hue='Transmitter ID Number')
+        plt.ylim(None, None)
+        plt.xlim(50, 155)
+        plt.savefig('all_data_noise_plot.png')
+
 
 
 
