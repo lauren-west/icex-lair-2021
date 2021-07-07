@@ -6,15 +6,15 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v5.0": {
-      "helloWorldInCsharp/1.0.0": {
+      "CsharpSerialToAUV/1.0.0": {
         "runtime": {
-          "helloWorldInCsharp.dll": {}
+          "CsharpSerialToAUV.dll": {}
         }
       }
     }
   },
   "libraries": {
-    "helloWorldInCsharp/1.0.0": {
+    "CsharpSerialToAUV/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

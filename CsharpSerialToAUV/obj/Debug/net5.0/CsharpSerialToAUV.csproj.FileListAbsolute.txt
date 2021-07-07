@@ -1,0 +1,15 @@
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/bin/Debug/net5.0/CsharpSerialToAUV.deps.json
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/bin/Debug/net5.0/CsharpSerialToAUV.runtimeconfig.json
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/bin/Debug/net5.0/CsharpSerialToAUV.runtimeconfig.dev.json
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/bin/Debug/net5.0/CsharpSerialToAUV.dll
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/bin/Debug/net5.0/ref/CsharpSerialToAUV.dll
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/bin/Debug/net5.0/CsharpSerialToAUV.pdb
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/obj/Debug/net5.0/CsharpSerialToAUV.csproj.AssemblyReference.cache
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/obj/Debug/net5.0/CsharpSerialToAUV.GeneratedMSBuildEditorConfig.editorconfig
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/obj/Debug/net5.0/CsharpSerialToAUV.AssemblyInfoInputs.cache
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/obj/Debug/net5.0/CsharpSerialToAUV.AssemblyInfo.cs
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/obj/Debug/net5.0/CsharpSerialToAUV.csproj.CoreCompileInputs.cache
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/obj/Debug/net5.0/CsharpSerialToAUV.dll
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/obj/Debug/net5.0/ref/CsharpSerialToAUV.dll
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/obj/Debug/net5.0/CsharpSerialToAUV.pdb
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/obj/Debug/net5.0/CsharpSerialToAUV.genruntimeconfig.cache
