@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/helloWorldInCsharp/helloWorldInCsharp.csproj": {}
+    "/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/CsharpSerialToAUV.csproj": {}
   },
   "projects": {
-    "/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/helloWorldInCsharp/helloWorldInCsharp.csproj": {
+    "/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/CsharpSerialToAUV.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/helloWorldInCsharp/helloWorldInCsharp.csproj",
-        "projectName": "helloWorldInCsharp",
-        "projectPath": "/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/helloWorldInCsharp/helloWorldInCsharp.csproj",
+        "projectUniqueName": "/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/CsharpSerialToAUV.csproj",
+        "projectName": "CsharpSerialToAUV",
+        "projectPath": "/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/CsharpSerialToAUV.csproj",
         "packagesPath": "/Users/laurenwest/.nuget/packages/",
-        "outputPath": "/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/helloWorldInCsharp/obj/",
+        "outputPath": "/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/laurenwest/.nuget/NuGet/NuGet.Config"
