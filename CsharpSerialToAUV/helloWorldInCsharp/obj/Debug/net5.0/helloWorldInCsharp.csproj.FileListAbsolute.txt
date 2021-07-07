@@ -13,3 +13,18 @@
 /Users/laurenwest/code/helloWorldInCsharp/obj/Debug/net5.0/ref/helloWorldInCsharp.dll
 /Users/laurenwest/code/helloWorldInCsharp/obj/Debug/net5.0/helloWorldInCsharp.pdb
 /Users/laurenwest/code/helloWorldInCsharp/obj/Debug/net5.0/helloWorldInCsharp.genruntimeconfig.cache
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/helloWorldInCsharp/bin/Debug/net5.0/helloWorldInCsharp.deps.json
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/helloWorldInCsharp/bin/Debug/net5.0/helloWorldInCsharp.runtimeconfig.json
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/helloWorldInCsharp/bin/Debug/net5.0/helloWorldInCsharp.runtimeconfig.dev.json
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/helloWorldInCsharp/bin/Debug/net5.0/helloWorldInCsharp.dll
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/helloWorldInCsharp/bin/Debug/net5.0/ref/helloWorldInCsharp.dll
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/helloWorldInCsharp/bin/Debug/net5.0/helloWorldInCsharp.pdb
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/helloWorldInCsharp/obj/Debug/net5.0/helloWorldInCsharp.csproj.AssemblyReference.cache
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/helloWorldInCsharp/obj/Debug/net5.0/helloWorldInCsharp.GeneratedMSBuildEditorConfig.editorconfig
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/helloWorldInCsharp/obj/Debug/net5.0/helloWorldInCsharp.AssemblyInfoInputs.cache
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/helloWorldInCsharp/obj/Debug/net5.0/helloWorldInCsharp.AssemblyInfo.cs
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/helloWorldInCsharp/obj/Debug/net5.0/helloWorldInCsharp.csproj.CoreCompileInputs.cache
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/helloWorldInCsharp/obj/Debug/net5.0/helloWorldInCsharp.dll
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/helloWorldInCsharp/obj/Debug/net5.0/ref/helloWorldInCsharp.dll
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/helloWorldInCsharp/obj/Debug/net5.0/helloWorldInCsharp.pdb
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/helloWorldInCsharp/obj/Debug/net5.0/helloWorldInCsharp.genruntimeconfig.cache

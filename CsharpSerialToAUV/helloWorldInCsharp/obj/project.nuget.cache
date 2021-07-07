@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "6dgV6mdJ36DL+AWTBMiZuei22ua/lwte8TH6tbEBpK1MjfIQFPvVFE4OozrX6JvUbi6ivf/okEt/TulEE8Wv9w==",
+  "dgSpecHash": "qm9KqkO0qzwe0rrg73MSaLLCpZ78thfcDDa80YTWn0VurO2uChcoJn7yZ+EwoKNEfaXMHQXJqn3tyZUW5QNk0g==",
   "success": true,
-  "projectFilePath": "/Users/laurenwest/code/helloWorldInCsharp/helloWorldInCsharp.csproj",
+  "projectFilePath": "/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpSerialToAUV/helloWorldInCsharp/helloWorldInCsharp.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }
