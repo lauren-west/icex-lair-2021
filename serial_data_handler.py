@@ -5,6 +5,7 @@ import datetime
 import statistics
 import os
 import os.path
+import shutil
 
 import numpy as np
 import pandas as pd
@@ -213,7 +214,7 @@ class Serial_Data_Handler():
         # df = pd.read_csv(filename, header=0)   # read the file w/header row #0
         # print(f"{filename} : file read into a pandas dataframe.")
     
-    def  create_final_plots(self, foldername):
+    def create_final_plots(self, foldername):
         AllFiles = list(os.walk("./" + foldername))  #Walks everything inside current directory
 
         df_list = []
@@ -252,7 +253,7 @@ class Serial_Data_Handler():
 
 
         NUM_OF_BINS = 10 # Anywhere from 5-20 with 20 being with at least 1000 data points
-        
+
         plt.hist(delta_t_values, NUM_OF_BINS)
         plt.title("Total Data: Times of Transmission")
         plt.xlabel("Time (s)")
@@ -267,7 +268,45 @@ class Serial_Data_Handler():
         plt.savefig("error_total_histogram.png")
         plt.show()
 
+    def organize_files(self):
+        foldername = input("What do you want to name the folder?: ")
+        os.mkdir(os.path.join(".", foldername))
+        path = os.path.join(".", foldername)
 
+        os.mkdir(os.path.join(path, "calculated_error_data"))
+        os.mkdir(os.path.join(path, "delta_t_histograms"))
+        os.mkdir(os.path.join(path, "noise_plots"))
+        os.mkdir(os.path.join(path, "raw_data"))
+        os.mkdir(os.path.join(path, "signal_plots"))
+        os.mkdir(os.path.join(path, "summaries"))
+        os.mkdir(os.path.join(path, "time_of_flight_histograms"))
+
+        AllFiles = list(os.walk("."))  #Walks everything inside current directory
+
+        foldername, _, LoFiles = AllFiles[0]
+
+
+        for filename in LoFiles:
+            if filename[-3:] == "csv" and "calculated_error" in filename:
+                shutil.move(filename, os.path.join(path, "calculated_error_data"))
+                
+            elif filename[-3:] == "png" and "histogram" in filename:
+                if "data" in filename:
+                    shutil.move(filename, os.path.join(path, "delta_t_histograms"))
+                else:
+                    shutil.move(filename, os.path.join(path, "time_of_flight_histograms"))
+                    
+            elif filename[-3:] == "csv" and "summaries" in filename:
+                shutil.move(filename, os.path.join(path, "summaries"))
+                
+            elif filename[-3:] == "png" and "noise" in filename:
+                shutil.move(filename, os.path.join(path, "noise_plots"))
+                
+            elif filename[-3:] == "png" and "signal" in filename:
+                shutil.move(filename, os.path.join(path, "signal_plots"))
+            
+            elif filename[-3:] == "csv" and (len(filename) == 10 or len(filename) == 11):
+                shutil.move(filename, os.path.join(path, "raw_data"))
 
 
 if __name__ == '__main__':
@@ -319,4 +358,5 @@ if __name__ == '__main__':
     finished = input("Are you finished collecting data for the day? (Y or N): ")
     if finished.upper == "Y" or finished.upper == "YES":
         handler.create_final_plots()
+        handler.organize_files()
 
