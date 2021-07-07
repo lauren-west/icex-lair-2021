@@ -217,6 +217,8 @@ class Serial_Data_Handler():
         AllFiles = list(os.walk("./" + foldername))  #Walks everything inside current directory
 
         df_list = []
+        delta_t_values = np.array([])
+        error_values = np.array([])
 
         for item in AllFiles:
             #print("item is", item, "\n")    
@@ -227,6 +229,12 @@ class Serial_Data_Handler():
                     path = os.getcwd() + foldername + filename 
                     df = pd.read_csv(path, engine='python', header=0, index_col=False)
                     df_list.append(df)
+
+                elif filename[-3:] == "csv" and "calculated_error" in filename:  
+                    path = os.getcwd() + foldername[1:] + "/" + filename 
+                    df = pd.read_csv(path, engine='python', header=None, index_col=False)
+                    delta_t_values = np.concatenate((delta_t_values, df.values[0][1:]))
+                    error_values = np.concatenate((error_values, df.values[3][1:]))
         
         final_df = pd.concat(df_list)
 
@@ -241,6 +249,23 @@ class Serial_Data_Handler():
         plt.ylim(None, None)
         plt.xlim(50, 155)
         plt.savefig('all_data_noise_plot.png')
+
+
+        NUM_OF_BINS = 10 # Anywhere from 5-20 with 20 being with at least 1000 data points
+        
+        plt.hist(delta_t_values, NUM_OF_BINS)
+        plt.title("Total Data: Times of Transmission")
+        plt.xlabel("Time (s)")
+        plt.ylabel("Frequency")
+        plt.savefig("time_of_flight_total_histogram.png")
+        plt.show()
+
+        plt.hist(error_values, NUM_OF_BINS)
+        plt.title("Total Data: Error")
+        plt.xlabel("Time (s)")
+        plt.ylabel("Frequency")
+        plt.savefig("error_total_histogram.png")
+        plt.show()
 
 
 
