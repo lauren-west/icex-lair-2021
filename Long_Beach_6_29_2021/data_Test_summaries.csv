@@ -1,2 +1,0 @@
-Receiver Serial Number,Three-Digit Line-Counter,Date/Time,Scheduled Status (STS),Detection Count (DC),Ping Count (PC),Line Voltage (LV) [V],Internal Receiver Temperature,Detection Memory Used,Raw Memory Used,Tilt Information [G],Output Noise,Output PPM Noise
-457012,055,2021-06-29 20:25:55.612,STS,1687,22535,11.4,-103.0,0.1,0.2,0.00:0.34:0.91,88.0,54.5,#F3,0,"(33.7523, -118.12829)","(33.75227, -118.12857)"

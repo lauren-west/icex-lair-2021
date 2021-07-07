@@ -134,8 +134,8 @@ class Serial_Data_Handler():
         t0 = 0
         # dilemma: What should delta t avg be?
         # delta_t_avg  = sum(delta_t[1:]) / (len(delta_t) - 1)
-        # delta_t_avg = 8.179
-        delta_t_avg  = sum(delta_t[1:10]) / (len(delta_t[1:10]))
+        delta_t_avg = 8.179
+        # delta_t_avg  = sum(delta_t[1:10]) / (len(delta_t[1:10]))
         print("avg: ", delta_t_avg)
         
         for i in range(1, len(delta_t)):
@@ -185,7 +185,7 @@ class Serial_Data_Handler():
         # 
         # for read_csv, use header=0 when row 0 is a header row 
 
-        filename = iteration + '.csv'     # TODO: Change name to reflect other half
+        filename = iteration + '.csv'
         df = pd.read_csv(filename, header=0)   # read the file w/header row #0
         print(f"{filename} : file read into a pandas dataframe.")
 
@@ -198,7 +198,7 @@ class Serial_Data_Handler():
         # Tweak these limits
         plt.ylim(None, None)
         plt.xlim(None, None)
-        plt.savefig(iteration + "_signal_plot.png")    # TODO: Change name
+        plt.savefig(iteration + "_signal_plot.png")
 
         # Plot using Seaborn
         sns.lmplot(x='Distance (m)', y='Noise-Level (dB)', fit_reg = True, data=df_clean, hue='Transmitter ID Number')
@@ -206,7 +206,7 @@ class Serial_Data_Handler():
         # Tweak these limits
         plt.ylim(None, None)
         plt.xlim(None, None)
-        plt.savefig(iteration + '_noise_plot.png')  # TODO: Change name
+        plt.savefig(iteration + '_noise_plot.png')
 
         # ADD TO PLOT OTHER STUFF
         # filename = iteration + '_calculated_error_values.csv'     # TODO: Change name to reflect other half
@@ -237,7 +237,7 @@ class Serial_Data_Handler():
         plt.savefig("all_data_signal_plot.png")
 
 
-        sns.lmplot(x='Distance (m)', y='Noise-Level (dB)', fit_reg = True, data=df_clean, hue='Transmitter ID Number')
+        sns.lmplot(x='Distance (m)', y='Noise-Level (dB)', fit_reg = True, data=final_df, hue='Transmitter ID Number')
         plt.ylim(None, None)
         plt.xlim(50, 155)
         plt.savefig('all_data_noise_plot.png')
