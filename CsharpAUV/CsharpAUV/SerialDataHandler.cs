@@ -12,7 +12,7 @@ namespace CsharpAUV
         //Tuple<double, double> sensorGpsCoord =
         //    new Tuple<double, double>(0, 0);
 
-        
+
 
         //// constructor
         //SerialDataHandler()
@@ -28,7 +28,14 @@ namespace CsharpAUV
         //    */
         //}
 
-        static void Main(string[] args)
+        public static string[] GetSerialPortNames()
+        {
+            string[] portNames = SerialPort.GetPortNames();
+
+            return portNames;
+        }
+
+        public void OpenConnection()
         {
             Console.WriteLine("Hi Joan Caitlyn Hannah Roman!");
             //SerialDataHandler handler = new SerialDataHandler();
@@ -42,6 +49,12 @@ namespace CsharpAUV
             {
                 Console.WriteLine(ex);
             }
+        }
+
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Hi Joan Caitlyn Hannah Roman!");
+
         }
     }
 }
