@@ -21,7 +21,7 @@ class Serial_Data_Handler():
     TIME_TO_RUN = 30 # seconds
 
     TAG_COORDINATES = (33.57676,-43.52746)
-    SENSOR_COORDINATES = (0,0) 
+    SENSOR_COORDINATES = (0,0)
 
     def __init__(self) -> None:
         pass

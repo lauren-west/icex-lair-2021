@@ -1,15 +1,15 @@
 ﻿<Properties StartupConfiguration="{21B54CBE-894B-445F-88F1-9D808DB97534}|Default">
-  <MonoDevelop.Ide.ItemProperties.CsharpAUV FirstBuild="True" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="CsharpAUV/Program.cs">
+  <MonoDevelop.Ide.ItemProperties.CsharpAUV PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="CsharpAUV/SerialDataHandler.cs">
     <Files>
-      <File FileName="CsharpAUV/Program.cs" Line="13" Column="1" />
+      <File FileName="CsharpAUV/Program.cs" Line="35" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="CsharpAUV" expanded="True">
             <Node name="CsharpAUV" expanded="True">
-              <Node name="Program.cs" selected="True" />
+              <Node name="Dependencies" selected="True" />
             </Node>
           </Node>
         </State>
