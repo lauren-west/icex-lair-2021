@@ -1,0 +1,12 @@
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpAUV/CsharpAUV/bin/Debug/netcoreapp3.1/CsharpAUV.deps.json
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpAUV/CsharpAUV/bin/Debug/netcoreapp3.1/CsharpAUV.runtimeconfig.json
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpAUV/CsharpAUV/bin/Debug/netcoreapp3.1/CsharpAUV.runtimeconfig.dev.json
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpAUV/CsharpAUV/bin/Debug/netcoreapp3.1/CsharpAUV.dll
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpAUV/CsharpAUV/bin/Debug/netcoreapp3.1/CsharpAUV.pdb
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpAUV/CsharpAUV/obj/Debug/netcoreapp3.1/CsharpAUV.csproj.AssemblyReference.cache
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpAUV/CsharpAUV/obj/Debug/netcoreapp3.1/CsharpAUV.AssemblyInfoInputs.cache
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpAUV/CsharpAUV/obj/Debug/netcoreapp3.1/CsharpAUV.AssemblyInfo.cs
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpAUV/CsharpAUV/obj/Debug/netcoreapp3.1/CsharpAUV.csproj.CoreCompileInputs.cache
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpAUV/CsharpAUV/obj/Debug/netcoreapp3.1/CsharpAUV.dll
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpAUV/CsharpAUV/obj/Debug/netcoreapp3.1/CsharpAUV.pdb
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpAUV/CsharpAUV/obj/Debug/netcoreapp3.1/CsharpAUV.genruntimeconfig.cache
