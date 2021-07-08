@@ -1,0 +1,4 @@
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/serialCommunicationAUV/serialCommunicationAUV/obj/Debug/netstandard2.1/serialCommunicationAUV.csproj.AssemblyReference.cache
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/serialCommunicationAUV/serialCommunicationAUV/obj/Debug/netstandard2.1/serialCommunicationAUV.AssemblyInfoInputs.cache
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/serialCommunicationAUV/serialCommunicationAUV/obj/Debug/netstandard2.1/serialCommunicationAUV.AssemblyInfo.cs
+/Users/laurenwest/code/ICEX Research/icex-lair-2021/serialCommunicationAUV/serialCommunicationAUV/obj/Debug/netstandard2.1/serialCommunicationAUV.csproj.CoreCompileInputs.cache

@@ -1,16 +1,13 @@
-﻿<Properties StartupConfiguration="{21B54CBE-894B-445F-88F1-9D808DB97534}|Default">
-  <MonoDevelop.Ide.ItemProperties.CsharpAUV PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="CsharpAUV/SerialDataHandler.cs">
+﻿<Properties>
+  <MonoDevelop.Ide.Workbench ActiveDocument="serialCommunicationAUV/serialHandler.cs">
     <Files>
-      <File FileName="CsharpAUV/SerialDataHandler.cs" Line="34" Column="2" />
+      <File FileName="serialCommunicationAUV/Class1.cs" Line="3" Column="22" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
-          <Node name="CsharpAUV" expanded="True">
-            <Node name="CsharpAUV" expanded="True">
-              <Node name="SerialDataHandler.cs" selected="True" />
-            </Node>
+          <Node name="serialCommunicationAUV" expanded="True">
+            <Node name="serialCommunicationAUV" expanded="True" />
           </Node>
         </State>
       </Pad>
