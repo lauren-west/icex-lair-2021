@@ -19,6 +19,8 @@ from geopy.distance import geodesic
 class Serial_Data_Handler():
 
     TIME_TO_RUN = 120 # seconds
+    NUM_OF_BINS = 10 # Anywhere from 5-20 with 20 being with at least 1000 data points
+    SPEED_OF_SOUND = 1500  # m/s
 
     TAG_COORDINATES = (34.109135,-117.71281)
     SENSOR_COORDINATES = (34.109172,-117.71241)
@@ -66,30 +68,47 @@ class Serial_Data_Handler():
             features include "Ping Count (PC)", "Line Voltage (LV) [V]"
         """
         data_list = []
-        data_list.append(["Receiver Serial Number", "Three-Digit Line-Counter", "Date/Time", "Transmitter Code-Space", "Transmitter ID Number", "Signal Level (dB)", "Noise-Level (dB)", "Distance (m)", "Channel", "Tag GPS Coords", "Sensor GPS Coords", "Time (s)"])  #Added distance and GPS for now
+        data_list.append(["Receiver Serial Number", "Three-Digit Line-Counter", "Date/Time", "Transmitter Code-Space", "Transmitter ID Number", "Signal Level (dB)", "Noise-Level (dB)", "Distance (m)", "Channel", "Tag GPS Coords", "Sensor GPS Coords", "Time (s)", "Time of Flight (s)", "Predicted Distance (m)"])  #Added distance and GPS for now
 
         summaries_list = []
-        summaries_list.append(["Receiver Serial Number", "Three-Digit Line-Counter", "Date/Time", "Scheduled Status (STS)", "Detection Count (DC)", "Ping Count (PC)", "Line Voltage (LV) [V]", "Internal Receiver Temperature", "Detection Memory Used", "Raw Memory Used", "Tilt Information [G]", "Output Noise", "Output PPM Noise", "Distance (m)", "Tag GPS Coords", "Sensor GPS Coords", "Time (s)"])
+        summaries_list.append(["Receiver Serial Number", "Three-Digit Line-Counter", "Date/Time", "Scheduled Status (STS)", "Detection Count (DC)", "Ping Count (PC)", "Line Voltage (LV) [V]", "Internal Receiver Temperature", "Detection Memory Used", "Raw Memory Used", "Tilt Information [G]", "Output Noise", "Output PPM Noise", "Distance (m)", "Tag GPS Coords", "Sensor GPS Coords", "Time (s)", "Time of Flight (s)", "Predicted Distance (m)"])
         
-        initial_time = None
+        initial_time = None        # Used to calculate time elapsed
         counter = 0
+
+        first_timestamp = None
+        
+        try:
+            with open('data_1.csv', "r") as f:
+                reader = csv.reader(f)
+                _ = next(reader)
+                row1 = next(reader)
+                first_timestamp = datetime.datetime.strptime(row1[2], '%Y-%m-%d %H:%M:%S.%f')
+        except:
+            line = output[0].split(',')
+            line = [s[s.find("=")+1:].strip() for s in line]
+            first_timestamp = datetime.datetime.strptime(line[2], '%Y-%m-%d %H:%M:%S.%f')
 
         for line in output:
             line = line.split(',')
             line = [s[s.find("=")+1:].strip() for s in line]
-
+            
             if counter == 0:
                 initial_time = datetime.datetime.strptime(line[2], '%Y-%m-%d %H:%M:%S.%f')
                 counter += 1
 
             line.append(distance)   #Adds distance for now
-            line.append(self.TAG_COORDINATES)   #Adds co\ords for now
-            line.append(self.SENSOR_COORDINATES)
+            line.append(self.TAG_COORDINATES)   #Adds tag coords for now
+            line.append(self.SENSOR_COORDINATES)   #Adds sensor coords for now
 
             current_datatime = datetime.datetime.strptime(line[2], '%Y-%m-%d %H:%M:%S.%f')
 
             line.append((current_datatime - initial_time).total_seconds())
-            
+
+            time_of_flight = (current_datatime - first_timestamp).total_seconds() % 8.179
+            line.append(time_of_flight)
+            line.append(time_of_flight * self.SPEED_OF_SOUND)
+
             for s in line:
                 try:
                     s = float(s)
@@ -127,7 +146,7 @@ class Serial_Data_Handler():
         """
         delta_t_np = np.array(delta_t[1:])
 
-        NUM_OF_BINS = 20 # Anywhere from 5-20 with 20 being with at least 1000 data points
+        NUM_OF_BINS = 10 # Anywhere from 5-20 with 20 being with at least 1000 data points
         plt.hist(delta_t_np, NUM_OF_BINS)
         plt.title("Time of Transmission Histogram")
         plt.xlabel("time (s)")
@@ -203,10 +222,10 @@ class Serial_Data_Handler():
         print(f"{filename} : file read into a pandas dataframe.")
 
         #df_clean = df.dropna()
-        df_clean = df
+        #df_clean = df
 
         # Plot using Seaborn
-        sns.lmplot(x='Distance (m)', y='Signal Level (dB)', fit_reg=True, data=df_clean, hue='Transmitter ID Number')
+        sns.lmplot(x='Time (s)', y='Signal Level (dB)', fit_reg=True, data=df, hue='Transmitter ID Number')
         
         # Tweak these limits
         plt.ylim(None, None)
@@ -214,18 +233,29 @@ class Serial_Data_Handler():
         plt.savefig(iteration + "_signal_plot.png")
 
         # Plot using Seaborn
-        sns.lmplot(x='Distance (m)', y='Noise-Level (dB)', fit_reg = True, data=df_clean, hue='Transmitter ID Number')
+        sns.lmplot(x='Time (s)', y='Noise-Level (dB)', fit_reg = True, data=df, hue='Transmitter ID Number')
         
         # Tweak these limits
         plt.ylim(None, None)
         plt.xlim(None, None)
         plt.savefig(iteration + '_noise_plot.png')
 
-        # ADD TO PLOT OTHER STUFF
-        # filename = iteration + '_calculated_error_values.csv'     # TODO: Change name to reflect other half
-        # df = pd.read_csv(filename, header=0)   # read the file w/header row #0
-        # print(f"{filename} : file read into a pandas dataframe.")
-    
+
+        plt.hist(df['Time of Flight (s)'], self.NUM_OF_BINS)
+        plt.title("Time of Flight")
+        plt.xlabel("Time (s)")
+        plt.ylabel("Frequency")
+        plt.savefig("time_of_flight_" + iteration + ".png")
+
+        
+        plt.hist(df['Predicted Distance (m)'], self.NUM_OF_BINS)
+        plt.title("Distance Predictions")
+        plt.xlabel("Distance (m)")
+        plt.ylabel("Frequency")
+        plt.savefig("time_of_flight_distance_predictions_" + iteration + ".png")
+        plt.show()
+        
+
     def create_final_plots(self):
         AllFiles = list(os.walk("."))  #Walks everything inside current directory
 
@@ -278,16 +308,20 @@ class Serial_Data_Handler():
         plt.savefig('all_data_noise_plot.png')
 
 
-        NUM_OF_BINS = 10 # Anywhere from 5-20 with 20 being with at least 1000 data points
+        sns.lmplot(x='Distance (m)', y='Predicted Distance (m)', fit_reg = True, data=final_df, hue='Transmitter ID Number')
+        plt.ylim(None, None)
+        plt.xlim(50, 155)
+        plt.savefig('time_of_flight_distance_predictions_all_data.png')
 
-        plt.hist(delta_t_values, NUM_OF_BINS)
+
+        plt.hist(delta_t_values, self.NUM_OF_BINS)
         plt.title("Total Data: Times of Transmission")
         plt.xlabel("Time (s)")
         plt.ylabel("Frequency")
         plt.savefig("time_of_flight_total_histogram.png")
         plt.show()
 
-        plt.hist(error_values, NUM_OF_BINS)
+        plt.hist(error_values, self.NUM_OF_BINS)
         plt.title("Total Data: Error")
         plt.xlabel("Time (s)")
         plt.ylabel("Frequency")
@@ -316,10 +350,10 @@ class Serial_Data_Handler():
                 shutil.move(filename, os.path.join(path, "calculated_error_data"))
                 
             elif filename[-3:] == "png" and "histogram" in filename:
-                if "data" in filename:
-                    shutil.move(filename, os.path.join(path, "delta_t_histograms"))
-                else:
+                if "time_of_flight" in filename:
                     shutil.move(filename, os.path.join(path, "time_of_flight_histograms"))
+                else:
+                    shutil.move(filename, os.path.join(path, "delta_t_histograms"))
                     
             elif filename[-3:] == "csv" and "summaries" in filename:
                 shutil.move(filename, os.path.join(path, "summaries"))
