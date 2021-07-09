@@ -163,7 +163,7 @@ class Serial_Data_Handler():
         error_tot = ["Error"]
         
         for i in range(1, len(predicted_times_of_transmission)):
-            error_tot.append(predicted_times_of_transmission[i] - real_times_of_transmission[i])
+            error_tot.append(real_times_of_transmission[i] - predicted_times_of_transmission[i])
 
         return error_tot
 
