@@ -66,7 +66,7 @@ class Serial_Data_Handler():
             features include "Ping Count (PC)", "Line Voltage (LV) [V]"
         """
         data_list = []
-        data_list.append(["Receiver Serial Number", "Three-Digit Line-Counter", "Date/Time", "Transmitter Code-Space", "Transmitter ID Number", "Signal Level (dB)", "Noise-Level (dB)", "Channel", "Distance (m)", "Sensor GPS Coords", "Tag GPS Coords"])  #Added distance and GPS for now
+        data_list.append(["Receiver Serial Number", "Three-Digit Line-Counter", "Date/Time", "Transmitter Code-Space", "Transmitter ID Number", "Signal Level (dB)", "Noise-Level (dB)", "Distance (m)", "Channel", "Sensor GPS Coords", "Tag GPS Coords"])  #Added distance and GPS for now
 
         summaries_list = []
         summaries_list.append(["Receiver Serial Number", "Three-Digit Line-Counter", "Date/Time", "Scheduled Status (STS)", "Detection Count (DC)", "Ping Count (PC)", "Line Voltage (LV) [V]", "Internal Receiver Temperature", "Detection Memory Used", "Raw Memory Used", "Tilt Information [G]", "Output Noise", "Output PPM Noise"])
@@ -187,7 +187,7 @@ class Serial_Data_Handler():
         # for read_csv, use header=0 when row 0 is a header row 
 
         filename = iteration + '.csv'
-        df = pd.read_csv(filename, header=0)   # read the file w/header row #0
+        df = pd.read_csv(filename, header=0, index_col=False)   # read the file w/header row #0
         print(f"{filename} : file read into a pandas dataframe.")
 
         #df_clean = df.dropna()
@@ -214,28 +214,42 @@ class Serial_Data_Handler():
         # df = pd.read_csv(filename, header=0)   # read the file w/header row #0
         # print(f"{filename} : file read into a pandas dataframe.")
     
-    def create_final_plots(self, foldername):
-        AllFiles = list(os.walk("./" + foldername))  #Walks everything inside current directory
+    def create_final_plots(self):
+        AllFiles = list(os.walk("."))  #Walks everything inside current directory
 
         df_list = []
         delta_t_values = np.array([])
         error_values = np.array([])
 
-        for item in AllFiles:
-            #print("item is", item, "\n")    
-            foldername, LoDirs, LoFiles = item 
+        _, _, LoFiles = AllFiles[0] 
 
-            for filename in LoFiles:
-                if filename[-3:] == "csv" and (len(filename) == 10 or len(filename) == 11):    
-                    path = os.getcwd() + foldername + filename 
-                    df = pd.read_csv(path, engine='python', header=0, index_col=False)
-                    df_list.append(df)
+        for filename in LoFiles:
+            if filename[-3:] == "csv" and (len(filename) == 10 or len(filename) == 11):    
+                path = os.getcwd() + "/" + filename 
+                df = pd.read_csv(path, engine='python', header=0, index_col=False)
+                df_list.append(df)
 
-                elif filename[-3:] == "csv" and "calculated_error" in filename:  
-                    path = os.getcwd() + foldername[1:] + "/" + filename 
-                    df = pd.read_csv(path, engine='python', header=None, index_col=False)
-                    delta_t_values = np.concatenate((delta_t_values, df.values[0][1:]))
-                    error_values = np.concatenate((error_values, df.values[3][1:]))
+            elif filename[-3:] == "csv" and "calculated_error" in filename:  
+                path = os.getcwd() + "/" + filename 
+                df = pd.read_csv(path, engine='python', header=None, index_col=False)
+                delta_t_values = np.concatenate((delta_t_values, df.values[0][1:]))
+                error_values = np.concatenate((error_values, df.values[3][1:]))
+
+        # for item in AllFiles:
+        #     #print("item is", item, "\n")    
+        #     foldername, LoDirs, LoFiles = item 
+
+        #     for filename in LoFiles:
+        #         if filename[-3:] == "csv" and (len(filename) == 10 or len(filename) == 11):    
+        #             path = os.getcwd() + foldername + filename 
+        #             df = pd.read_csv(path, engine='python', header=0, index_col=False)
+        #             df_list.append(df)
+
+        #         elif filename[-3:] == "csv" and "calculated_error" in filename:  
+        #             path = os.getcwd() + foldername[1:] + "/" + filename 
+        #             df = pd.read_csv(path, engine='python', header=None, index_col=False)
+        #             delta_t_values = np.concatenate((delta_t_values, df.values[0][1:]))
+        #             error_values = np.concatenate((error_values, df.values[3][1:]))
         
         final_df = pd.concat(df_list)
 
@@ -268,8 +282,7 @@ class Serial_Data_Handler():
         plt.savefig("error_total_histogram.png")
         plt.show()
 
-    def organize_files(self):
-        foldername = input("What do you want to name the folder?: ")
+    def organize_files(self, foldername):
         os.mkdir(os.path.join(".", foldername))
         path = os.path.join(".", foldername)
 
@@ -283,7 +296,7 @@ class Serial_Data_Handler():
 
         AllFiles = list(os.walk("."))  #Walks everything inside current directory
 
-        foldername, _, LoFiles = AllFiles[0]
+        _, _, LoFiles = AllFiles[0]
 
 
         for filename in LoFiles:
@@ -312,51 +325,52 @@ class Serial_Data_Handler():
 if __name__ == '__main__':
     handler = Serial_Data_Handler()
 
-    ports = serial.tools.list_ports.comports()
-    serialInst = serial.Serial()
+    # ports = serial.tools.list_ports.comports()
+    # serialInst = serial.Serial()
 
-    # consider this to make program more user-friendly. Otherwise, we will code in settings manually
-    # TIME_TO_RUN, sensor_gps_coords, tag_gps_coords, distance = handler.get_settings()
+    # # consider this to make program more user-friendly. Otherwise, we will code in settings manually
+    # # TIME_TO_RUN, sensor_gps_coords, tag_gps_coords, distance = handler.get_settings()
 
-    serial_port = handler.get_serial_data(ports, serialInst)
-    distance = handler.get_distance_from_gps_locations()
+    # serial_port = handler.get_serial_data(ports, serialInst)
+    # distance = handler.get_distance_from_gps_locations()
 
-    iteration = "data_" + str(input("Iteration of data collection (Enter a number to not overwrite files): "))
+    # iteration = "data_" + str(input("Iteration of data collection (Enter a number to not overwrite files): "))
 
-    #Starts the stopwatch/counter
-    t1_start = time.perf_counter()
+    # #Starts the stopwatch/counter
+    # t1_start = time.perf_counter()
 
-    output = []
+    # output = []
 
-    while time.perf_counter() - t1_start < handler.TIME_TO_RUN:
-        if serialInst.in_waiting:
-            packet = serialInst.readline()
-            print(packet.decode('utf').rstrip('\n'))
-            output.append(packet.decode('utf').rstrip('\n'))
+    # while time.perf_counter() - t1_start < handler.TIME_TO_RUN:
+    #     if serialInst.in_waiting:
+    #         packet = serialInst.readline()
+    #         print(packet.decode('utf').rstrip('\n'))
+    #         output.append(packet.decode('utf').rstrip('\n'))
         
-    # data_list is 2D array of strings of data
-    # rows are lines, and cols are the specific measurements
-    data_list, summaries_list = handler.make_data_and_summaries_lists(output, distance)
+    # # data_list is 2D array of strings of data
+    # # rows are lines, and cols are the specific measurements
+    # data_list, summaries_list = handler.make_data_and_summaries_lists(output, distance)
 
-    delta_t = handler.make_delta_t(data_list)
-    # get std dev, statistics.stdev(sample_set, x_bar)
-    std_dev_delta_t = statistics.stdev(delta_t[1:], statistics.mean(delta_t[1:]))
-    print("Standard Deviation of sample is % s " % (std_dev_delta_t))
+    # delta_t = handler.make_delta_t(data_list)
+    # # get std dev, statistics.stdev(sample_set, x_bar)
+    # std_dev_delta_t = statistics.stdev(delta_t[1:], statistics.mean(delta_t[1:]))
+    # print("Standard Deviation of sample is % s " % (std_dev_delta_t))
 
-    handler.create_histogram(iteration, delta_t)
+    # handler.create_histogram(iteration, delta_t)
 
-    # lists to get projected &  real tot & error between them
-    predicted_times_of_transmission  = handler.get_predicted_times(delta_t)
-    real_times_of_transmission  = handler.get_real_times(delta_t)
-    error_tot = handler.get_error_tot(predicted_times_of_transmission, real_times_of_transmission)
-    times_list = list(zip([delta_t, real_times_of_transmission, predicted_times_of_transmission, error_tot]))
+    # # lists to get projected &  real tot & error between them
+    # predicted_times_of_transmission  = handler.get_predicted_times(delta_t)
+    # real_times_of_transmission  = handler.get_real_times(delta_t)
+    # error_tot = handler.get_error_tot(predicted_times_of_transmission, real_times_of_transmission)
+    # times_list = [delta_t, real_times_of_transmission, predicted_times_of_transmission, error_tot]
 
-    # create csvs and plot
-    handler.create_csvs(iteration, data_list, summaries_list, times_list)
-    handler.create_plots(iteration)
+    # # create csvs and plot
+    # handler.create_csvs(iteration, data_list, summaries_list, times_list)
+    # handler.create_plots(iteration)
 
     finished = input("Are you finished collecting data for the day? (Y or N): ")
-    if finished.upper == "Y" or finished.upper == "YES":
+    if finished == "Y" or finished == "YES" or finished == "y" or finished == "yes":
+        foldername = input("What do you want to name the folder?: ")
         handler.create_final_plots()
-        handler.organize_files()
+        handler.organize_files(foldername)
 
