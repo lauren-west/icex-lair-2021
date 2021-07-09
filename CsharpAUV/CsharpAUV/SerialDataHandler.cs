@@ -42,7 +42,6 @@ namespace CsharpAUV
             _serialPort.DataBits = SetPortDataBits(_serialPort.DataBits);
             _serialPort.StopBits = SetPortStopBits(_serialPort.StopBits);
             _serialPort.Handshake = SetPortHandshake(_serialPort.Handshake);
-            //s
 
             //Set the read / write timeouts
             _serialPort.ReadTimeout = 500;
