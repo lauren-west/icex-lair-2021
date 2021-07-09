@@ -8,9 +8,11 @@
   <ItemGroup>
     <None Remove="System.IO.Ports" />
     <None Remove="System.IO" />
+    <None Remove="System.Threading" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.IO.Ports" Version="5.0.1" />
     <PackageReference Include="System.IO" Version="4.3.0" />
+    <PackageReference Include="System.Threading" Version="4.3.0" />
   </ItemGroup>
 </Project>
