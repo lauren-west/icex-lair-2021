@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.IO.Ports;
 
 namespace CsharpAUV
 {
@@ -13,11 +14,11 @@ namespace CsharpAUV
 
 
 
-        //// constructor
-        //SerialDataHandler()
-        //{
-        //    // guess we are writing this later
-        //}
+        // constructor
+        SerialDataHandler()
+        {
+            // guess we are writing this later
+        }
 
         //public void getSerialData()
         //{
@@ -27,16 +28,23 @@ namespace CsharpAUV
         //    */
         //}
 
-        public static string[] GetSerialPortNames()
-        {
-            string[] portNames = SerialPort.GetPortNames();
+        //public static string[] GetSerialPortNames()
+        //{
+        //    string[] portNames = SerialPort.GetPortNames();
 
-            return portNames;
-        }
+        //    return portNames;
+        //}
+
+        //public string[] GetSerialPortNames()
+        //{
+        //    string[] portNames = SerialPort.GetPortNames();
+
+        //    return portNames;
+        //}
 
         public void OpenConnection()
         {
-            Console.WriteLine("Hi Joan Caitlyn Hannah Roman!");
+            //Console.WriteLine("Hi Joan Caitlyn Hannah Roman!");
             //SerialDataHandler handler = new SerialDataHandler();
             SerialPort mySerialPort = new SerialPort("COM3", 9600);
             try
@@ -49,10 +57,14 @@ namespace CsharpAUV
                 Console.WriteLine(ex);
             }
         }
-
+        
         static void Main(string[] args)
         {
             Console.WriteLine("Hi Joan Caitlyn Hannah Roman!");
+
+            SerialDataHandler littleH = new SerialDataHandler();
+          
+            Console.WriteLine(littleH.OpenConnection());
 
         }
     }
