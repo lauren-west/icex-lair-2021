@@ -66,17 +66,29 @@ class Serial_Data_Handler():
             features include "Ping Count (PC)", "Line Voltage (LV) [V]"
         """
         data_list = []
-        data_list.append(["Receiver Serial Number", "Three-Digit Line-Counter", "Date/Time", "Transmitter Code-Space", "Transmitter ID Number", "Signal Level (dB)", "Noise-Level (dB)", "Distance (m)", "Channel", "Sensor GPS Coords", "Tag GPS Coords"])  #Added distance and GPS for now
+        data_list.append(["Receiver Serial Number", "Three-Digit Line-Counter", "Date/Time", "Transmitter Code-Space", "Transmitter ID Number", "Signal Level (dB)", "Noise-Level (dB)", "Distance (m)", "Channel", "Tag GPS Coords", "Sensor GPS Coords", "Time (s)"])  #Added distance and GPS for now
 
         summaries_list = []
-        summaries_list.append(["Receiver Serial Number", "Three-Digit Line-Counter", "Date/Time", "Scheduled Status (STS)", "Detection Count (DC)", "Ping Count (PC)", "Line Voltage (LV) [V]", "Internal Receiver Temperature", "Detection Memory Used", "Raw Memory Used", "Tilt Information [G]", "Output Noise", "Output PPM Noise"])
+        summaries_list.append(["Receiver Serial Number", "Three-Digit Line-Counter", "Date/Time", "Scheduled Status (STS)", "Detection Count (DC)", "Ping Count (PC)", "Line Voltage (LV) [V]", "Internal Receiver Temperature", "Detection Memory Used", "Raw Memory Used", "Tilt Information [G]", "Output Noise", "Output PPM Noise", "Distance (m)", "Tag GPS Coords", "Sensor GPS Coords", "Time (s)"])
+        
+        initial_time = None
+        counter = 0
 
         for line in output:
             line = line.split(',')
             line = [s[s.find("=")+1:].strip() for s in line]
+
+            if counter == 0:
+                initial_time = datetime.datetime.strptime(line[2], '%Y-%m-%d %H:%M:%S.%f')
+                counter += 1
+
             line.append(distance)   #Adds distance for now
-            line.append(self.TAG_COORDINATES)   #Adds coords for now
+            line.append(self.TAG_COORDINATES)   #Adds co\ords for now
             line.append(self.SENSOR_COORDINATES)
+
+            current_datatime = datetime.datetime.strptime(line[2], '%Y-%m-%d %H:%M:%S.%f')
+
+            line.append((current_datatime - initial_time).total_seconds())
             
             for s in line:
                 try:
