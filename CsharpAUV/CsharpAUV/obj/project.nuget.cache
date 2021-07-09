@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "fr9dZFhpqxXg4F1oEaJFpmVr/BmBBUjunVVpF+y06pKlG/eJPkYSrD6+dQXgnBum60LgirrmIllm/is050W6Ag==",
+  "dgSpecHash": "5os4dob9GsTBbtUvb6mgoTnn3waukuFXLNOR5IcPfY2fsp284p/JwPR5ZaOQ84hXFPF1t8MsFU4jxhEUIJBPGQ==",
   "success": true,
   "projectFilePath": "/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpAUV/CsharpAUV/CsharpAUV.csproj",
   "expectedPackageFiles": [
@@ -18,6 +18,7 @@
     "/Users/laurenwest/.nuget/packages/system.security.accesscontrol/5.0.0/system.security.accesscontrol.5.0.0.nupkg.sha512",
     "/Users/laurenwest/.nuget/packages/system.security.principal.windows/5.0.0/system.security.principal.windows.5.0.0.nupkg.sha512",
     "/Users/laurenwest/.nuget/packages/system.text.encoding/4.3.0/system.text.encoding.4.3.0.nupkg.sha512",
+    "/Users/laurenwest/.nuget/packages/system.threading/4.3.0/system.threading.4.3.0.nupkg.sha512",
     "/Users/laurenwest/.nuget/packages/system.threading.tasks/4.3.0/system.threading.tasks.4.3.0.nupkg.sha512"
   ],
   "logs": []

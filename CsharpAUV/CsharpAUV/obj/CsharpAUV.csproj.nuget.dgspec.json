@@ -45,6 +45,10 @@
             "System.IO.Ports": {
               "target": "Package",
               "version": "[5.0.1, )"
+            },
+            "System.Threading": {
+              "target": "Package",
+              "version": "[4.3.0, )"
             }
           },
           "imports": [
