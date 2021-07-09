@@ -18,10 +18,10 @@ from geopy.distance import geodesic
 
 class Serial_Data_Handler():
 
-    TIME_TO_RUN = 30 # seconds
+    TIME_TO_RUN = 120 # seconds
 
-    TAG_COORDINATES = (33.57676,-43.52746)
-    SENSOR_COORDINATES = (0,0)
+    TAG_COORDINATES = (34.109135,-117.71281)
+    SENSOR_COORDINATES = (34.109172,-117.71241)
 
     def __init__(self) -> None:
         pass
@@ -340,7 +340,7 @@ if __name__ == '__main__':
 
     delta_t = handler.make_delta_t(data_list)
     # get std dev, statistics.stdev(sample_set, x_bar)
-    std_dev_delta_t = statistics.stdev(delta_t, statistics.mean(delta_t))
+    std_dev_delta_t = statistics.stdev(delta_t[1:], statistics.mean(delta_t[1:]))
     print("Standard Deviation of sample is % s " % (std_dev_delta_t))
 
     handler.create_histogram(iteration, delta_t)
