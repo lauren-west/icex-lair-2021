@@ -1,9 +1,6 @@
-﻿<Properties StartupConfiguration="{21B54CBE-894B-445F-88F1-9D808DB97534}|Default">
+﻿<Properties StartupConfiguration="{8BAFA130-273C-49FA-B764-FC228A81A98F}|Default">
   <MonoDevelop.Ide.ItemProperties.CsharpAUV PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="CsharpAUV/SerialDataHandler.cs">
-    <Files>
-      <File FileName="CsharpAUV/SerialDataHandler.cs" Line="44" Column="31" />
-    </Files>
+  <MonoDevelop.Ide.Workbench>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
