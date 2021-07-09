@@ -325,48 +325,48 @@ class Serial_Data_Handler():
 if __name__ == '__main__':
     handler = Serial_Data_Handler()
 
-    # ports = serial.tools.list_ports.comports()
-    # serialInst = serial.Serial()
+    ports = serial.tools.list_ports.comports()
+    serialInst = serial.Serial()
 
-    # # consider this to make program more user-friendly. Otherwise, we will code in settings manually
-    # # TIME_TO_RUN, sensor_gps_coords, tag_gps_coords, distance = handler.get_settings()
+    # consider this to make program more user-friendly. Otherwise, we will code in settings manually
+    # TIME_TO_RUN, sensor_gps_coords, tag_gps_coords, distance = handler.get_settings()
 
-    # serial_port = handler.get_serial_data(ports, serialInst)
-    # distance = handler.get_distance_from_gps_locations()
+    serial_port = handler.get_serial_data(ports, serialInst)
+    distance = handler.get_distance_from_gps_locations()
 
-    # iteration = "data_" + str(input("Iteration of data collection (Enter a number to not overwrite files): "))
+    iteration = "data_" + str(input("Iteration of data collection (Enter a number to not overwrite files): "))
 
-    # #Starts the stopwatch/counter
-    # t1_start = time.perf_counter()
+    #Starts the stopwatch/counter
+    t1_start = time.perf_counter()
 
-    # output = []
+    output = []
 
-    # while time.perf_counter() - t1_start < handler.TIME_TO_RUN:
-    #     if serialInst.in_waiting:
-    #         packet = serialInst.readline()
-    #         print(packet.decode('utf').rstrip('\n'))
-    #         output.append(packet.decode('utf').rstrip('\n'))
+    while time.perf_counter() - t1_start < handler.TIME_TO_RUN:
+        if serialInst.in_waiting:
+            packet = serialInst.readline()
+            print(packet.decode('utf').rstrip('\n'))
+            output.append(packet.decode('utf').rstrip('\n'))
         
-    # # data_list is 2D array of strings of data
-    # # rows are lines, and cols are the specific measurements
-    # data_list, summaries_list = handler.make_data_and_summaries_lists(output, distance)
+    # data_list is 2D array of strings of data
+    # rows are lines, and cols are the specific measurements
+    data_list, summaries_list = handler.make_data_and_summaries_lists(output, distance)
 
-    # delta_t = handler.make_delta_t(data_list)
-    # # get std dev, statistics.stdev(sample_set, x_bar)
-    # std_dev_delta_t = statistics.stdev(delta_t[1:], statistics.mean(delta_t[1:]))
-    # print("Standard Deviation of sample is % s " % (std_dev_delta_t))
+    delta_t = handler.make_delta_t(data_list)
+    # get std dev, statistics.stdev(sample_set, x_bar)
+    std_dev_delta_t = statistics.stdev(delta_t[1:], statistics.mean(delta_t[1:]))
+    print("Standard Deviation of sample is % s " % (std_dev_delta_t))
 
-    # handler.create_histogram(iteration, delta_t)
+    handler.create_histogram(iteration, delta_t)
 
-    # # lists to get projected &  real tot & error between them
-    # predicted_times_of_transmission  = handler.get_predicted_times(delta_t)
-    # real_times_of_transmission  = handler.get_real_times(delta_t)
-    # error_tot = handler.get_error_tot(predicted_times_of_transmission, real_times_of_transmission)
-    # times_list = [delta_t, real_times_of_transmission, predicted_times_of_transmission, error_tot]
+    # lists to get projected &  real tot & error between them
+    predicted_times_of_transmission  = handler.get_predicted_times(delta_t)
+    real_times_of_transmission  = handler.get_real_times(delta_t)
+    error_tot = handler.get_error_tot(predicted_times_of_transmission, real_times_of_transmission)
+    times_list = [delta_t, real_times_of_transmission, predicted_times_of_transmission, error_tot]
 
-    # # create csvs and plot
-    # handler.create_csvs(iteration, data_list, summaries_list, times_list)
-    # handler.create_plots(iteration)
+    # create csvs and plot
+    handler.create_csvs(iteration, data_list, summaries_list, times_list)
+    handler.create_plots(iteration)
 
     finished = input("Are you finished collecting data for the day? (Y or N): ")
     if finished == "Y" or finished == "YES" or finished == "y" or finished == "yes":
