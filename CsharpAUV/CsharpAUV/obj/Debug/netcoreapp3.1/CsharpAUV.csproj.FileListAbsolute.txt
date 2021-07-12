@@ -56,3 +56,5 @@ C:\Users\Caitlyn Ossa\Documents\GitHub\icex-lair-2021\CsharpAUV\CsharpAUV\obj\De
 C:\Users\Caitlyn Ossa\Documents\GitHub\icex-lair-2021\CsharpAUV\CsharpAUV\obj\Debug\netcoreapp3.1\CsharpAUV.dll
 C:\Users\Caitlyn Ossa\Documents\GitHub\icex-lair-2021\CsharpAUV\CsharpAUV\obj\Debug\netcoreapp3.1\CsharpAUV.pdb
 C:\Users\Caitlyn Ossa\Documents\GitHub\icex-lair-2021\CsharpAUV\CsharpAUV\obj\Debug\netcoreapp3.1\CsharpAUV.genruntimeconfig.cache
+C:\Users\HMC\Documents\GitHub\icex-lair-2021\CsharpAUV\CsharpAUV\obj\Debug\netcoreapp3.1\CsharpAUV.dll
+C:\Users\HMC\Documents\GitHub\icex-lair-2021\CsharpAUV\CsharpAUV\obj\Debug\netcoreapp3.1\CsharpAUV.pdb
