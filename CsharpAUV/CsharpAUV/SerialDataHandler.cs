@@ -44,10 +44,10 @@ namespace CsharpAUV
             _serialPort.StopBits = SetPortStopBits(_serialPort.StopBits);
             _serialPort.Handshake = SetPortHandshake(_serialPort.Handshake);
 
-            // get Distance
-            var myLocation = new GeoCoordinate(-51.39792, -0.12084);
-            var yourLocation = new GeoCoordinate(-29.83245, 31.04034);
-            double distance = myLocation.GetDistanceTo(yourLocation);
+            // get Distance w/ C# equivalent to python's geopy
+            //var myLocation = new GeoCoordinate(-51.39792, -0.12084);
+            //var yourLocation = new GeoCoordinate(-29.83245, 31.04034);
+            //double distance = myLocation.GetDistanceTo(yourLocation);
 
 
             //Set the read / write timeouts
@@ -209,5 +209,6 @@ namespace CsharpAUV
 
             return (Handshake)Enum.Parse(typeof(Handshake), handshake, true);
         }
+        o
     }
 }
