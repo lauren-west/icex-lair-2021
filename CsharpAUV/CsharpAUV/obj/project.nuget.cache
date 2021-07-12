@@ -1,34 +1,42 @@
 {
   "version": 2,
-  "dgSpecHash": "Bpt5sqhwUu+En9ZJgmcm1UUw4hAuWcD1EJtwNMGCCNpsqfeAq4DKHTDdp1S6cTx56Zw3YbEcr5wmoIZ9h4ntHQ==",
-  "success": true,
-  "projectFilePath": "C:\\Users\\Caitlyn Ossa\\Documents\\GitHub\\icex-lair-2021\\CsharpAUV\\CsharpAUV\\CsharpAUV.csproj",
-  "expectedPackageFiles": [
-    "C:\\Users\\Caitlyn Ossa\\.nuget\\packages\\microsoft.netcore.platforms\\5.0.0\\microsoft.netcore.platforms.5.0.0.nupkg.sha512",
-    "C:\\Users\\Caitlyn Ossa\\.nuget\\packages\\microsoft.netcore.targets\\1.1.0\\microsoft.netcore.targets.1.1.0.nupkg.sha512",
-    "C:\\Users\\Caitlyn Ossa\\.nuget\\packages\\microsoft.win32.registry\\5.0.0\\microsoft.win32.registry.5.0.0.nupkg.sha512",
-    "C:\\Users\\Caitlyn Ossa\\.nuget\\packages\\runtime.linux-arm.runtime.native.system.io.ports\\5.0.0\\runtime.linux-arm.runtime.native.system.io.ports.5.0.0.nupkg.sha512",
-    "C:\\Users\\Caitlyn Ossa\\.nuget\\packages\\runtime.linux-arm64.runtime.native.system.io.ports\\5.0.0\\runtime.linux-arm64.runtime.native.system.io.ports.5.0.0.nupkg.sha512",
-    "C:\\Users\\Caitlyn Ossa\\.nuget\\packages\\runtime.linux-x64.runtime.native.system.io.ports\\5.0.0\\runtime.linux-x64.runtime.native.system.io.ports.5.0.0.nupkg.sha512",
-    "C:\\Users\\Caitlyn Ossa\\.nuget\\packages\\runtime.native.system.io.ports\\5.0.1\\runtime.native.system.io.ports.5.0.1.nupkg.sha512",
-    "C:\\Users\\Caitlyn Ossa\\.nuget\\packages\\runtime.osx-x64.runtime.native.system.io.ports\\5.0.0\\runtime.osx-x64.runtime.native.system.io.ports.5.0.0.nupkg.sha512",
-    "C:\\Users\\Caitlyn Ossa\\.nuget\\packages\\system.device.location.portable\\1.0.0\\system.device.location.portable.1.0.0.nupkg.sha512",
-    "C:\\Users\\Caitlyn Ossa\\.nuget\\packages\\system.io\\4.3.0\\system.io.4.3.0.nupkg.sha512",
-    "C:\\Users\\Caitlyn Ossa\\.nuget\\packages\\system.io.ports\\5.0.1\\system.io.ports.5.0.1.nupkg.sha512",
-    "C:\\Users\\Caitlyn Ossa\\.nuget\\packages\\system.runtime\\4.3.0\\system.runtime.4.3.0.nupkg.sha512",
-    "C:\\Users\\Caitlyn Ossa\\.nuget\\packages\\system.security.accesscontrol\\5.0.0\\system.security.accesscontrol.5.0.0.nupkg.sha512",
-    "C:\\Users\\Caitlyn Ossa\\.nuget\\packages\\system.security.principal.windows\\5.0.0\\system.security.principal.windows.5.0.0.nupkg.sha512",
-    "C:\\Users\\Caitlyn Ossa\\.nuget\\packages\\system.text.encoding\\4.3.0\\system.text.encoding.4.3.0.nupkg.sha512",
-    "C:\\Users\\Caitlyn Ossa\\.nuget\\packages\\system.threading\\4.3.0\\system.threading.4.3.0.nupkg.sha512",
-    "C:\\Users\\Caitlyn Ossa\\.nuget\\packages\\system.threading.tasks\\4.3.0\\system.threading.tasks.4.3.0.nupkg.sha512"
-  ],
+  "dgSpecHash": "k91k7HFUIrz6IO1x3HPjVIo1YcJKac96yIGWYi3bRaVcdR82Qq3VNK/D7I6FxwiXaDic93G5udxnKPY/kXCl7Q==",
+  "success": false,
+  "projectFilePath": "C:\\Users\\HMC\\Documents\\GitHub\\icex-lair-2021\\CsharpAUV\\CsharpAUV\\CsharpAUV.csproj",
+  "expectedPackageFiles": [],
   "logs": [
     {
-      "code": "NU1701",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "Package 'System.Device.Location.Portable 1.0.0' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8' instead of the project target framework '.NETCoreApp,Version=v3.1'. This package may not be fully compatible with your project.",
+      "code": "NU1101",
+      "level": "Error",
+      "message": "Unable to find package System.IO.Ports. No packages exist with this id in source(s): Microsoft Visual Studio Offline Packages",
+      "libraryId": "System.IO.Ports",
+      "targetGraphs": [
+        ".NETCoreApp,Version=v3.1"
+      ]
+    },
+    {
+      "code": "NU1101",
+      "level": "Error",
+      "message": "Unable to find package System.Device.Location.Portable. No packages exist with this id in source(s): Microsoft Visual Studio Offline Packages",
       "libraryId": "System.Device.Location.Portable",
+      "targetGraphs": [
+        ".NETCoreApp,Version=v3.1"
+      ]
+    },
+    {
+      "code": "NU1102",
+      "level": "Error",
+      "message": "Unable to find package System.IO with version (>= 4.3.0)\r\n  - Found 2 version(s) in Microsoft Visual Studio Offline Packages [ Nearest version: 4.1.0 ]",
+      "libraryId": "System.IO",
+      "targetGraphs": [
+        ".NETCoreApp,Version=v3.1"
+      ]
+    },
+    {
+      "code": "NU1102",
+      "level": "Error",
+      "message": "Unable to find package System.Threading with version (>= 4.3.0)\r\n  - Found 2 version(s) in Microsoft Visual Studio Offline Packages [ Nearest version: 4.0.11 ]",
+      "libraryId": "System.Threading",
       "targetGraphs": [
         ".NETCoreApp,Version=v3.1"
       ]

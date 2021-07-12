@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Caitlyn Ossa\\Documents\\GitHub\\icex-lair-2021\\CsharpAUV\\CsharpAUV\\CsharpAUV.csproj": {}
+    "C:\\Users\\HMC\\Documents\\GitHub\\icex-lair-2021\\CsharpAUV\\CsharpAUV\\CsharpAUV.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Caitlyn Ossa\\Documents\\GitHub\\icex-lair-2021\\CsharpAUV\\CsharpAUV\\CsharpAUV.csproj": {
+    "C:\\Users\\HMC\\Documents\\GitHub\\icex-lair-2021\\CsharpAUV\\CsharpAUV\\CsharpAUV.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Caitlyn Ossa\\Documents\\GitHub\\icex-lair-2021\\CsharpAUV\\CsharpAUV\\CsharpAUV.csproj",
+        "projectUniqueName": "C:\\Users\\HMC\\Documents\\GitHub\\icex-lair-2021\\CsharpAUV\\CsharpAUV\\CsharpAUV.csproj",
         "projectName": "CsharpAUV",
-        "projectPath": "C:\\Users\\Caitlyn Ossa\\Documents\\GitHub\\icex-lair-2021\\CsharpAUV\\CsharpAUV\\CsharpAUV.csproj",
-        "packagesPath": "C:\\Users\\Caitlyn Ossa\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Caitlyn Ossa\\Documents\\GitHub\\icex-lair-2021\\CsharpAUV\\CsharpAUV\\obj\\",
+        "projectPath": "C:\\Users\\HMC\\Documents\\GitHub\\icex-lair-2021\\CsharpAUV\\CsharpAUV\\CsharpAUV.csproj",
+        "packagesPath": "C:\\Users\\HMC\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\HMC\\Documents\\GitHub\\icex-lair-2021\\CsharpAUV\\CsharpAUV\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\Caitlyn Ossa\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\HMC\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -25,8 +25,7 @@
           "netcoreapp3.1"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "https://api.nuget.org/v3/index.json": {}
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {}
         },
         "frameworks": {
           "netcoreapp3.1": {
