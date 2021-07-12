@@ -9,7 +9,8 @@
         <State name="__root__">
           <Node name="CsharpAUV" expanded="True">
             <Node name="CsharpAUV" expanded="True">
-              <Node name="Dependencies" expanded="True" selected="True" />
+              <Node name="Dependencies" expanded="True" />
+              <Node name="SerialDataHandler.cs" selected="True" />
             </Node>
           </Node>
         </State>
