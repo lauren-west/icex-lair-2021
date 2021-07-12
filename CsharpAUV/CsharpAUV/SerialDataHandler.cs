@@ -2,6 +2,7 @@
 using System.IO.Ports;
 using System.Threading;
 using System.Device.Location;
+using System.Collections.Generic;
 
 namespace CsharpAUV
 {
@@ -15,13 +16,12 @@ namespace CsharpAUV
             new Tuple<double, double>(33.57676, -43.52746);
         Tuple<double, double> sensorGpsCoord =
             new Tuple<double, double>(0, 0);
-
-        //// constructor
-        //SerialDataHandler()
-        //{
-        //    // guess we are writing this later
-        //}
-
+        public List<string> outputList;
+        // constructor
+        public SerialDataHandler()
+        {
+            this.outputList = new List<string>();
+        }
         static void Main(string[] args)
         {
             Console.WriteLine("Hi Joan Caitlyn Hannah Roman!");
@@ -30,7 +30,7 @@ namespace CsharpAUV
             string message;
             StringComparer stringComparer = StringComparer.OrdinalIgnoreCase;
             Thread readThread = new Thread(Read);
-
+            SerialDataHandler serialdatahandler = new SerialDataHandler();
 
             // Create a new SerialPort object with default settings.
 
@@ -57,6 +57,7 @@ namespace CsharpAUV
             _serialPort.Open();
             _continue = true;
             readThread.Start();
+            
 
             Console.Write("Name: ");
             name = Console.ReadLine();
@@ -66,6 +67,7 @@ namespace CsharpAUV
             while (_continue)
             {
                 message = Console.ReadLine();
+                serialdatahandler.outputList.Add(message);
 
                 if (stringComparer.Equals("quit", message))
                 {
@@ -80,6 +82,26 @@ namespace CsharpAUV
 
             readThread.Join();
             _serialPort.Close();
+
+
+        }
+        //
+        public void make_data_lists()
+        {
+
+            string[] dateTimes = new string[outputList.Count];
+            // split up the outputList
+            for (int line = 0; line < outputList.Count; line++) {
+                dateTimes[line] = this.outputList[line].Split(',');
+            }
+            string[] subs = this.outputList[0].Split(',');
+            if (subs.Length <= 10)
+            {
+                DateTime date_time = subs[2];
+
+
+            }
+
         }
         public static void Read()
         {
@@ -209,6 +231,6 @@ namespace CsharpAUV
 
             return (Handshake)Enum.Parse(typeof(Handshake), handshake, true);
         }
-        o
+        
     }
 }
