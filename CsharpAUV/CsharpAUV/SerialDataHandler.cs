@@ -85,22 +85,29 @@ namespace CsharpAUV
 
 
         }
-        //
+
+
         public void make_data_lists()
         {
-
             string[] dateTimes = new string[outputList.Count];
+            string[] transmitterID = new string[outputList.Count];
+            string[] tempArray = new string[10];
+
             // split up the outputList
             for (int line = 0; line < outputList.Count; line++) {
-                dateTimes[line] = this.outputList[line].Split(',');
+                tempArray = this.outputList[line].Split();
+                if (tempArray.Length <= 10)
+                {
+                    dateTimes[line] = tempArray[2];
+                    transmitterID[line] = tempArray[4];
+                }
+                else {
+                    // what do we do when we miss a ping?
+                }
             }
-            string[] subs = this.outputList[0].Split(',');
-            if (subs.Length <= 10)
-            {
-                DateTime date_time = subs[2];
-
-
-            }
+ 
+            
+            // TODO: CONVERT strings in datetime to DATETIME objects
 
         }
         public static void Read()
