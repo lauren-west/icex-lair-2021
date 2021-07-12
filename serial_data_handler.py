@@ -20,7 +20,13 @@ class Serial_Data_Handler():
 
     TIME_TO_RUN = 30 # seconds
     NUM_OF_BINS = 10 # Anywhere from 5-20 with 20 being with at least 1000 data points
-    SPEED_OF_SOUND = 1500  # m/s
+
+    # allows user to input the temp., salinity, and depth the sensor is at when taking data
+    Temp = int(input("Temperature of the water in Celsius: "))
+    Salinity = int(input("Salinity of the water in ppt: "))
+    Depth = int(input("Depth of the sensor in m: "))
+    SPEED_OF_SOUND = 1449.2 + ((4.6)*Temp) - ((5.5*(10**-2))*(Temp**2)) + ((2.9*(10**(-4)))*(Temp**3)) \
+        + ((1.34 - ((10**3)*Temp))*(Salinity - 35)) + ((1.6*(10**(-2)))*Depth) # average is 1500 m/s
 
     TAG_COORDINATES = (34.109135,-117.71281)
     SENSOR_COORDINATES = (34.109172,-117.71241)
