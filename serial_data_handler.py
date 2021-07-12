@@ -18,9 +18,18 @@ from geopy.distance import geodesic
 
 class Serial_Data_Handler():
 
-    TIME_TO_RUN = 120 # seconds
+    TIME_TO_RUN = 240 # seconds
     NUM_OF_BINS = 10 # Anywhere from 5-20 with 20 being with at least 1000 data points
-    SPEED_OF_SOUND = 1500  # m/s
+
+    # allows user to input the temp., salinity, and depth the sensor is at when taking data
+    # Temp = int(input("Temperature of the water in Celsius: "))
+    # Salinity = int(input("Salinity of the water in ppt: "))
+    # Depth = int(input("Depth of the sensor in m: "))
+
+    # SPEED_OF_SOUND = 1449.2 + ((4.6)*Temp) - ((5.5*(10**-2))*(Temp**2)) + ((2.9*(10**(-4)))*(Temp**3)) \
+    #     + ((1.34 - ((10**3)*Temp))*(Salinity - 35)) + ((1.6*(10**(-2)))*Depth) # average is 1500 m/s
+
+    SPEED_OF_SOUND = 1500
 
     TAG_COORDINATES = (34.109135,-117.71281)
     SENSOR_COORDINATES = (34.109172,-117.71241)
@@ -68,7 +77,7 @@ class Serial_Data_Handler():
             features include "Ping Count (PC)", "Line Voltage (LV) [V]"
         """
         data_list = []
-        data_list.append(["Receiver Serial Number", "Three-Digit Line-Counter", "Date/Time", "Transmitter Code-Space", "Transmitter ID Number", "Signal Level (dB)", "Noise-Level (dB)", "Distance (m)", "Channel", "Tag GPS Coords", "Sensor GPS Coords", "Time (s)", "Time of Flight (s)", "Predicted Distance (m)"])  #Added distance and GPS for now
+        data_list.append(["Receiver Serial Number", "Three-Digit Line-Counter", "Date/Time", "Transmitter Code-Space", "Transmitter ID Number", "Signal Level (dB)", "Noise-Level (dB)", 'C', "Channel",  "Distance (m)", "Tag GPS Coords", "Sensor GPS Coords", "Time (s)", "Time of Flight (s)", "Predicted Distance (m)"])  #Added distance and GPS for now
 
         summaries_list = []
         summaries_list.append(["Receiver Serial Number", "Three-Digit Line-Counter", "Date/Time", "Scheduled Status (STS)", "Detection Count (DC)", "Ping Count (PC)", "Line Voltage (LV) [V]", "Internal Receiver Temperature", "Detection Memory Used", "Raw Memory Used", "Tilt Information [G]", "Output Noise", "Output PPM Noise", "Distance (m)", "Tag GPS Coords", "Sensor GPS Coords", "Time (s)", "Time of Flight (s)", "Predicted Distance (m)"])
@@ -105,7 +114,13 @@ class Serial_Data_Handler():
 
             line.append((current_datatime - initial_time).total_seconds())
 
-            time_of_flight = (current_datatime - first_timestamp).total_seconds() % 8.179
+            diff_in_time = (current_datatime - first_timestamp).total_seconds()
+            delta_t_avg = 8.179
+            time_of_flight = diff_in_time % delta_t_avg
+
+            if time_of_flight > 8:
+                time_of_flight = delta_t_avg - time_of_flight
+            
             line.append(time_of_flight)
             line.append(time_of_flight * self.SPEED_OF_SOUND)
 
@@ -115,7 +130,7 @@ class Serial_Data_Handler():
                 except:
                     pass  
 
-            if len(line) < 14:
+            if len(line) < 17:
                 data_list.append(line)
             else:
                 summaries_list.append(line)
@@ -149,10 +164,10 @@ class Serial_Data_Handler():
         NUM_OF_BINS = 10 # Anywhere from 5-20 with 20 being with at least 1000 data points
         plt.hist(delta_t_np, NUM_OF_BINS)
         plt.title("Time of Transmission Histogram")
-        plt.xlabel("time (s)")
+        plt.xlabel("Difference in Time of Pings (s)")
         plt.ylabel("Frequency")
         plt.savefig(iteration + "_histogram.png")
-        plt.show()
+        plt.close()
 
     def get_predicted_times(self, delta_t):
         """ Returns:
@@ -230,7 +245,11 @@ class Serial_Data_Handler():
         # Tweak these limits
         plt.ylim(None, None)
         plt.xlim(None, None)
+        plt.title("Signal Level over Time at One Distance")
+        plt.xlabel("Time (s)")
+        plt.ylabel("Signal Level (dB)")
         plt.savefig(iteration + "_signal_plot.png")
+        plt.close()
 
         # Plot using Seaborn
         sns.lmplot(x='Time (s)', y='Noise-Level (dB)', fit_reg = True, data=df, hue='Transmitter ID Number')
@@ -238,7 +257,11 @@ class Serial_Data_Handler():
         # Tweak these limits
         plt.ylim(None, None)
         plt.xlim(None, None)
+        plt.title("Noise Level over Time at One Distance")
+        plt.xlabel("Time (s)")
+        plt.ylabel("Noise-Level (dB)")
         plt.savefig(iteration + '_noise_plot.png')
+        plt.close()
 
 
         plt.hist(df['Time of Flight (s)'], self.NUM_OF_BINS)
@@ -246,15 +269,15 @@ class Serial_Data_Handler():
         plt.xlabel("Time (s)")
         plt.ylabel("Frequency")
         plt.savefig("time_of_flight_" + iteration + ".png")
+        plt.close()
 
-        
         plt.hist(df['Predicted Distance (m)'], self.NUM_OF_BINS)
         plt.title("Distance Predictions")
         plt.xlabel("Distance (m)")
         plt.ylabel("Frequency")
         plt.savefig("time_of_flight_distance_predictions_" + iteration + ".png")
-        plt.show()
-        
+        plt.close()
+    
 
     def create_final_plots(self):
         AllFiles = list(os.walk("."))  #Walks everything inside current directory
@@ -299,34 +322,41 @@ class Serial_Data_Handler():
         sns.lmplot(x='Distance (m)', y='Signal Level (dB)', fit_reg=True, data=final_df, hue='Transmitter ID Number')
         plt.ylim(None, None)
         plt.xlim(None, None)
+        plt.title("Signal Level over Distance")
         plt.savefig("all_data_signal_plot.png")
+        plt.close()
 
 
         sns.lmplot(x='Distance (m)', y='Noise-Level (dB)', fit_reg = True, data=final_df, hue='Transmitter ID Number')
         plt.ylim(None, None)
         plt.xlim(None, None)
+        plt.title("Noise Level over Distance")
         plt.savefig('all_data_noise_plot.png')
+        plt.close()
 
 
         sns.lmplot(x='Distance (m)', y='Predicted Distance (m)', fit_reg = True, data=final_df, hue='Transmitter ID Number')
         plt.ylim(None, None)
         plt.xlim(None, None)
+        plt.title("Actual Distance versus Predicted Distance")
         plt.savefig('time_of_flight_distance_predictions_all_data.png')
+        plt.close()
 
+        print(delta_t_values)
 
         plt.hist(delta_t_values, self.NUM_OF_BINS)
         plt.title("Total Data: Times of Transmission")
         plt.xlabel("Time (s)")
         plt.ylabel("Frequency")
         plt.savefig("time_of_flight_total_histogram.png")
-        plt.show()
+        plt.close()
 
         plt.hist(error_values, self.NUM_OF_BINS)
         plt.title("Total Data: Error")
         plt.xlabel("Time (s)")
         plt.ylabel("Frequency")
         plt.savefig("error_total_histogram.png")
-        plt.show()
+        plt.close()
 
     def organize_files(self, foldername):
         os.mkdir(os.path.join(".", foldername))
@@ -338,7 +368,7 @@ class Serial_Data_Handler():
         os.mkdir(os.path.join(path, "raw_data"))
         os.mkdir(os.path.join(path, "signal_plots"))
         os.mkdir(os.path.join(path, "summaries"))
-        os.mkdir(os.path.join(path, "time_of_flight_histograms"))
+        os.mkdir(os.path.join(path, "time_of_flight_plots"))
 
         AllFiles = list(os.walk("."))  #Walks everything inside current directory
 
@@ -348,12 +378,12 @@ class Serial_Data_Handler():
         for filename in LoFiles:
             if filename[-3:] == "csv" and "calculated_error" in filename:
                 shutil.move(filename, os.path.join(path, "calculated_error_data"))
-                
+
+            elif filename[-3:] == "png" and "time_of_flight" in filename:
+                shutil.move(filename, os.path.join(path, "time_of_flight_plots"))
+
             elif filename[-3:] == "png" and "histogram" in filename:
-                if "time_of_flight" in filename:
-                    shutil.move(filename, os.path.join(path, "time_of_flight_histograms"))
-                else:
-                    shutil.move(filename, os.path.join(path, "delta_t_histograms"))
+                shutil.move(filename, os.path.join(path, "delta_t_histograms"))
                     
             elif filename[-3:] == "csv" and "summaries" in filename:
                 shutil.move(filename, os.path.join(path, "summaries"))
@@ -397,8 +427,8 @@ if __name__ == '__main__':
     # data_list is 2D array of strings of data
     # rows are lines, and cols are the specific measurements
     data_list, summaries_list = handler.make_data_and_summaries_lists(output, distance)
-
     delta_t = handler.make_delta_t(data_list)
+
     # get std dev, statistics.stdev(sample_set, x_bar)
     std_dev_delta_t = statistics.stdev(delta_t[1:], statistics.mean(delta_t[1:]))
     print("Standard Deviation of sample is % s " % (std_dev_delta_t))
