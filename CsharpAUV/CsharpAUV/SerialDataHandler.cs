@@ -3,6 +3,8 @@ using System.IO.Ports;
 using System.Threading;
 using System.Device.Location;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Collections;
 
 namespace CsharpAUV
 {
@@ -83,33 +85,36 @@ namespace CsharpAUV
             readThread.Join();
             _serialPort.Close();
 
+            // start using data
+            ArrayList datalist = serialdatahandler.make_data_lists();
 
         }
 
 
-        public void make_data_lists()
+        public ArrayList make_data_lists()
         {
-            string[] dateTimes = new string[outputList.Count];
-            string[] transmitterID = new string[outputList.Count];
-            string[] tempArray = new string[10];
+            //string dateString = "yyyy-MM-dd HH:mm:ss.fff";
+            List<DateTime> dateTimes = new List<DateTime>();
+            List<string> transmitterID = new List<string>();
 
             // split up the outputList
-            for (int line = 0; line < outputList.Count; line++) {
-                tempArray = this.outputList[line].Split();
-                if (tempArray.Length <= 10)
+            foreach (string line in outputList) {
+                string[] tempArr = line.Split();
+                if (tempArr.Length <= 10)
                 {
-                    dateTimes[line] = tempArray[2];
-                    transmitterID[line] = tempArray[4];
-                }
-                else {
-                    // what do we do when we miss a ping?
+                    transmitterID.Add(tempArr[4]);
+                    dateTimes.Add(DateTimeOffset.Parse(tempArr[2]).UtcDateTime);
+                    // TRY # 2 if above line doesn't work as desired.
+                    //dateTimes[line] = DateTime.ParseExact(tempArray[2], dateString, CultureInfo.InvariantCulture);
                 }
             }
- 
-            
-            // TODO: CONVERT strings in datetime to DATETIME objects
+            ArrayList DataList = new ArrayList();
+            DataList.Add(dateTimes);
+            DataList.Add(transmitterID);
 
+            return DataList;
         }
+
         public static void Read()
         {
             while (_continue)
