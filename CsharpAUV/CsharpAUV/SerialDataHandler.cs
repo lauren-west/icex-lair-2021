@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO.Ports;
 using System.Threading;
+using System.Device.Location;
 
 namespace CsharpAUV
 {
@@ -42,6 +43,12 @@ namespace CsharpAUV
             _serialPort.DataBits = SetPortDataBits(_serialPort.DataBits);
             _serialPort.StopBits = SetPortStopBits(_serialPort.StopBits);
             _serialPort.Handshake = SetPortHandshake(_serialPort.Handshake);
+
+            // get Distance
+            var myLocation = new GeoCoordinate(-51.39792, -0.12084);
+            var yourLocation = new GeoCoordinate(-29.83245, 31.04034);
+            double distance = myLocation.GetDistanceTo(yourLocation);
+
 
             //Set the read / write timeouts
             _serialPort.ReadTimeout = 500;

@@ -9,10 +9,13 @@
     <None Remove="System.IO.Ports" />
     <None Remove="System.IO" />
     <None Remove="System.Threading" />
+    <None Remove="GeoCoordinate" />
+    <None Remove="System.Device.Location.Portable" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.IO.Ports" Version="5.0.1" />
     <PackageReference Include="System.IO" Version="4.3.0" />
     <PackageReference Include="System.Threading" Version="4.3.0" />
+    <PackageReference Include="System.Device.Location.Portable" Version="1.0.0" />
   </ItemGroup>
 </Project>
