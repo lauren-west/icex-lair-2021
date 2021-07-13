@@ -109,6 +109,8 @@ namespace CsharpAUV
                 distances.Add(serialdatahandler.speedOfSound * timeOfFlight[i]);
             }
 
+            // TODO: hand predicted distances to the particle filter???
+
         }
 
         public double getDistFromTOF(List<DateTime> dateTimes)
