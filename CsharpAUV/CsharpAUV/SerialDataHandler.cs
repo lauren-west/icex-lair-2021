@@ -86,12 +86,25 @@ namespace CsharpAUV
             _serialPort.Close();
 
             // start using data
-            ArrayList datalist = serialdatahandler.make_data_lists();
+            Tuple<List<DateTime>, List<string>> data = serialdatahandler.makeData();
+            // retrieve totalTimes Lsit and timeOfFlight List
+            var (totalTime, timeOfFlight) = serialdatahandler.makeTimeOfFlightList(data.Item1);
 
         }
 
+        public Tuple<List<double>, List<double>> makeTimeOfFlightList(List<DateTime> dateTimes) {
+            List<double> totalTime = new List<double>();
+            List<double> timeOfFlight = new List<double>();
+            DateTime initialTime = dateTimes[0];
+            for (int i = 1; i < dateTimes.Count; i++) {
+                double diff1 = dateTimes[i].Subtract(initialTime).TotalSeconds;
+                totalTime.Add(diff1);
+                timeOfFlight.Add(diff1 % 8.179); // add total time % 8.179 to get tof
+            }
+            return Tuple.Create(totalTime, timeOfFlight);
+        }
 
-        public ArrayList make_data_lists()
+        public Tuple<List<DateTime>, List<string>> makeData()
         {
             //string dateString = "yyyy-MM-dd HH:mm:ss.fff";
             List<DateTime> dateTimes = new List<DateTime>();
@@ -112,7 +125,8 @@ namespace CsharpAUV
             DataList.Add(dateTimes);
             DataList.Add(transmitterID);
 
-            return DataList;
+            return Tuple.Create(dateTimes, transmitterID);
+
         }
 
         public static void Read()
