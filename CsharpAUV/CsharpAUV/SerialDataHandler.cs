@@ -104,6 +104,11 @@ namespace CsharpAUV
             // retrieve totalTimes Lsit and timeOfFlight List
             var (totalTime, timeOfFlight) = serialdatahandler.makeTimeOfFlightList(data.Item1);
 
+            List<double> distances = new List<double>();
+            for (int i = 0; i < timeOfFlight.Count; i++) {
+                distances.Add(serialdatahandler.speedOfSound * timeOfFlight[i]);
+            }
+
         }
 
         public double getDistFromTOF(List<DateTime> dateTimes)
