@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Collections;
 
+
 namespace CsharpAUV
 {
     class SerialDataHandler
@@ -19,6 +20,19 @@ namespace CsharpAUV
         Tuple<double, double> sensorGpsCoord =
             new Tuple<double, double>(0, 0);
         public List<string> outputList;
+        static double temp = 12; // (Celsius)
+        static double depth = 10; // (meters)
+        static double salinity = 33.5; // (ppt) Default: 33.5
+        // the mackenzie equation for speed of sound underwater
+        // http://resource.npl.co.uk/acoustics/techguides/soundseawater/content.html
+        double speedOfSound = 1448.96 + (4.591 * temp) -
+            (5.304 * Math.Pow(10,-2) * Math.Pow(temp,2)) +
+            (2.374 * Math.Pow(10,-4) * Math.Pow(temp,3)) +
+            (1.340 * (salinity-35)) + (1.630 * Math.Pow(10,-2) * depth) +
+            (1.675 * Math.Pow(10,-7)* Math.Pow(depth,2)) -
+            (1.025 * Math.Pow(10,-2)* temp * (salinity-35)) -
+            (7.139 * Math.Pow(10,-13)* temp * Math.Pow(depth,3));
+
         // constructor
         public SerialDataHandler()
         {
@@ -92,7 +106,14 @@ namespace CsharpAUV
 
         }
 
-        public Tuple<List<double>, List<double>> makeTimeOfFlightList(List<DateTime> dateTimes) {
+        public double getDistFromTOF(List<DateTime> dateTimes)
+        {
+            // getting predicted distance from TOF
+
+            return 0.0;
+        }
+
+            public Tuple<List<double>, List<double>> makeTimeOfFlightList(List<DateTime> dateTimes) {
             List<double> totalTime = new List<double>();
             List<double> timeOfFlight = new List<double>();
             DateTime initialTime = dateTimes[0];
