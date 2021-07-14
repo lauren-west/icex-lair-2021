@@ -101,23 +101,23 @@ namespace CsharpAUV
 
             // start using data
             Tuple<List<DateTime>, List<string>> data = serialdatahandler.makeData();
-            // retrieve totalTimes Lsit and timeOfFlight List
+            // retrieve totalTimes Lsit and timeOfFlight List from dateTimes List
             var (totalTime, timeOfFlight) = serialdatahandler.makeTimeOfFlightList(data.Item1);
 
-            List<double> distances = new List<double>();
-            for (int i = 0; i < timeOfFlight.Count; i++) {
-                distances.Add(serialdatahandler.speedOfSound * timeOfFlight[i]);
-            }
-
+            List<double> distances = serialdatahandler.getDistFromTOF(timeOfFlight);
             // TODO: hand over predicted distances to the particle filter???
 
         }
 
-        public double getDistFromTOF(List<DateTime> dateTimes)
+        public List<double> getDistFromTOF(List<double> timeOfFlight)
         {
             // getting predicted distance from TOF
-
-            return 0.0;
+            List<double> distances = new List<double>();
+            for (int i = 0; i < timeOfFlight.Count; i++)
+            {
+                distances.Add(this.speedOfSound * timeOfFlight[i]);
+            }
+            return distances;
         }
 
             public Tuple<List<double>, List<double>> makeTimeOfFlightList(List<DateTime> dateTimes) {
