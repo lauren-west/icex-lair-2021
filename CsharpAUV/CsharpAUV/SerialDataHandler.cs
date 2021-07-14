@@ -109,7 +109,7 @@ namespace CsharpAUV
                 distances.Add(serialdatahandler.speedOfSound * timeOfFlight[i]);
             }
 
-            // TODO: hand predicted distances to the particle filter???
+            // TODO: hand over predicted distances to the particle filter???
 
         }
 
