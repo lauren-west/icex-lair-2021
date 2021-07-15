@@ -110,11 +110,11 @@ class Serial_Data_Handler():
             line.append(self.TAG_COORDINATES)   #Adds tag coords for now
             line.append(self.SENSOR_COORDINATES)   #Adds sensor coords for now
 
-            current_datatime = datetime.datetime.strptime(line[2], '%Y-%m-%d %H:%M:%S.%f')
+            current_datetime = datetime.datetime.strptime(line[2], '%Y-%m-%d %H:%M:%S.%f')
 
-            line.append((current_datatime - initial_time).total_seconds())
+            line.append((current_datetime - initial_time).total_seconds())
 
-            diff_in_time = (current_datatime - first_timestamp).total_seconds()
+            diff_in_time = (current_datetime - first_timestamp).total_seconds()
             delta_t_avg = 8.179
             time_of_flight = diff_in_time % delta_t_avg
 
@@ -122,7 +122,7 @@ class Serial_Data_Handler():
                 time_of_flight = delta_t_avg - time_of_flight
             
             line.append(time_of_flight)
-            line.append(time_of_flight * self.SPEED_OF_SOUND)
+            line.append(time_of_flight * self.SPEED_OF_SOUND) # Predicted Distance
 
             for s in line:
                 try:
