@@ -351,7 +351,7 @@ class Serial_Data_Handler():
         plt.savefig('time_of_flight_distance_predictions_all_data.png')
         plt.close()
 
-        print(delta_t_values)
+        # print(delta_t_values)
 
         plt.hist(delta_t_values, self.NUM_OF_BINS)
         plt.title("Total Data: Times of Transmission")
