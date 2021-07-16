@@ -403,8 +403,11 @@ class Serial_Data_Handler():
             elif filename[-3:] == "png" and "signal" in filename:
                 shutil.move(filename, os.path.join(path, "signal_plots"))
             
-            elif filename[-3:] == "csv" and (len(filename) == 10 or len(filename) == 11):
+            # elif filename[-3:] == "csv" and (len(filename) == 10 or len(filename) == 11):
+            elif filename[-3:] == "csv":
                 shutil.move(filename, os.path.join(path, "raw_data"))
+            
+
 
 
 if __name__ == '__main__':
@@ -427,12 +430,19 @@ if __name__ == '__main__':
 
     output = []
 
-    while time.perf_counter() - t1_start < handler.TIME_TO_RUN:
-        if serialInst.in_waiting:
-            packet = serialInst.readline()
-            handler.INTERNAL_CLOCK_TIMES.append(time.perf_counter()-t1_start)
-            print(packet.decode('utf').rstrip('\n'))
-            output.append(packet.decode('utf').rstrip('\n'))
+    with open("raw_serial_" + iteration + ".csv", "w") as f:
+        writer = csv.writer(f)
+        while time.perf_counter() - t1_start < handler.TIME_TO_RUN:
+            if serialInst.in_waiting:
+                packet = serialInst.readline()
+                time_elapsed = time.perf_counter()-t1_start
+                handler.INTERNAL_CLOCK_TIMES.append(time_elapsed)
+                print(packet.decode('utf').rstrip('\n'))
+                output.append(packet.decode('utf').rstrip('\n'))
+
+                row = output[-1]
+                row += time_elapsed
+                writer.writerow(row)
 
    
         
