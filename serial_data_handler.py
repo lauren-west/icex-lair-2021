@@ -18,7 +18,7 @@ from geopy.distance import geodesic
 
 class Serial_Data_Handler():
 
-    TIME_TO_RUN = 300 # seconds
+    TIME_TO_RUN = 60 # seconds
     NUM_OF_BINS = 10 # Anywhere from 5-20 with 20 being with at least 1000 data points
 
     # allows user to input the temp., salinity, and depth the sensor is at when taking data
@@ -33,6 +33,8 @@ class Serial_Data_Handler():
 
     TAG_COORDINATES = (34.109135,-117.71281)
     SENSOR_COORDINATES = (34.109172,-117.71241)
+
+    INTERNAL_CLOCK_TIMES = ["Internal Computer Clock"]
 
     def __init__(self) -> None:
         pass
@@ -77,10 +79,17 @@ class Serial_Data_Handler():
             features include "Ping Count (PC)", "Line Voltage (LV) [V]"
         """
         data_list = []
-        data_list.append(["Receiver Serial Number", "Three-Digit Line-Counter", "Date/Time", "Transmitter Code-Space", "Transmitter ID Number", "Signal Level (dB)", "Noise-Level (dB)", 'C', "Channel",  "Distance (m)", "Tag GPS Coords", "Sensor GPS Coords", "Time (s)", "Time of Flight (s)", "Predicted Distance (m)"])  #Added distance and GPS for now
+        data_list.append(["Receiver Serial Number", "Three-Digit Line-Counter", "Date/Time", \
+            "Transmitter Code-Space", "Transmitter ID Number", "Signal Level (dB)", "Noise-Level (dB)", \
+                'C', "Channel",  "Distance (m)", "Tag GPS Coords", "Sensor GPS Coords", "Time (s)", "Time of Flight (s)", \
+                    "Predicted Distance (m)"])
 
         summaries_list = []
-        summaries_list.append(["Receiver Serial Number", "Three-Digit Line-Counter", "Date/Time", "Scheduled Status (STS)", "Detection Count (DC)", "Ping Count (PC)", "Line Voltage (LV) [V]", "Internal Receiver Temperature", "Detection Memory Used", "Raw Memory Used", "Tilt Information [G]", "Output Noise", "Output PPM Noise", "Distance (m)", "Tag GPS Coords", "Sensor GPS Coords", "Time (s)", "Time of Flight (s)", "Predicted Distance (m)"])
+        summaries_list.append(["Receiver Serial Number", "Three-Digit Line-Counter", "Date/Time", \
+            "Scheduled Status (STS)", "Detection Count (DC)", "Ping Count (PC)", "Line Voltage (LV) [V]", \
+                "Internal Receiver Temperature", "Detection Memory Used", "Raw Memory Used", "Tilt Information [G]", \
+                     "Output Noise", "Output PPM Noise", "Distance (m)", "Tag GPS Coords", "Sensor GPS Coords", \
+                         "Time (s)", "Time of Flight (s)", "Predicted Distance (m)"])
         
         initial_time = None        # Used to calculate time elapsed
         counter = 0
@@ -421,8 +430,11 @@ if __name__ == '__main__':
     while time.perf_counter() - t1_start < handler.TIME_TO_RUN:
         if serialInst.in_waiting:
             packet = serialInst.readline()
+            handler.INTERNAL_CLOCK_TIMES.append(time.perf_counter()-t1_start)
             print(packet.decode('utf').rstrip('\n'))
             output.append(packet.decode('utf').rstrip('\n'))
+
+   
         
     # data_list is 2D array of strings of data
     # rows are lines, and cols are the specific measurements
@@ -439,7 +451,7 @@ if __name__ == '__main__':
     predicted_times_of_transmission  = handler.get_predicted_times(delta_t)
     real_times_of_transmission  = handler.get_real_times(delta_t)
     error_tot = handler.get_error_tot(predicted_times_of_transmission, real_times_of_transmission)
-    times_list = [delta_t, real_times_of_transmission, predicted_times_of_transmission, error_tot]
+    times_list = [delta_t, real_times_of_transmission, predicted_times_of_transmission, error_tot, handler.INTERNAL_CLOCK_TIMES]
 
     # create csvs and plot
     handler.create_csvs(iteration, data_list, summaries_list, times_list)
