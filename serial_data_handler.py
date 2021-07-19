@@ -41,6 +41,8 @@ class Serial_Data_Handler():
 
     delta_t_avg = 8.17907142857143
 
+    additive = 0
+
 
     def __init__(self) -> None:
         pass
@@ -106,11 +108,11 @@ class Serial_Data_Handler():
                 reader = csv.reader(f)
                 _ = next(reader)
                 row1 = next(reader)
-                first_timestamp = datetime.datetime.strptime(row1[2], '%Y-%m-%d %H:%M:%S.%f')
+                self.FIRST_TIMESTAMP = datetime.datetime.strptime(row1[2], '%Y-%m-%d %H:%M:%S.%f')
         except:
             line = output[0].split(',')
             line = [s[s.find("=")+1:].strip() for s in line]
-            first_timestamp = datetime.datetime.strptime(line[2], '%Y-%m-%d %H:%M:%S.%f')
+            self.FIRST_TIMESTAMP = datetime.datetime.strptime(line[2], '%Y-%m-%d %H:%M:%S.%f')
 
         for line in output:
             line = line.split(',')
@@ -126,11 +128,20 @@ class Serial_Data_Handler():
 
             current_datetime = datetime.datetime.strptime(line[2], '%Y-%m-%d %H:%M:%S.%f')
 
-            diff_in_time = (current_datetime - first_timestamp).total_seconds()
+            diff_in_time = (current_datetime - self.FIRST_TIMESTAMP).total_seconds()
             time_of_flight = diff_in_time % self.delta_t_avg
 
             if time_of_flight > 8:
                 time_of_flight = self.delta_t_avg - time_of_flight
+
+            current_index = output.index(line)
+            previous_line = output[current_index -1]
+
+            previous_time_of_flight = previous_line[-2]
+            if time_of_flight > (previous_time_of_flight * 10):
+                self.additive += (time_of_flight - previous_time_of_flight)
+                revised_initial_time = self.FIRST_TIMESTAMP + self.additive
+                self.FIRST_TIMESTAMP = revised_initial_time
 
             line.append(diff_in_time)
             line.append(time_of_flight)
