@@ -19,7 +19,7 @@ from geopy.distance import geodesic
 
 class Serial_Data_Handler():
 
-    TIME_TO_RUN = 52901 # seconds
+    TIME_TO_RUN = 60 # seconds
     NUM_OF_BINS = 10 # Anywhere from 5-20 with 20 being with at least 1000 data points
 
     # allows user to input the temp., salinity, and depth the sensor is at when taking data
@@ -457,8 +457,12 @@ if __name__ == '__main__':
                 output.append(packet.decode('utf').rstrip('\n'))
 
                 row = output[-1]
-                row += time_elapsed
-                writer.writerow(row)
+                line = row.split(',')
+                line = [s[s.find("=")+1:].strip() for s in line]
+                # print(row)
+                line.append(time_elapsed)
+                # print(row)
+                writer.writerow(line)
 
    
         
