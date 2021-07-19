@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 sns.set(style="darkgrid")
 
+
 from geopy.distance import geodesic
 
 
@@ -37,6 +38,9 @@ class Serial_Data_Handler():
     INTERNAL_CLOCK_TIMES = ["Internal Computer Clock"]
 
     FIRST_TIMESTAMP = None
+
+    delta_t_avg = 8.17907142857143
+
 
     def __init__(self) -> None:
         pass
@@ -93,7 +97,7 @@ class Serial_Data_Handler():
                      "Output Noise", "Output PPM Noise", "Distance (m)", "Tag GPS Coords", "Sensor GPS Coords", \
                          "Time (s)", "Time of Flight (s)", "Predicted Distance (m)"])
         
-        initial_time = None        # Used to calculate time elapsed
+        # initial_time = None        # Used to calculate time elapsed
         counter = 0
 
         
@@ -112,9 +116,9 @@ class Serial_Data_Handler():
             line = line.split(',')
             line = [s[s.find("=")+1:].strip() for s in line]
             
-            if counter == 0:
-                initial_time = datetime.datetime.strptime(line[2], '%Y-%m-%d %H:%M:%S.%f')
-                counter += 1
+            # if counter == 0:
+            #     initial_time = datetime.datetime.strptime(line[2], '%Y-%m-%d %H:%M:%S.%f')
+            #     counter += 1
 
             line.append(distance)   #Adds distance for now
             line.append(self.TAG_COORDINATES)   #Adds tag coords for now
@@ -123,11 +127,10 @@ class Serial_Data_Handler():
             current_datetime = datetime.datetime.strptime(line[2], '%Y-%m-%d %H:%M:%S.%f')
 
             diff_in_time = (current_datetime - first_timestamp).total_seconds()
-            delta_t_avg = 8.17907142857143
-            time_of_flight = diff_in_time % delta_t_avg
+            time_of_flight = diff_in_time % self.delta_t_avg
 
             if time_of_flight > 8:
-                time_of_flight = delta_t_avg - time_of_flight
+                time_of_flight = self.delta_t_avg - time_of_flight
 
             line.append(diff_in_time)
             line.append(time_of_flight)
@@ -156,19 +159,26 @@ class Serial_Data_Handler():
 
         for i in range(2, len(data_list)):
             past_datetime = datetime.datetime.strptime(data_list[i-1][2], '%Y-%m-%d %H:%M:%S.%f')
-            current_datatime = datetime.datetime.strptime(data_list[i][2], '%Y-%m-%d %H:%M:%S.%f')
-            if (current_datatime - past_datetime).total_seconds() > 10:
-                pass
-            else:
-                total_seconds = (current_datatime - past_datetime).total_seconds()
-                delta_t.append(total_seconds)
+            current_datetime = datetime.datetime.strptime(data_list[i][2], '%Y-%m-%d %H:%M:%S.%f')
+            total_seconds = (current_datetime - past_datetime).total_seconds()
+            delta_t.append(total_seconds)
+
+            # if (current_datetime - past_datetime).total_seconds() > 10:
+            #     pass
+            # else:
+            #     total_seconds = (current_datetime - past_datetime).total_seconds()
+            #     delta_t.append(total_seconds)
         return delta_t
 
     def create_histogram(self, iteration, delta_t):
         """ 
             Creates and saves histogram in file
         """
-        delta_t_np = np.array(delta_t[1:])
+        no_outlier = []
+        for time in delta_t[1:]:
+            if time < 10:
+                no_outlier.append(time)
+        delta_t_np = np.array(no_outlier)
 
         NUM_OF_BINS = 10 # Anywhere from 5-20 with 20 being with at least 1000 data points
         plt.hist(delta_t_np, NUM_OF_BINS)
@@ -182,20 +192,21 @@ class Serial_Data_Handler():
         """ Returns:
           predicted_times_of_transmission (list): contains doubles, each predicted 
           time calculated by using an average tot (average delta_t) before drift.
-          t_predicted = t0 + (k * delta_t_avg)
+          t_predicted = t0 + (k * self.delta_t_avg)
 
-          Note: there may be a better way to get delta_t_avg than the method below
+          Note: there may be a better way to get self.delta_t_avg than the method below
         """
         predicted_times_of_transmission = ["Predicted Times of Transmission"]
         t0 = 0
+
         # dilemma: What should delta t avg be?
-        # delta_t_avg  = sum(delta_t[1:]) / (len(delta_t) - 1)
-        delta_t_avg = 8.179
-        # delta_t_avg  = sum(delta_t[1:10]) / (len(delta_t[1:10]))
-        print("avg: ", delta_t_avg)
+        # self.delta_t_avg  = sum(delta_t[1:]) / (len(delta_t) - 1)
+        # self.delta_t_avg  = sum(delta_t[1:10]) / (len(delta_t[1:10]))
+
+        print("avg: ", self.delta_t_avg)
         
         for i in range(1, len(delta_t)):
-            predicted_times_of_transmission.append(t0 + i * delta_t_avg)
+            predicted_times_of_transmission.append(t0 + i * self.delta_t_avg)
 
         return predicted_times_of_transmission
 
@@ -205,6 +216,7 @@ class Serial_Data_Handler():
             continuous record of ping times in seconds, starting with the first ping
             example: (8, 16, 24, 32)
         """
+
         real_times_of_transmission = ["Real Time of Transmission"]
         prior_sum = 0
         for i in range(1, len(delta_t)):
@@ -214,11 +226,19 @@ class Serial_Data_Handler():
         return real_times_of_transmission
 
     def get_error_tot(self, predicted_times_of_transmission, real_times_of_transmission):
-
+        # value // 8.17907  == 2,   value == diff between real and predicted
+        # error = time_of_flight / value  == 0.01
         error_tot = ["Error"]
         
         for i in range(1, len(predicted_times_of_transmission)):
-            error_tot.append(real_times_of_transmission[i] - predicted_times_of_transmission[i])
+            difference = real_times_of_transmission[i] - predicted_times_of_transmission[i]
+            if difference > 8:
+                integer_divide_value = difference//self.delta_t_avg
+                time_of_flight = difference % self.delta_t_avg
+                error = time_of_flight/integer_divide_value
+                error_tot.append(error)
+            else:
+                error_tot.append(difference)
 
         return error_tot
 
@@ -351,8 +371,6 @@ class Serial_Data_Handler():
         plt.savefig('time_of_flight_distance_predictions_all_data.png')
         plt.close()
 
-        # print(delta_t_values)
-
         plt.hist(delta_t_values, self.NUM_OF_BINS)
         plt.title("Total Data: Times of Transmission")
         plt.xlabel("Time (s)")
@@ -406,8 +424,6 @@ class Serial_Data_Handler():
             # elif filename[-3:] == "csv" and (len(filename) == 10 or len(filename) == 11):
             elif filename[-3:] == "csv":
                 shutil.move(filename, os.path.join(path, "raw_data"))
-            
-
 
 
 if __name__ == '__main__':
