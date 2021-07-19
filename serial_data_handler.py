@@ -29,12 +29,14 @@ class Serial_Data_Handler():
     # SPEED_OF_SOUND = 1449.2 + ((4.6)*Temp) - ((5.5*(10**-2))*(Temp**2)) + ((2.9*(10**(-4)))*(Temp**3)) \
     #     + ((1.34 - ((10**3)*Temp))*(Salinity - 35)) + ((1.6*(10**(-2)))*Depth) # average is 1500 m/s
 
-    SPEED_OF_SOUND = 1500
+    SPEED_OF_SOUND = 1460
 
     TAG_COORDINATES = (34.109135,-117.71281)
     SENSOR_COORDINATES = (34.109172,-117.71241)
 
     INTERNAL_CLOCK_TIMES = ["Internal Computer Clock"]
+
+    FIRST_TIMESTAMP = None
 
     def __init__(self) -> None:
         pass
@@ -94,7 +96,6 @@ class Serial_Data_Handler():
         initial_time = None        # Used to calculate time elapsed
         counter = 0
 
-        first_timestamp = None
         
         try:
             with open('data_1.csv', "r") as f:
@@ -121,15 +122,14 @@ class Serial_Data_Handler():
 
             current_datetime = datetime.datetime.strptime(line[2], '%Y-%m-%d %H:%M:%S.%f')
 
-            line.append((current_datetime - initial_time).total_seconds())
-
             diff_in_time = (current_datetime - first_timestamp).total_seconds()
-            delta_t_avg = 8.179
+            delta_t_avg = 8.17907142857143
             time_of_flight = diff_in_time % delta_t_avg
 
             if time_of_flight > 8:
                 time_of_flight = delta_t_avg - time_of_flight
-            
+
+            line.append(diff_in_time)
             line.append(time_of_flight)
             line.append(time_of_flight * self.SPEED_OF_SOUND) # Predicted Distance
 
@@ -453,7 +453,7 @@ if __name__ == '__main__':
 
     # get std dev, statistics.stdev(sample_set, x_bar)
     std_dev_delta_t = statistics.stdev(delta_t[1:], statistics.mean(delta_t[1:]))
-    print("Standard Deviation of sample is % s " % (std_dev_delta_t))
+    print("Standard Deviation of sample's delta_t is % s " % (std_dev_delta_t))
 
     handler.create_histogram(iteration, delta_t)
 
