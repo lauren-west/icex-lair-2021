@@ -83,7 +83,8 @@ namespace CsharpAUV
         }
 
         public List<double> calcDistFromTOF(List<double> timeOfFlight)
-        {  /* param: list of timeOfFlight 
+        {  /* 
+            * param: list of timeOfFlight 
             * returns: list of distances
             */
             // getting predicted distance from TOF
@@ -116,6 +117,7 @@ namespace CsharpAUV
         public Tuple<List<DateTime>, List<string>> makeData()
         {   /* 
              * Using raw serial data, we isolate dateTimes and transmitterIDs
+             * 
              * returns: list of dateTimes and list of transmitterID
              */
 
@@ -140,7 +142,8 @@ namespace CsharpAUV
         public static double calcSpeedOfSound() {
             /* 
              * Prompts salinity, temperature, and depth quantities
-             * returns speed of sound
+             * 
+             * returns: speed of sound
              */
 
             Console.WriteLine("Enter temperature (Celsius): Default=12");
@@ -167,7 +170,8 @@ namespace CsharpAUV
         public static int getTimeToRun()
         {   /* 
              * Prompts for a time to run in minutes,
-             * returns time to run in milliseconds
+             * 
+             * returns: time to run in milliseconds
              */
 
             Console.WriteLine("Enter time to run program (minutes): ");
