@@ -3,7 +3,7 @@
   <MonoDevelop.Ide.Workbench ActiveDocument="CsharpAUV/SerialDataHandler.cs">
     <Files>
       <File FileName="CsharpAUV/SerialDataHandler.cs" Line="119" Column="14" />
-      <File FileName="../serial_data_handler.py" Line="29" Column="43" />
+      <File FileName="../serial_data_handler.py" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
