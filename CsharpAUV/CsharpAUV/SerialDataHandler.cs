@@ -12,7 +12,7 @@ namespace CsharpAUV
     {
         static bool _continue;
         static SerialPort _serialPort;
-        public List<string> rawSerialData;
+        public List<string> rawSerialData = new List<string>();
 
         double speedOfSound = calcSpeedOfSound();
         static int timeToRun = getTimeToRun();
@@ -54,6 +54,7 @@ namespace CsharpAUV
                 {
                     message = _serialPort.ReadLine();
                     Console.WriteLine(message);
+                    serialdatahandler.rawSerialData.Add(message);
                 }
                 catch (TimeoutException) { }
             }
