@@ -1,4 +1,5 @@
 import csv
+from typing_extensions import final
 import serial.tools.list_ports
 import time
 import datetime
@@ -89,15 +90,15 @@ class Serial_Data_Handler():
         data_list = []
         data_list.append(["Receiver Serial Number", "Three-Digit Line-Counter", "Date/Time", \
             "Transmitter Code-Space", "Transmitter ID Number", "Signal Level (dB)", "Noise-Level (dB)", \
-                'C', "Channel",  "Distance (m)", "Tag GPS Coords", "Sensor GPS Coords", "Time (s)", "Time of Flight (s)", \
+                'C', "Channel", "Tag GPS Coords", "Sensor GPS Coords", "Time (s)", "Distance (m)", "Time of Flight (s)", \
                     "Predicted Distance (m)"])
 
         summaries_list = []
         summaries_list.append(["Receiver Serial Number", "Three-Digit Line-Counter", "Date/Time", \
             "Scheduled Status (STS)", "Detection Count (DC)", "Ping Count (PC)", "Line Voltage (LV) [V]", \
                 "Internal Receiver Temperature", "Detection Memory Used", "Raw Memory Used", "Tilt Information [G]", \
-                     "Output Noise", "Output PPM Noise", "Distance (m)", "Tag GPS Coords", "Sensor GPS Coords", \
-                         "Time (s)", "Time of Flight (s)", "Predicted Distance (m)"])
+                     "Output Noise", "Output PPM Noise", "Tag GPS Coords", "Sensor GPS Coords", \
+                         "Time (s)", "Distance (m)", "Time of Flight (s)", "Predicted Distance (m)"])
         
         # initial_time = None        # Used to calculate time elapsed
         counter = 0
@@ -122,7 +123,7 @@ class Serial_Data_Handler():
             #     initial_time = datetime.datetime.strptime(line[2], '%Y-%m-%d %H:%M:%S.%f')
             #     counter += 1
 
-            line.append(distance)   #Adds distance for now
+            
             line.append(self.TAG_COORDINATES)   #Adds tag coords for now
             line.append(self.SENSOR_COORDINATES)   #Adds sensor coords for now
 
@@ -146,6 +147,7 @@ class Serial_Data_Handler():
                     self.FIRST_TIMESTAMP = revised_initial_time
 
             line.append(diff_in_time)
+            line.append(distance)
             line.append(time_of_flight)
             line.append(time_of_flight * self.SPEED_OF_SOUND) # Predicted Distance
 
@@ -278,10 +280,13 @@ class Serial_Data_Handler():
         df = pd.read_csv(filename, header=0, index_col=False)   # read the file w/header row #0
         print(f"{filename} : file read into a pandas dataframe.")
 
-        #df_clean = df.dropna()
+        #df = df.dropna()
         #df_clean = df
-
+        
         # Plot using Seaborn
+        # with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
+        #     print(df)
+
         sns.lmplot(x='Time (s)', y='Signal Level (dB)', fit_reg=True, data=df, hue='Transmitter ID Number')
         
         # Tweak these limits
@@ -305,6 +310,30 @@ class Serial_Data_Handler():
         plt.savefig(iteration + '_noise_plot.png')
         plt.close()
 
+        self.create_plots_without_noise_signal(iteration)
+
+        # plt.hist(df['Time of Flight (s)'], self.NUM_OF_BINS)
+        # plt.title("Time of Flight")
+        # plt.xlabel("Time (s)")
+        # plt.ylabel("Frequency")
+        # plt.savefig("time_of_flight_" + iteration + ".png")
+        # plt.close()
+
+        # plt.hist(df['Predicted Distance (m)'], self.NUM_OF_BINS)
+        # plt.title("Distance Predictions")
+        # plt.xlabel("Distance (m)")
+        # plt.ylabel("Frequency")
+        # plt.savefig("time_of_flight_distance_predictions_" + iteration + ".png")
+        # plt.close()
+    
+    def create_plots_without_noise_signal(self, iteration):
+        # Read in the data
+        # 
+        # for read_csv, use header=0 when row 0 is a header row 
+
+        filename = iteration + '.csv'
+        df = pd.read_csv(filename, header=0, index_col=False)   # read the file w/header row #0
+        print(f"{filename} : file read into a pandas dataframe.")
 
         plt.hist(df['Time of Flight (s)'], self.NUM_OF_BINS)
         plt.title("Time of Flight")
@@ -360,6 +389,7 @@ class Serial_Data_Handler():
         
         final_df = pd.concat(df_list)
 
+
         # Plot using Seaborn
         sns.lmplot(x='Distance (m)', y='Signal Level (dB)', fit_reg=True, data=final_df, hue='Transmitter ID Number')
         plt.ylim(None, None)
@@ -376,8 +406,40 @@ class Serial_Data_Handler():
         plt.savefig('all_data_noise_plot.png')
         plt.close()
 
+        self.create_final_plots_without_noise_signal(final_df = final_df, delta_t_values = delta_t_values, error_values = error_values)
 
-        sns.lmplot(x='Distance (m)', y='Predicted Distance (m)', fit_reg = True, data=final_df, hue='Transmitter ID Number')
+    def create_final_plots_without_noise_signal(self, final_df = None, delta_t_values = None, error_values = None ):
+
+        if final_df == None or delta_t_values == None or error_values == None:
+            AllFiles = list(os.walk("."))  #Walks everything inside current directory
+
+            df_list = []
+            delta_t_values = np.array([])
+            error_values = np.array([])
+
+            _, _, LoFiles = AllFiles[0] 
+
+            for filename in LoFiles:
+                if filename[-3:] == "csv" and (len(filename) == 10 or len(filename) == 11):    
+                    path = os.getcwd() + "/" + filename 
+                    df = pd.read_csv(path, engine='python', header=0, index_col=False)
+                    df_list.append(df)
+
+                elif filename[-3:] == "csv" and "calculated_error" in filename:  
+                    path = os.getcwd() + "/" + filename 
+                    df = pd.read_csv(path, engine='python', header=None, index_col=False)
+                    delta_t_values = np.concatenate((delta_t_values, df.values[0][1:]))
+                    error_values = np.concatenate((error_values, df.values[3][1:]))
+            
+            final_df = pd.concat(df_list)
+
+        # with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
+        #     print(final_df)
+        print(final_df['Distance (m)'])
+        print(final_df['Predicted Distance (m)'])
+
+        # sns.lmplot(x='Distance (m)', y='Predicted Distance (m)', fit_reg = True, data=final_df, hue='Transmitter ID Number')
+        plt.scatter(final_df['Distance (m)'], final_df['Predicted Distance (m)'])
         plt.ylim(None, None)
         plt.xlim(None, None)
         plt.title("Actual Distance versus Predicted Distance")
@@ -397,6 +459,7 @@ class Serial_Data_Handler():
         plt.ylabel("Frequency")
         plt.savefig("error_total_histogram.png")
         plt.close()
+
 
     def organize_files(self, foldername):
         os.mkdir(os.path.join(".", foldername))
@@ -439,25 +502,22 @@ class Serial_Data_Handler():
                 shutil.move(filename, os.path.join(path, "raw_data"))
 
 
-if __name__ == '__main__':
-    handler = Serial_Data_Handler()
+# consider this to make program more user-friendly. Otherwise, we will code in settings manually
+# TIME_TO_RUN, sensor_gps_coords, tag_gps_coords, distance = handler.get_settings()
+def run_program_with_new_data(handler):
 
     ports = serial.tools.list_ports.comports()
     serialInst = serial.Serial()
-
-    # consider this to make program more user-friendly. Otherwise, we will code in settings manually
-    # TIME_TO_RUN, sensor_gps_coords, tag_gps_coords, distance = handler.get_settings()
-
-    serial_port = handler.get_serial_data(ports, serialInst)
+    handler.get_serial_data(ports, serialInst)
     #distance = handler.get_distance_from_gps_locations()
     distance = input("What's the distance?: ")
 
     iteration = "data_" + str(input("Iteration of data collection (Enter a number to not overwrite files): "))
+    
+    output = []
 
     #Starts the stopwatch/counter
     t1_start = time.perf_counter()
-
-    output = []
 
     with open("raw_serial_" + iteration + ".csv", "w") as f:
         writer = csv.writer(f)
@@ -477,8 +537,7 @@ if __name__ == '__main__':
                 # print(row)
                 writer.writerow(line)
 
-   
-        
+
     # data_list is 2D array of strings of data
     # rows are lines, and cols are the specific measurements
     data_list, summaries_list = handler.make_data_and_summaries_lists(output, distance)
@@ -506,3 +565,113 @@ if __name__ == '__main__':
         handler.create_final_plots()
         handler.organize_files(foldername)
 
+
+def run_program_with_old_data(handler):
+    # name_of_folder = "Some String"
+    foldername = input("What is the name of the folder of data you want to use? (Case sensitive): ")
+    path = os.path.join(".", foldername)
+    AllFiles = list(os.walk(path))
+    path, _, LoFiles = AllFiles[4]    # Accesses the raw data from the dataset
+    LoFiles.sort()
+    counter = 0    # Used to make sure we can get handler.FIRST_TIMESTAMP
+    index_of_first_raw_data = len(LoFiles)
+    new_dataset = ("raw_serial_data_1.csv") in LoFiles
+
+    if new_dataset:
+        index_of_first_raw_data = LoFiles.index("raw_serial_data_1.csv")
+
+    for file in LoFiles[:index_of_first_raw_data]:
+        df = pd.read_csv(path + "/" + file, engine='python', header=0, index_col=False)
+        new_time_of_flight_list = []
+        new_predicted_distance_list = []
+
+        for line in df.values:
+            current_datetime = datetime.datetime.strptime(line[2], '%Y-%m-%d %H:%M:%S.%f')
+
+            if counter == 0:
+                handler.FIRST_TIMESTAMP = current_datetime
+                counter += 1
+
+            diff_in_time = (current_datetime - handler.FIRST_TIMESTAMP).total_seconds()
+            time_of_flight = diff_in_time % handler.delta_t_avg
+
+            if time_of_flight > 8:
+                time_of_flight = handler.delta_t_avg - time_of_flight
+
+            current_index = np.where(df.values == line)[0][0]
+
+            if current_index > 1:
+                previous_line = df.values[current_index -1]
+                previous_time_of_flight = previous_line[-2]
+
+                if time_of_flight > (previous_time_of_flight * 10):
+                    handler.additive += (time_of_flight - previous_time_of_flight)
+                    revised_initial_time = handler.FIRST_TIMESTAMP + handler.additive
+                    handler.FIRST_TIMESTAMP = revised_initial_time
+            
+            new_time_of_flight_list.append(time_of_flight)
+            new_predicted_distance_list.append(time_of_flight * handler.delta_t_avg)
+        
+        df['Time of Flight (s)'] = new_time_of_flight_list
+        df['Predicted Distance (m)'] = new_predicted_distance_list
+        data_list = df.values
+
+        df.to_csv(file, index=False)
+
+        delta_t = handler.make_delta_t(data_list)
+
+        # get std dev, statistics.stdev(sample_set, x_bar)
+        std_dev_delta_t = statistics.stdev(delta_t[1:], statistics.mean(delta_t[1:]))
+        print("Standard Deviation of sample's delta_t is % s " % (std_dev_delta_t))
+
+        handler.create_histogram(file[:-4], delta_t)
+
+        # lists to get projected &  real tot & error between them
+        predicted_times_of_transmission  = handler.get_predicted_times(delta_t)
+        real_times_of_transmission  = handler.get_real_times(delta_t)
+        error_tot = handler.get_error_tot(predicted_times_of_transmission, real_times_of_transmission)
+
+        clock_times = []
+
+        if new_dataset:
+            datafile = open(path + '/raw_serial_' + file, 'r')
+            datareader = csv.reader(datafile, delimiter=',')
+            for row in datareader:
+                if row == []:
+                    pass
+                else:
+                    clock_times.append(row[-1])    
+
+        times_list = [delta_t, real_times_of_transmission, predicted_times_of_transmission, error_tot, clock_times]
+
+        # create csvs and plot
+        with open(file[:-4] + "_calculated_error_values.csv", "w") as f:
+            writer = csv.writer(f)
+            writer.writerows(times_list)
+
+        if new_dataset:
+            handler.create_plots(file[:-4])
+        else:
+            handler.create_plots_without_noise_signal(file[:-4])
+
+    foldername = input("What do you want to name the folder? (DO NOT REPEAT OLD DATASET NAME): ")
+    
+    if new_dataset:
+        handler.create_final_plots()
+    else:
+        handler.create_final_plots_without_noise_signal()
+        
+    handler.organize_files(foldername)
+
+
+if __name__ == '__main__':
+    handler = Serial_Data_Handler()
+
+    which_data = input("Are you collecting new data or using old data? (Enter new or old): ")
+
+    if which_data.lower() ==  "new":
+        run_program_with_new_data(handler)
+    elif which_data.lower() == "old":
+        run_program_with_old_data(handler)
+    else:
+        print("Invalid Input. Please rerun the program and try again.")
