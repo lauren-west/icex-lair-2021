@@ -35,7 +35,9 @@ namespace CsharpAUV
             SerialDataHandler serialdatahandler = new SerialDataHandler();
 
             // Create a new SerialPort object with default settings.
-            _serialPort = new SerialPort("COM3", 9600);
+            SerialPort _serialPort = new SerialPort();
+
+            _serialPort.PortName = SetPortName(_serialPort.PortName);
 
             //Set the read / write timeouts
             _serialPort.ReadTimeout = 500;
