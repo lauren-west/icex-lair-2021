@@ -23,7 +23,7 @@ namespace CsharpAUV
 
         public SerialDataHandler()
         {
-            // this.rawSerialData = new List<string>();
+            //this.rawSerialData = new List<string>();
         }
 
         static void Main(string[] args)
@@ -32,7 +32,7 @@ namespace CsharpAUV
             string name;
             string message;
             StringComparer stringComparer = StringComparer.OrdinalIgnoreCase;
-            Thread readThread = new Thread(Read);
+            //Thread readThread = new Thread(Read);
             SerialDataHandler serialdatahandler = new SerialDataHandler();
 
             // Create a new SerialPort object with default settings.
@@ -45,35 +45,25 @@ namespace CsharpAUV
             _serialPort.WriteTimeout = 500;
 
             Console.WriteLine("Beginning to listen to " + _serialPort.PortName + ".");
+
             _serialPort.Open();
             _continue = true;
+
             //readThread.Start();
 
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
-            //Console.Write("Name: ");
-            name = "randomidk";
-            //Console.ReadLine();
-           
-
-            Console.WriteLine("Type QUIT to exit");
-            while (_continue)
-            {
-                Console.WriteLine("message created in main");
-                message = Console.ReadLine();
-
-                if (stringComparer.Equals("quit", message))
+            while (sw.ElapsedMilliseconds < timeToRun) {
+                try
                 {
-                    _continue = false;
-                    
+                    message = _serialPort.ReadLine();
+                    Console.WriteLine(message);
+                    serialdatahandler.rawSerialData.Add(message);
                 }
-                else
-                {
-                    _serialPort.WriteLine(
-                        String.Format("<{0}>: {1}", name, message));
-                }
+                catch (TimeoutException) { }
             }
+
             //while (_continue)
             //{
             //    message = Console.ReadLine();
@@ -88,7 +78,38 @@ namespace CsharpAUV
             //    }
             //}
 
-            readThread.Join();
+            //Console.WriteLine("Type QUIT to exit");
+            //while (_continue)
+            //{
+            //    Console.WriteLine("message created in main");
+            //    message = Console.ReadLine();
+
+            //    if (stringComparer.Equals("quit", message))
+            //    {
+            //        _continue = false;
+                    
+            //    }
+            //    else
+            //    {
+            //        _serialPort.WriteLine(
+            //            String.Format("<{0}>: {1}", name, message));
+            //    }
+            //}
+            //while (_continue)
+            //{
+            //    message = Console.ReadLine();
+            //    if (sw.ElapsedMilliseconds > timeToRun)
+            //    {
+            //        _continue = false;
+            //    }
+            //    else
+            //    {
+            //        _serialPort.WriteLine(
+            //            String.Format("<{0}>: {1}", name, message));
+            //    }
+            //}
+
+            //readThread.Join();
             _serialPort.Close();
 
             serialdatahandler.rawSerialData.ForEach(Console.WriteLine);
@@ -208,18 +229,19 @@ namespace CsharpAUV
 
             return timeToRun;
         }
-        public static void Read()
-        {
-            while (_continue)
-            {
-                try
-                {
-                    string message = _serialPort.ReadLine();
-                    Console.WriteLine(message);
-                }
-                catch (TimeoutException) { }
-            }
-        }
+
+        //public static void Read()
+        //{
+        //    while (_continue)
+        //    {
+        //        try
+        //        {
+        //            string message = _serialPort.ReadLine();
+        //            Console.WriteLine(message);
+        //        }
+        //        catch (TimeoutException) { }
+        //    }
+        //}
 
         // Display Port values and prompt user to enter a port.
         public static string SetPortName(string defaultPortName)
