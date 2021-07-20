@@ -35,7 +35,7 @@ namespace CsharpAUV
             SerialDataHandler serialdatahandler = new SerialDataHandler();
 
             // Create a new SerialPort object with default settings.
-            SerialPort _serialPort = new SerialPort();
+            _serialPort = new SerialPort();
 
             _serialPort.PortName = SetPortName(_serialPort.PortName);
 
@@ -57,8 +57,7 @@ namespace CsharpAUV
             while (_continue)
             {
                 message = Console.ReadLine();
-
-                if (sw.ElapsedMilliseconds < timeToRun)
+                if (sw.ElapsedMilliseconds > timeToRun)
                 {
                     _continue = false;
                 }
@@ -185,8 +184,6 @@ namespace CsharpAUV
 
             return timeToRun;
         }
-
-
         public static void Read()
         {
             while (_continue)
@@ -199,7 +196,6 @@ namespace CsharpAUV
                 catch (TimeoutException) { }
             }
         }
-
 
         // Display Port values and prompt user to enter a port.
         public static string SetPortName(string defaultPortName)
