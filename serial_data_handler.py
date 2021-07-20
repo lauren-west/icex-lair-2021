@@ -433,11 +433,6 @@ class Serial_Data_Handler():
             
             final_df = pd.concat(df_list)
 
-        # with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
-        #     print(final_df)
-        print(final_df['Distance (m)'])
-        print(final_df['Predicted Distance (m)'])
-
         # sns.lmplot(x='Distance (m)', y='Predicted Distance (m)', fit_reg = True, data=final_df, hue='Transmitter ID Number')
         plt.scatter(final_df['Distance (m)'], final_df['Predicted Distance (m)'])
         plt.ylim(None, None)
@@ -532,9 +527,7 @@ def run_program_with_new_data(handler):
                 row = output[-1]
                 line = row.split(',')
                 line = [s[s.find("=")+1:].strip() for s in line]
-                # print(row)
                 line.append(time_elapsed)
-                # print(row)
                 writer.writerow(line)
 
 
