@@ -81,6 +81,7 @@ namespace CsharpAUV
             
             // outputToParticleFilter = distances, datetimes, transmitterID
             serialdatahandler.outputToParticleFilter = Tuple.Create(distances, data.Item1, data.Item2);
+            Console.WriteLine(serialdatahandler.outputToParticleFilter);
 
         }
 
