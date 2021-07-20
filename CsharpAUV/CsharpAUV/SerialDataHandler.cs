@@ -59,7 +59,6 @@ namespace CsharpAUV
                 {
                     message = _serialPort.ReadLine();
                     Console.WriteLine(message);
-                    serialdatahandler.rawSerialData.Add(message);
                 }
                 catch (TimeoutException) { }
             }
