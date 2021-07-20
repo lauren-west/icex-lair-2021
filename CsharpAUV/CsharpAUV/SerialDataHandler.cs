@@ -18,11 +18,12 @@ namespace CsharpAUV
         double speedOfSound = calcSpeedOfSound();
         static int timeToRun = getTimeToRun();
 
+
         Tuple<List<double>, List<DateTime>, List<string>> outputToParticleFilter;
 
         public SerialDataHandler()
         {
-            this.rawSerialData = new List<string>();
+            // this.rawSerialData = new List<string>();
         }
 
         static void Main(string[] args)
@@ -46,22 +47,26 @@ namespace CsharpAUV
             Console.WriteLine("Beginning to listen to " + _serialPort.PortName + ".");
             _serialPort.Open();
             _continue = true;
-            readThread.Start();
-            
-            Console.Write("Name: ");
-            name = Console.ReadLine();
+            //readThread.Start();
 
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
+            //Console.Write("Name: ");
+            name = "randomidk";
+            //Console.ReadLine();
+           
+
             Console.WriteLine("Type QUIT to exit");
             while (_continue)
             {
+                Console.WriteLine("message created in main");
                 message = Console.ReadLine();
 
                 if (stringComparer.Equals("quit", message))
                 {
                     _continue = false;
+                    
                 }
                 else
                 {
@@ -86,6 +91,8 @@ namespace CsharpAUV
             readThread.Join();
             _serialPort.Close();
 
+            serialdatahandler.rawSerialData.ForEach(Console.WriteLine);
+
             // start using data (datetimes, transmitterIDs)
             Tuple<List<DateTime>, List<string>> data = serialdatahandler.makeData();
 
@@ -93,7 +100,7 @@ namespace CsharpAUV
 
             List<double> distances = serialdatahandler.calcDistFromTOF(timeOfFlight);
             
-            // outputToParticleFilter = distances, datetimes, transmitterID
+            //outputToParticleFilter = distances, datetimes, transmitterID
             serialdatahandler.outputToParticleFilter = Tuple.Create(distances, data.Item1, data.Item2);
             Console.WriteLine(serialdatahandler.outputToParticleFilter);
 
@@ -142,7 +149,9 @@ namespace CsharpAUV
             List<string> transmitterID = new List<string>();
 
             foreach (string line in rawSerialData) {
-                string[] tempArr = line.Split();
+                Console.WriteLine(line);
+                string[] tempArr = line.Split(',');
+                Console.WriteLine(tempArr);
                 if (tempArr.Length <= 10)
                 {
                     transmitterID.Add(tempArr[4]);
