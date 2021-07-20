@@ -135,13 +135,15 @@ class Serial_Data_Handler():
                 time_of_flight = self.delta_t_avg - time_of_flight
 
             current_index = output.index(line)
-            previous_line = output[current_index -1]
 
-            previous_time_of_flight = previous_line[-2]
-            if time_of_flight > (previous_time_of_flight * 10):
-                self.additive += (time_of_flight - previous_time_of_flight)
-                revised_initial_time = self.FIRST_TIMESTAMP + self.additive
-                self.FIRST_TIMESTAMP = revised_initial_time
+            if current_index > 1:
+                previous_line = output[current_index -1]
+                previous_time_of_flight = previous_line[-2]
+
+                if time_of_flight > (previous_time_of_flight * 10):
+                    self.additive += (time_of_flight - previous_time_of_flight)
+                    revised_initial_time = self.FIRST_TIMESTAMP + self.additive
+                    self.FIRST_TIMESTAMP = revised_initial_time
 
             line.append(diff_in_time)
             line.append(time_of_flight)
