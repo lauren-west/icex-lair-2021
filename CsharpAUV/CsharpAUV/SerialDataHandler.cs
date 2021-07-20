@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO.Ports;
-using System.Threading;
 using System.Device.Location;
 using System.Collections.Generic;
 using System.Globalization;
@@ -29,10 +28,8 @@ namespace CsharpAUV
         static void Main(string[] args)
         {
             Console.WriteLine("Welcome.");
-            string name;
             string message;
             StringComparer stringComparer = StringComparer.OrdinalIgnoreCase;
-            //Thread readThread = new Thread(Read);
             SerialDataHandler serialdatahandler = new SerialDataHandler();
 
             // Create a new SerialPort object with default settings.
@@ -49,8 +46,6 @@ namespace CsharpAUV
             _serialPort.Open();
             _continue = true;
 
-            //readThread.Start();
-
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
@@ -63,52 +58,6 @@ namespace CsharpAUV
                 catch (TimeoutException) { }
             }
 
-            //while (_continue)
-            //{
-            //    message = Console.ReadLine();
-            //    if (sw.ElapsedMilliseconds > timeToRun)
-            //    {
-            //        _continue = false;
-            //    }
-            //    else
-            //    {
-            //        _serialPort.WriteLine(
-            //            String.Format("<{0}>: {1}", name, message));
-            //    }
-            //}
-
-            //Console.WriteLine("Type QUIT to exit");
-            //while (_continue)
-            //{
-            //    Console.WriteLine("message created in main");
-            //    message = Console.ReadLine();
-
-            //    if (stringComparer.Equals("quit", message))
-            //    {
-            //        _continue = false;
-                    
-            //    }
-            //    else
-            //    {
-            //        _serialPort.WriteLine(
-            //            String.Format("<{0}>: {1}", name, message));
-            //    }
-            //}
-            //while (_continue)
-            //{
-            //    message = Console.ReadLine();
-            //    if (sw.ElapsedMilliseconds > timeToRun)
-            //    {
-            //        _continue = false;
-            //    }
-            //    else
-            //    {
-            //        _serialPort.WriteLine(
-            //            String.Format("<{0}>: {1}", name, message));
-            //    }
-            //}
-
-            //readThread.Join();
             _serialPort.Close();
 
             serialdatahandler.rawSerialData.ForEach(Console.WriteLine);
