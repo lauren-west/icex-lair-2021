@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO.Ports;
-using System.Threading;
 using System.Device.Location;
 using System.Collections.Generic;
 using System.Globalization;
@@ -13,29 +12,28 @@ namespace CsharpAUV
     {
         static bool _continue;
         static SerialPort _serialPort;
-        public List<string> rawSerialData;
+        public List<string> rawSerialData = new List<string>();
 
         double speedOfSound = calcSpeedOfSound();
         static int timeToRun = getTimeToRun();
+
 
         Tuple<List<double>, List<DateTime>, List<string>> outputToParticleFilter;
 
         public SerialDataHandler()
         {
-            this.rawSerialData = new List<string>();
+            //this.rawSerialData = new List<string>();
         }
 
         static void Main(string[] args)
         {
             Console.WriteLine("Welcome.");
-            string name;
             string message;
             StringComparer stringComparer = StringComparer.OrdinalIgnoreCase;
-            Thread readThread = new Thread(Read);
             SerialDataHandler serialdatahandler = new SerialDataHandler();
 
             // Create a new SerialPort object with default settings.
-            SerialPort _serialPort = new SerialPort();
+            _serialPort = new SerialPort();
 
             _serialPort.PortName = SetPortName(_serialPort.PortName);
 
@@ -44,33 +42,26 @@ namespace CsharpAUV
             _serialPort.WriteTimeout = 500;
 
             Console.WriteLine("Beginning to listen to " + _serialPort.PortName + ".");
+
             _serialPort.Open();
             _continue = true;
-            readThread.Start();
-            
-            Console.Write("Name: ");
-            name = Console.ReadLine();
 
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
-            while (_continue)
-            {
-                message = Console.ReadLine();
-
-                if (sw.ElapsedMilliseconds < timeToRun)
+            while (sw.ElapsedMilliseconds < timeToRun) {
+                try
                 {
-                    _continue = false;
+                    message = _serialPort.ReadLine();
+                    Console.WriteLine(message);
+                    serialdatahandler.rawSerialData.Add(message);
                 }
-                else
-                {
-                    _serialPort.WriteLine(
-                        String.Format("<{0}>: {1}", name, message));
-                }
+                catch (TimeoutException) { }
             }
 
-            readThread.Join();
             _serialPort.Close();
+
+            serialdatahandler.rawSerialData.ForEach(Console.WriteLine);
 
             // start using data (datetimes, transmitterIDs)
             Tuple<List<DateTime>, List<string>> data = serialdatahandler.makeData();
@@ -79,8 +70,9 @@ namespace CsharpAUV
 
             List<double> distances = serialdatahandler.calcDistFromTOF(timeOfFlight);
             
-            // outputToParticleFilter = distances, datetimes, transmitterID
+            //outputToParticleFilter = distances, datetimes, transmitterID
             serialdatahandler.outputToParticleFilter = Tuple.Create(distances, data.Item1, data.Item2);
+            Console.WriteLine(serialdatahandler.outputToParticleFilter);
 
         }
 
@@ -127,7 +119,9 @@ namespace CsharpAUV
             List<string> transmitterID = new List<string>();
 
             foreach (string line in rawSerialData) {
-                string[] tempArr = line.Split();
+                Console.WriteLine(line);
+                string[] tempArr = line.Split(',');
+                Console.WriteLine(tempArr);
                 if (tempArr.Length <= 10)
                 {
                     transmitterID.Add(tempArr[4]);
@@ -185,20 +179,18 @@ namespace CsharpAUV
             return timeToRun;
         }
 
-
-        public static void Read()
-        {
-            while (_continue)
-            {
-                try
-                {
-                    string message = _serialPort.ReadLine();
-                    Console.WriteLine(message);
-                }
-                catch (TimeoutException) { }
-            }
-        }
-
+        //public static void Read()
+        //{
+        //    while (_continue)
+        //    {
+        //        try
+        //        {
+        //            string message = _serialPort.ReadLine();
+        //            Console.WriteLine(message);
+        //        }
+        //        catch (TimeoutException) { }
+        //    }
+        //}
 
         // Display Port values and prompt user to enter a port.
         public static string SetPortName(string defaultPortName)
