@@ -2,7 +2,7 @@
   <MonoDevelop.Ide.ItemProperties.CsharpAUV PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.Workbench ActiveDocument="CsharpAUV/SerialDataHandler.cs">
     <Files>
-      <File FileName="CsharpAUV/SerialDataHandler.cs" Line="38" Column="47" />
+      <File FileName="CsharpAUV/SerialDataHandler.cs" Line="7" Column="25" />
       <File FileName="../serial_data_handler.py" />
     </Files>
     <Pads>

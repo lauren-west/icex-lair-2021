@@ -54,10 +54,12 @@ namespace CsharpAUV
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
+            Console.WriteLine("Type QUIT to exit");
             while (_continue)
             {
                 message = Console.ReadLine();
-                if (sw.ElapsedMilliseconds > timeToRun)
+
+                if (stringComparer.Equals("quit", message))
                 {
                     _continue = false;
                 }
@@ -67,6 +69,19 @@ namespace CsharpAUV
                         String.Format("<{0}>: {1}", name, message));
                 }
             }
+            //while (_continue)
+            //{
+            //    message = Console.ReadLine();
+            //    if (sw.ElapsedMilliseconds > timeToRun)
+            //    {
+            //        _continue = false;
+            //    }
+            //    else
+            //    {
+            //        _serialPort.WriteLine(
+            //            String.Format("<{0}>: {1}", name, message));
+            //    }
+            //}
 
             readThread.Join();
             _serialPort.Close();
