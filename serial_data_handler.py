@@ -20,7 +20,7 @@ from geopy.distance import geodesic
 
 class Serial_Data_Handler():
 
-    TIME_TO_RUN = 180 # seconds
+    TIME_TO_RUN = 300 # seconds
     NUM_OF_BINS = 10 # Anywhere from 5-20 with 20 being with at least 1000 data points
 
     # allows user to input the temp., salinity, and depth the sensor is at when taking data
@@ -115,15 +115,20 @@ class Serial_Data_Handler():
             line = [s[s.find("=")+1:].strip() for s in line]
             self.FIRST_TIMESTAMP = datetime.datetime.strptime(line[2], '%Y-%m-%d %H:%M:%S.%f')
 
+    
         for line in output:
+            
             line = line.split(',')
             line = [s[s.find("=")+1:].strip() for s in line]
             
-            # if counter == 0:
-            #     initial_time = datetime.datetime.strptime(line[2], '%Y-%m-%d %H:%M:%S.%f')
-            #     counter += 1
-
+            if len(line) > 12:
+                summaries_list.append(line)
+            else:
+                data_list.append(line)
             
+        
+        for line in data_list[1:]:
+            current_index = data_list.index(line)
             line.append(self.TAG_COORDINATES)   #Adds tag coords for now
             line.append(self.SENSOR_COORDINATES)   #Adds sensor coords for now
 
@@ -135,16 +140,18 @@ class Serial_Data_Handler():
             if time_of_flight > 8:
                 time_of_flight = self.delta_t_avg - time_of_flight
 
-            current_index = output.index(line)
+            if current_index > 2:
+                previous_line = data_list[current_index - 1]
+                previous_time_of_flight = float(previous_line[-2])
 
-            if current_index > 1:
-                previous_line = output[current_index -1]
-                previous_time_of_flight = previous_line[-2]
-
-                if time_of_flight > (previous_time_of_flight * 10):
-                    self.additive += (time_of_flight - previous_time_of_flight)
-                    revised_initial_time = self.FIRST_TIMESTAMP + self.additive
+                diff_time_of_flight = time_of_flight - previous_time_of_flight
+                if diff_time_of_flight > 0.001:
+                    self.additive += diff_time_of_flight
+                    revised_initial_time = self.FIRST_TIMESTAMP + datetime.timedelta(0, handler.additive)
+                    print("We are at timestamp: ", current_datetime)
+                    print("\nBefore:", self.FIRST_TIMESTAMP)
                     self.FIRST_TIMESTAMP = revised_initial_time
+                    print("After:", self.FIRST_TIMESTAMP, "\n")
 
             line.append(diff_in_time)
             line.append(distance)
@@ -156,11 +163,6 @@ class Serial_Data_Handler():
                     s = float(s)
                 except:
                     pass  
-
-            if len(line) < 17:
-                data_list.append(line)
-            else:
-                summaries_list.append(line)
         
         return data_list, summaries_list
 
@@ -333,7 +335,7 @@ class Serial_Data_Handler():
 
         filename = iteration + '.csv'
         df = pd.read_csv(filename, header=0, index_col=False)   # read the file w/header row #0
-        print(f"{filename} : file read into a pandas dataframe.")
+        # print(f"{filename} : file read into a pandas dataframe.")
 
         plt.hist(df['Time of Flight (s)'], self.NUM_OF_BINS)
         plt.title("Time of Flight")
@@ -410,7 +412,7 @@ class Serial_Data_Handler():
 
     def create_final_plots_without_noise_signal(self, final_df = None, delta_t_values = None, error_values = None ):
 
-        if final_df == None or delta_t_values == None or error_values == None:
+        if final_df is None or delta_t_values is None or error_values is None:
             AllFiles = list(os.walk("."))  #Walks everything inside current directory
 
             df_list = []
@@ -597,13 +599,16 @@ def run_program_with_old_data(handler):
                 previous_line = df.values[current_index -1]
                 previous_time_of_flight = previous_line[-2]
 
-                if time_of_flight > (previous_time_of_flight * 10):
-                    handler.additive += (time_of_flight - previous_time_of_flight)
-                    revised_initial_time = handler.FIRST_TIMESTAMP + handler.additive
+                diff_time_of_flight = time_of_flight - previous_time_of_flight
+                if diff_time_of_flight > 0.001:
+                    handler.additive += diff_time_of_flight
+                    revised_initial_time = handler.FIRST_TIMESTAMP + datetime.timedelta(0, handler.additive)
+                    print("\nBefore:", handler.FIRST_TIMESTAMP)
                     handler.FIRST_TIMESTAMP = revised_initial_time
+                    print("After:", handler.FIRST_TIMESTAMP, "\n")
             
             new_time_of_flight_list.append(time_of_flight)
-            new_predicted_distance_list.append(time_of_flight * handler.delta_t_avg)
+            new_predicted_distance_list.append(time_of_flight * handler.SPEED_OF_SOUND)
         
         df['Time of Flight (s)'] = new_time_of_flight_list
         df['Predicted Distance (m)'] = new_predicted_distance_list
