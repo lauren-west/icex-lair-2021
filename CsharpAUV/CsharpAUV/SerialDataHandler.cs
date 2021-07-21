@@ -17,7 +17,7 @@ namespace CsharpAUV
         int timeToRun;
 
 
-        Tuple<List<double>, List<DateTime>, List<string>> outputToParticleFilter;
+        Tuple<List<double>, List<DateTime>, List<string>, List<string>> outputToParticleFilter;
 
         public SerialDataHandler()
         {
@@ -81,14 +81,16 @@ namespace CsharpAUV
                 _serialPort.Close();
             }
             // start using data (datetimes, transmitterIDs)
-            Tuple<List<DateTime>, List<string>> data = serialdatahandler.isloateInfoFromRawMessages();
+            Tuple<List<DateTime>, List<string>, List<string>> data = serialdatahandler.isloateInfoFromRawMessages();
 
             var (totalTime, timeOfFlight) = serialdatahandler.makeTimeOfFlightList(data.Item1);
 
             List<double> distances = serialdatahandler.calcDistFromTOF(timeOfFlight);
             
             //outputToParticleFilter = distances, datetimes, transmitterID
-            serialdatahandler.outputToParticleFilter = Tuple.Create(distances, data.Item1, data.Item2);
+
+            // ALSO OUTPUT SENSOR ID 
+            serialdatahandler.outputToParticleFilter = Tuple.Create(distances, data.Item1, data.Item2, data.Item3);
             Console.WriteLine(serialdatahandler.outputToParticleFilter);
 
         }
@@ -125,7 +127,7 @@ namespace CsharpAUV
             return Tuple.Create(totalTime, timeOfFlight);
         }
 
-        public Tuple<List<DateTime>, List<string>> isloateInfoFromRawMessages()
+        public Tuple<List<DateTime>, List<string>, List<string>> isloateInfoFromRawMessages()
         {   /* 
              * Using raw serial data, we isolate dateTimes and transmitterIDs
              * 
@@ -134,6 +136,7 @@ namespace CsharpAUV
 
             List<DateTime> dateTimes = new List<DateTime>();
             List<string> transmitterID = new List<string>();
+            List<string> sensorID = new List<string>();
 
             foreach (string line in this.rawSerialData) {
                 Console.WriteLine(line);
@@ -141,6 +144,7 @@ namespace CsharpAUV
                 Console.WriteLine(tempArr);
                 if (tempArr.Length <= 10)
                 {
+                    sensorID.Add(tempArr[0]);
                     transmitterID.Add(tempArr[4]);
                     dateTimes.Add(DateTimeOffset.Parse(tempArr[2]).UtcDateTime);
                 }
@@ -148,8 +152,9 @@ namespace CsharpAUV
             ArrayList DataList = new ArrayList();
             DataList.Add(dateTimes);
             DataList.Add(transmitterID);
+            DataList.Add(sensorID);
 
-            return Tuple.Create(dateTimes, transmitterID);
+            return Tuple.Create(dateTimes, transmitterID, sensorID);
         }
 
         public double calcSpeedOfSound() {
@@ -207,19 +212,6 @@ namespace CsharpAUV
 
             return timeToRun;
         }
-
-        //public static void Read()
-        //{
-        //    while (_continue)
-        //    {
-        //        try
-        //        {
-        //            string message = _serialPort.ReadLine();
-        //            Console.WriteLine(message);
-        //        }
-        //        catch (TimeoutException) { }
-        //    }
-        //}
 
         // Display Port values and prompt user to enter a port.
         public static string SetPortName(string defaultPortName)
