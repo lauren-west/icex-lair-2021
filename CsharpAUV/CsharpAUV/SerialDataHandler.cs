@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.IO.Ports;
 using System.Collections.Generic;
 using System.Collections;
@@ -34,7 +35,8 @@ namespace CsharpAUV
                 serialdatahandler.speedOfSound = 1500; 
                 Console.WriteLine("Input csv file name without file type");
                 string filename = Console.ReadLine();
-                using (var reader = new StreamReader(@"C:\"+ filename + ".csv"))
+                //using (var reader = new StreamReader(@"C:\" + filename + ".csv")) // old
+                using (var reader = new StreamReader(@"../../../"+ filename + ".csv"))
                 {
                     while (!reader.EndOfStream)
                     {
