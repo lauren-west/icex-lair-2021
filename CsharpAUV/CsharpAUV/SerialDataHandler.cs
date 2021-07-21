@@ -9,7 +9,6 @@ namespace CsharpAUV
 {
     class SerialDataHandler
     {
-        static bool _continue;
         static SerialPort _serialPort;
         //public List<string> rawSerialData = new List<string>();
         double speedOfSound;
@@ -35,13 +34,19 @@ namespace CsharpAUV
                 serialdatahandler.speedOfSound = 1500; 
                 Console.WriteLine("Input csv file name without file type");
                 string filename = Console.ReadLine();
-                //using (var reader = new StreamReader(@"C:\" + filename + ".csv")) // old
-                using (var reader = new StreamReader(@"../../../"+ filename + ".csv"))
+                //(@"C:\" + filename + ".csv") old file path
+                using (StreamReader sr = new StreamReader(@"../../../" + filename + ".csv"))
                 {
-                    while (!reader.EndOfStream)
+                    string headerLine = sr.ReadLine();
+                    string line;
+                    //string headerLine = reader.ReadLine();
+                    //while (!reader.EndOfStream)
+                    while ((line = sr.ReadLine()) != null)
                     {
-                        message = reader.ReadLine();
+                        //message = reader.ReadLine();
+                        message = sr.ReadLine();
                         //serialdatahandler.rawSerialData.Add(message);
+
                         if (message != null)
                         {
                             Tuple<DateTime, string, string> data = serialdatahandler.isolateInfoFromMessages(message);
@@ -50,6 +55,7 @@ namespace CsharpAUV
                                 serialdatahandler.firstDateTimeVal = data.Item1;
                                 serialdatahandler.firstDatetime = false;
                             }
+
                             double tof = serialdatahandler.makeTimeOfFlight(serialdatahandler.firstDateTimeVal, data.Item1);
                             double distance = serialdatahandler.calcDistFromTOF(tof);
 
@@ -77,7 +83,6 @@ namespace CsharpAUV
                 Console.WriteLine("Beginning to listen to " + _serialPort.PortName + ".");
 
                 _serialPort.Open();
-                _continue = true;
 
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
@@ -86,7 +91,6 @@ namespace CsharpAUV
                     try
                     {
                         message = _serialPort.ReadLine();
-                        Console.WriteLine(message);
                         //serialdatahandler.rawSerialData.Add(message);
                         if (message != null){
                             Tuple<DateTime, string, string> data = serialdatahandler.isolateInfoFromMessages(message);
@@ -142,14 +146,23 @@ namespace CsharpAUV
             string transmitterID = "";
             string sensorID = "";
 
+            Console.WriteLine(message);
             string[] tempArr = message.Split(',');
 
-            if (tempArr.Length <= 10)
+            foreach (string s in tempArr)
             {
                 sensorID = tempArr[0];
                 transmitterID = tempArr[4];
                 dateTimes = DateTimeOffset.Parse(tempArr[2]).UtcDateTime;
             }
+
+            // because many files have extra items appended to it (ROMANNNNNN)
+            //if (tempArr.Length <= 10)
+            //{
+            //    sensorID = tempArr[0];
+            //    transmitterID = tempArr[4];
+            //    dateTimes = DateTimeOffset.Parse(tempArr[2]).UtcDateTime;
+            //}
 
             return Tuple.Create(dateTimes, transmitterID, sensorID);
         }
