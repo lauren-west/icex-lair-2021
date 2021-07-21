@@ -13,9 +13,8 @@ namespace CsharpAUV
         static bool _continue;
         static SerialPort _serialPort;
         public List<string> rawSerialData = new List<string>();
-
-        double speedOfSound = calcSpeedOfSound();
-        static int timeToRun = getTimeToRun();
+        double speedOfSound;
+        int timeToRun;
 
 
         Tuple<List<double>, List<DateTime>, List<string>> outputToParticleFilter;
@@ -28,43 +27,61 @@ namespace CsharpAUV
         static void Main(string[] args)
         {
             Console.WriteLine("Welcome.");
-            string message;
-            StringComparer stringComparer = StringComparer.OrdinalIgnoreCase;
             SerialDataHandler serialdatahandler = new SerialDataHandler();
+            string message;
 
-            // Create a new SerialPort object with default settings.
-            _serialPort = new SerialPort();
-
-            _serialPort.PortName = SetPortName(_serialPort.PortName);
-
-            //Set the read / write timeouts
-            _serialPort.ReadTimeout = 500;
-            _serialPort.WriteTimeout = 500;
-
-            Console.WriteLine("Beginning to listen to " + _serialPort.PortName + ".");
-
-            _serialPort.Open();
-            _continue = true;
-
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-
-            while (sw.ElapsedMilliseconds < timeToRun) {
-                try
+            if (serialdatahandler.runCSV()) {
+                // assume speed of sound for old data is a default 1500
+                serialdatahandler.speedOfSound = 1500; 
+                Console.WriteLine("Input csv file name without file type");
+                string filename = Console.ReadLine();
+                using (var reader = new StreamReader(@"C:\"+ filename + ".csv"))
                 {
-                    message = _serialPort.ReadLine();
-                    Console.WriteLine(message);
-                    serialdatahandler.rawSerialData.Add(message);
+                    List<string> listA = new List<string>();
+                    List<string> listB = new List<string>();
+                    while (!reader.EndOfStream)
+                    {
+                        message = reader.ReadLine();
+                        serialdatahandler.rawSerialData.Add(message);
+                    }
                 }
-                catch (TimeoutException) { }
             }
+            else {
+                StringComparer stringComparer = StringComparer.OrdinalIgnoreCase;
+                serialdatahandler.speedOfSound = serialdatahandler.calcSpeedOfSound();
+                serialdatahandler.timeToRun = serialdatahandler.getTimeToRun();
 
-            _serialPort.Close();
+                // Create a new SerialPort object with default settings.
+                _serialPort = new SerialPort();
 
-            serialdatahandler.rawSerialData.ForEach(Console.WriteLine);
+                _serialPort.PortName = SetPortName(_serialPort.PortName);
 
+                //Set the read / write timeouts
+                _serialPort.ReadTimeout = 500;
+                _serialPort.WriteTimeout = 500;
+
+                Console.WriteLine("Beginning to listen to " + _serialPort.PortName + ".");
+
+                _serialPort.Open();
+                _continue = true;
+
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
+
+                while (sw.ElapsedMilliseconds < serialdatahandler.timeToRun) {
+                    try
+                    {
+                        message = _serialPort.ReadLine();
+                        Console.WriteLine(message);
+                        serialdatahandler.rawSerialData.Add(message);
+                    }
+                    catch (TimeoutException) { }
+                }
+
+                _serialPort.Close();
+            }
             // start using data (datetimes, transmitterIDs)
-            Tuple<List<DateTime>, List<string>> data = serialdatahandler.makeData();
+            Tuple<List<DateTime>, List<string>> data = serialdatahandler.isloateInfoFromRawMessages();
 
             var (totalTime, timeOfFlight) = serialdatahandler.makeTimeOfFlightList(data.Item1);
 
@@ -108,7 +125,7 @@ namespace CsharpAUV
             return Tuple.Create(totalTime, timeOfFlight);
         }
 
-        public Tuple<List<DateTime>, List<string>> makeData()
+        public Tuple<List<DateTime>, List<string>> isloateInfoFromRawMessages()
         {   /* 
              * Using raw serial data, we isolate dateTimes and transmitterIDs
              * 
@@ -118,7 +135,7 @@ namespace CsharpAUV
             List<DateTime> dateTimes = new List<DateTime>();
             List<string> transmitterID = new List<string>();
 
-            foreach (string line in rawSerialData) {
+            foreach (string line in this.rawSerialData) {
                 Console.WriteLine(line);
                 string[] tempArr = line.Split(',');
                 Console.WriteLine(tempArr);
@@ -135,7 +152,7 @@ namespace CsharpAUV
             return Tuple.Create(dateTimes, transmitterID);
         }
 
-        public static double calcSpeedOfSound() {
+        public double calcSpeedOfSound() {
             /* 
              * Prompts salinity, temperature, and depth quantities
              * 
@@ -163,7 +180,19 @@ namespace CsharpAUV
             return speedOfSound;
         }
 
-        public static int getTimeToRun()
+        public Boolean runCSV() {
+            Console.WriteLine("Would you like to run old data from a CSV? Respond with Y or N");
+            string yesno = (Console.ReadLine());
+            if (yesno == "Y")
+            {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        public int getTimeToRun()
         {   /* 
              * Prompts for a time to run in minutes,
              * 
