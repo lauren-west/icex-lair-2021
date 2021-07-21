@@ -1,8 +1,6 @@
 ﻿using System;
 using System.IO.Ports;
-using System.Device.Location;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Collections;
 using System.Diagnostics;
 
@@ -12,16 +10,17 @@ namespace CsharpAUV
     {
         static bool _continue;
         static SerialPort _serialPort;
-        public List<string> rawSerialData = new List<string>();
+        //public List<string> rawSerialData = new List<string>();
         double speedOfSound;
         int timeToRun;
+        DateTime firstDateTimeVal;
+        bool firstDatetime = true;
 
-
-        Tuple<List<double>, List<DateTime>, List<string>, List<string>> outputToParticleFilter;
+        // contains most recent measurement from serial port
+        Tuple<double, DateTime, string, string> outputToParticleFilter;
 
         public SerialDataHandler()
         {
-            //this.rawSerialData = new List<string>();
         }
 
         static void Main(string[] args)
@@ -37,12 +36,25 @@ namespace CsharpAUV
                 string filename = Console.ReadLine();
                 using (var reader = new StreamReader(@"C:\"+ filename + ".csv"))
                 {
-                    List<string> listA = new List<string>();
-                    List<string> listB = new List<string>();
                     while (!reader.EndOfStream)
                     {
                         message = reader.ReadLine();
-                        serialdatahandler.rawSerialData.Add(message);
+                        //serialdatahandler.rawSerialData.Add(message);
+                        if (message != null)
+                        {
+                            Tuple<DateTime, string, string> data = serialdatahandler.isolateInfoFromMessages(message);
+                            // retrieve first datetime (this only happens once per run!!)
+                            if (serialdatahandler.firstDatetime) { 
+                                serialdatahandler.firstDateTimeVal = data.Item1;
+                                serialdatahandler.firstDatetime = false;
+                            }
+                            double tof = serialdatahandler.makeTimeOfFlight(serialdatahandler.firstDateTimeVal, data.Item1);
+                            double distance = serialdatahandler.calcDistFromTOF(tof);
+
+                            //outputToParticleFilter = distance, datetime, transmitterID, sensorID
+                            serialdatahandler.outputToParticleFilter = Tuple.Create(distance, data.Item1, data.Item2, data.Item3);
+                        }
+
                     }
                 }
             }
@@ -73,86 +85,69 @@ namespace CsharpAUV
                     {
                         message = _serialPort.ReadLine();
                         Console.WriteLine(message);
-                        serialdatahandler.rawSerialData.Add(message);
+                        //serialdatahandler.rawSerialData.Add(message);
+                        if (message != null){
+                            Tuple<DateTime, string, string> data = serialdatahandler.isolateInfoFromMessages(message);
+                            // retrieve first datetime (this only happens once per run!!)
+                            if (serialdatahandler.firstDatetime)
+                            {
+                                serialdatahandler.firstDateTimeVal = data.Item1;
+                                serialdatahandler.firstDatetime = false;
+                            }
+                            double tof = serialdatahandler.makeTimeOfFlight(serialdatahandler.firstDateTimeVal, data.Item1);
+                            double distance = serialdatahandler.calcDistFromTOF(tof);
+
+                            //outputToParticleFilter = distance, datetime, transmitterID, sensorID
+                            serialdatahandler.outputToParticleFilter = Tuple.Create(distance, data.Item1, data.Item2, data.Item3);
+                        }
                     }
                     catch (TimeoutException) { }
                 }
 
                 _serialPort.Close();
             }
-            // start using data (datetimes, transmitterIDs)
-            Tuple<List<DateTime>, List<string>, List<string>> data = serialdatahandler.isloateInfoFromRawMessages();
-
-            var (totalTime, timeOfFlight) = serialdatahandler.makeTimeOfFlightList(data.Item1);
-
-            List<double> distances = serialdatahandler.calcDistFromTOF(timeOfFlight);
-            
-            //outputToParticleFilter = distances, datetimes, transmitterID
-
-            // ALSO OUTPUT SENSOR ID 
-            serialdatahandler.outputToParticleFilter = Tuple.Create(distances, data.Item1, data.Item2, data.Item3);
-            Console.WriteLine(serialdatahandler.outputToParticleFilter);
 
         }
 
-        public List<double> calcDistFromTOF(List<double> timeOfFlight)
-        {  /* 
-            * param: list of timeOfFlight 
-            * returns: list of distances
+        public double calcDistFromTOF(double tof)
+        {  /* getting predicted distance from TOF
+            * 
+            * param: (double) timeOfFlight 
+            * returns: (double) distances
             */
-            // getting predicted distance from TOF
-            List<double> distances = new List<double>();
-            for (int i = 0; i < timeOfFlight.Count; i++)
-            {
-                distances.Add(this.speedOfSound * timeOfFlight[i]);
-            }
-            return distances;
+
+            return this.speedOfSound * tof;
         }
 
-        public Tuple<List<double>, List<double>> makeTimeOfFlightList(List<DateTime> dateTimes)
+        public double makeTimeOfFlight(DateTime initial, DateTime dateTimeCurrent)
         {   /* 
-             * param: list of dateTimes 
-             * returns: list of totalTime and list of timeOfFlight
+             * param: dateTime
+             * returns: timeOfFlight
              */
-
-            List<double> totalTime = new List<double>();
-            List<double> timeOfFlight = new List<double>();
-            DateTime initialTime = dateTimes[0];
-            for (int i = 1; i < dateTimes.Count; i++) {
-                double diff1 = dateTimes[i].Subtract(initialTime).TotalSeconds;
-                totalTime.Add(diff1);
-                timeOfFlight.Add(diff1 % 8.179); // add total time % 8.179 to get tof
-            }
-
-            return Tuple.Create(totalTime, timeOfFlight);
+            double diff1 = dateTimeCurrent.Subtract(initial).TotalSeconds;
+            return diff1 % 8.179; ; // add total time % 8.179 to get tof
+            
         }
 
-        public Tuple<List<DateTime>, List<string>, List<string>> isloateInfoFromRawMessages()
+        public Tuple<DateTime, string, string> isolateInfoFromMessages(string message)
         {   /* 
              * Using raw serial data, we isolate dateTimes and transmitterIDs
              * 
-             * returns: list of dateTimes and list of transmitterID
+             * returns: dateTime, transmitterID, and sensor id
              */
 
-            List<DateTime> dateTimes = new List<DateTime>();
-            List<string> transmitterID = new List<string>();
-            List<string> sensorID = new List<string>();
+            DateTime dateTimes = new DateTime();
+            string transmitterID = "";
+            string sensorID = "";
 
-            foreach (string line in this.rawSerialData) {
-                Console.WriteLine(line);
-                string[] tempArr = line.Split(',');
-                Console.WriteLine(tempArr);
-                if (tempArr.Length <= 10)
-                {
-                    sensorID.Add(tempArr[0]);
-                    transmitterID.Add(tempArr[4]);
-                    dateTimes.Add(DateTimeOffset.Parse(tempArr[2]).UtcDateTime);
-                }
+            string[] tempArr = message.Split(',');
+
+            if (tempArr.Length <= 10)
+            {
+                sensorID = tempArr[0];
+                transmitterID = tempArr[4];
+                dateTimes = DateTimeOffset.Parse(tempArr[2]).UtcDateTime;
             }
-            ArrayList DataList = new ArrayList();
-            DataList.Add(dateTimes);
-            DataList.Add(transmitterID);
-            DataList.Add(sensorID);
 
             return Tuple.Create(dateTimes, transmitterID, sensorID);
         }
