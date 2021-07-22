@@ -1,8 +1,7 @@
 ﻿using System;
+using System.IO;
 using System.IO.Ports;
-using System.Device.Location;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Collections;
 using System.Diagnostics;
 
@@ -10,132 +9,165 @@ namespace CsharpAUV
 {
     class SerialDataHandler
     {
-        static bool _continue;
         static SerialPort _serialPort;
-        public List<string> rawSerialData = new List<string>();
+        //public List<string> rawSerialData = new List<string>();
+        double speedOfSound;
+        int timeToRun;
+        DateTime firstDateTimeVal;
+        bool firstDatetime = true;
 
-        double speedOfSound = calcSpeedOfSound();
-        static int timeToRun = getTimeToRun();
-
-
-        Tuple<List<double>, List<DateTime>, List<string>> outputToParticleFilter;
+        // contains most recent measurement from serial port
+        Tuple<double, DateTime, string, string> outputToParticleFilter;
 
         public SerialDataHandler()
         {
-            //this.rawSerialData = new List<string>();
         }
 
         static void Main(string[] args)
         {
             Console.WriteLine("Welcome.");
-            string message;
-            StringComparer stringComparer = StringComparer.OrdinalIgnoreCase;
             SerialDataHandler serialdatahandler = new SerialDataHandler();
+            string message;
 
-            // Create a new SerialPort object with default settings.
-            _serialPort = new SerialPort();
-
-            _serialPort.PortName = SetPortName(_serialPort.PortName);
-
-            //Set the read / write timeouts
-            _serialPort.ReadTimeout = 500;
-            _serialPort.WriteTimeout = 500;
-
-            Console.WriteLine("Beginning to listen to " + _serialPort.PortName + ".");
-
-            _serialPort.Open();
-            _continue = true;
-
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-
-            while (sw.ElapsedMilliseconds < timeToRun) {
-                try
+            if (serialdatahandler.runCSV()) {
+                // assume speed of sound for old data is a default 1500
+                serialdatahandler.speedOfSound = 1500; 
+                Console.WriteLine("Input csv file name without file type");
+                string filename = Console.ReadLine();
+                //(@"C:\" + filename + ".csv") old file path
+                using (StreamReader sr = new StreamReader(@"../../../" + filename + ".csv"))
                 {
-                    message = _serialPort.ReadLine();
-                    Console.WriteLine(message);
-                    serialdatahandler.rawSerialData.Add(message);
+                    string headerLine = sr.ReadLine();
+                    string line;
+                    //string headerLine = reader.ReadLine();
+                    //while (!reader.EndOfStream)
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        //message = reader.ReadLine();
+                        message = sr.ReadLine();
+                        //serialdatahandler.rawSerialData.Add(message);
+
+                        if (message != null)
+                        {
+                            Tuple<DateTime, string, string> data = serialdatahandler.isolateInfoFromMessages(message);
+                            // retrieve first datetime (this only happens once per run!!)
+                            if (serialdatahandler.firstDatetime) { 
+                                serialdatahandler.firstDateTimeVal = data.Item1;
+                                serialdatahandler.firstDatetime = false;
+                            }
+
+                            double tof = serialdatahandler.makeTimeOfFlight(serialdatahandler.firstDateTimeVal, data.Item1);
+                            double distance = serialdatahandler.calcDistFromTOF(tof);
+
+                            //outputToParticleFilter = distance, datetime, transmitterID, sensorID
+                            serialdatahandler.outputToParticleFilter = Tuple.Create(distance, data.Item1, data.Item2, data.Item3);
+                        }
+
+                    }
                 }
-                catch (TimeoutException) { }
             }
+            else {
+                StringComparer stringComparer = StringComparer.OrdinalIgnoreCase;
+                serialdatahandler.speedOfSound = serialdatahandler.calcSpeedOfSound();
+                serialdatahandler.timeToRun = serialdatahandler.getTimeToRun();
 
-            _serialPort.Close();
+                // Create a new SerialPort object with default settings.
+                _serialPort = new SerialPort();
 
-            serialdatahandler.rawSerialData.ForEach(Console.WriteLine);
+                _serialPort.PortName = SetPortName(_serialPort.PortName);
 
-            // start using data (datetimes, transmitterIDs)
-            Tuple<List<DateTime>, List<string>> data = serialdatahandler.makeData();
+                //Set the read / write timeouts
+                _serialPort.ReadTimeout = 500;
+                _serialPort.WriteTimeout = 500;
 
-            var (totalTime, timeOfFlight) = serialdatahandler.makeTimeOfFlightList(data.Item1);
+                Console.WriteLine("Beginning to listen to " + _serialPort.PortName + ".");
 
-            List<double> distances = serialdatahandler.calcDistFromTOF(timeOfFlight);
-            
-            //outputToParticleFilter = distances, datetimes, transmitterID
-            serialdatahandler.outputToParticleFilter = Tuple.Create(distances, data.Item1, data.Item2);
-            Console.WriteLine(serialdatahandler.outputToParticleFilter);
+                _serialPort.Open();
+
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
+
+                while (sw.ElapsedMilliseconds < serialdatahandler.timeToRun) {
+                    try
+                    {
+                        message = _serialPort.ReadLine();
+                        //serialdatahandler.rawSerialData.Add(message);
+                        if (message != null){
+                            Tuple<DateTime, string, string> data = serialdatahandler.isolateInfoFromMessages(message);
+                            // retrieve first datetime (this only happens once per run!!)
+                            if (serialdatahandler.firstDatetime)
+                            {
+                                serialdatahandler.firstDateTimeVal = data.Item1;
+                                serialdatahandler.firstDatetime = false;
+                            }
+                            double tof = serialdatahandler.makeTimeOfFlight(serialdatahandler.firstDateTimeVal, data.Item1);
+                            double distance = serialdatahandler.calcDistFromTOF(tof);
+
+                            //outputToParticleFilter = distance, datetime, transmitterID, sensorID
+                            serialdatahandler.outputToParticleFilter = Tuple.Create(distance, data.Item1, data.Item2, data.Item3);
+                        }
+                    }
+                    catch (TimeoutException) { }
+                }
+
+                _serialPort.Close();
+            }
 
         }
 
-        public List<double> calcDistFromTOF(List<double> timeOfFlight)
-        {  /* 
-            * param: list of timeOfFlight 
-            * returns: list of distances
+        public double calcDistFromTOF(double tof)
+        {  /* getting predicted distance from TOF
+            * 
+            * param: (double) timeOfFlight 
+            * returns: (double) distances
             */
-            // getting predicted distance from TOF
-            List<double> distances = new List<double>();
-            for (int i = 0; i < timeOfFlight.Count; i++)
-            {
-                distances.Add(this.speedOfSound * timeOfFlight[i]);
-            }
-            return distances;
+
+            return this.speedOfSound * tof;
         }
 
-        public Tuple<List<double>, List<double>> makeTimeOfFlightList(List<DateTime> dateTimes)
+        public double makeTimeOfFlight(DateTime initial, DateTime dateTimeCurrent)
         {   /* 
-             * param: list of dateTimes 
-             * returns: list of totalTime and list of timeOfFlight
+             * param: dateTime
+             * returns: timeOfFlight
              */
-
-            List<double> totalTime = new List<double>();
-            List<double> timeOfFlight = new List<double>();
-            DateTime initialTime = dateTimes[0];
-            for (int i = 1; i < dateTimes.Count; i++) {
-                double diff1 = dateTimes[i].Subtract(initialTime).TotalSeconds;
-                totalTime.Add(diff1);
-                timeOfFlight.Add(diff1 % 8.179); // add total time % 8.179 to get tof
-            }
-
-            return Tuple.Create(totalTime, timeOfFlight);
+            double diff1 = dateTimeCurrent.Subtract(initial).TotalSeconds;
+            return diff1 % 8.179; ; // add total time % 8.179 to get tof
+            
         }
 
-        public Tuple<List<DateTime>, List<string>> makeData()
+        public Tuple<DateTime, string, string> isolateInfoFromMessages(string message)
         {   /* 
              * Using raw serial data, we isolate dateTimes and transmitterIDs
              * 
-             * returns: list of dateTimes and list of transmitterID
+             * returns: dateTime, transmitterID, and sensor id
              */
 
-            List<DateTime> dateTimes = new List<DateTime>();
-            List<string> transmitterID = new List<string>();
+            DateTime dateTimes = new DateTime();
+            string transmitterID = "";
+            string sensorID = "";
 
-            foreach (string line in rawSerialData) {
-                Console.WriteLine(line);
-                string[] tempArr = line.Split(',');
-                Console.WriteLine(tempArr);
-                if (tempArr.Length <= 10)
-                {
-                    transmitterID.Add(tempArr[4]);
-                    dateTimes.Add(DateTimeOffset.Parse(tempArr[2]).UtcDateTime);
-                }
+            Console.WriteLine(message);
+            string[] tempArr = message.Split(',');
+
+            foreach (string s in tempArr)
+            {
+                sensorID = tempArr[0];
+                transmitterID = tempArr[4];
+                dateTimes = DateTimeOffset.Parse(tempArr[2]).UtcDateTime;
             }
-            ArrayList DataList = new ArrayList();
-            DataList.Add(dateTimes);
-            DataList.Add(transmitterID);
 
-            return Tuple.Create(dateTimes, transmitterID);
+            // because many files have extra items appended to it (ROMANNNNNN)
+            //if (tempArr.Length <= 10)
+            //{
+            //    sensorID = tempArr[0];
+            //    transmitterID = tempArr[4];
+            //    dateTimes = DateTimeOffset.Parse(tempArr[2]).UtcDateTime;
+            //}
+
+            return Tuple.Create(dateTimes, transmitterID, sensorID);
         }
 
-        public static double calcSpeedOfSound() {
+        public double calcSpeedOfSound() {
             /* 
              * Prompts salinity, temperature, and depth quantities
              * 
@@ -163,7 +195,19 @@ namespace CsharpAUV
             return speedOfSound;
         }
 
-        public static int getTimeToRun()
+        public Boolean runCSV() {
+            Console.WriteLine("Would you like to run old data from a CSV? Respond with Y or N");
+            string yesno = (Console.ReadLine());
+            if (yesno == "Y")
+            {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        public int getTimeToRun()
         {   /* 
              * Prompts for a time to run in minutes,
              * 
@@ -178,19 +222,6 @@ namespace CsharpAUV
 
             return timeToRun;
         }
-
-        //public static void Read()
-        //{
-        //    while (_continue)
-        //    {
-        //        try
-        //        {
-        //            string message = _serialPort.ReadLine();
-        //            Console.WriteLine(message);
-        //        }
-        //        catch (TimeoutException) { }
-        //    }
-        //}
 
         // Display Port values and prompt user to enter a port.
         public static string SetPortName(string defaultPortName)
