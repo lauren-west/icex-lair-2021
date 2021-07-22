@@ -20,7 +20,7 @@ from geopy.distance import geodesic
 
 class Serial_Data_Handler():
 
-    TIME_TO_RUN = 90 # seconds
+    TIME_TO_RUN = 900 # seconds
     NUM_OF_BINS = 10 # Anywhere from 5-20 with 20 being with at least 1000 data points
 
     # allows user to input the temp., salinity, and depth the sensor is at when taking data
@@ -252,7 +252,10 @@ class Serial_Data_Handler():
             if difference > 8:
                 integer_divide_value = difference//self.delta_t_avg
                 time_of_flight = difference % self.delta_t_avg
-                error = time_of_flight/integer_divide_value
+                if integer_divide_value > 0:
+                    error = time_of_flight/integer_divide_value
+                else:
+                    error = time_of_flight
                 error_tot.append(error)
             else:
                 error_tot.append(difference)
