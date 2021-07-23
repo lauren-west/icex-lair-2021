@@ -1,16 +1,17 @@
 ﻿<Properties StartupConfiguration="{21B54CBE-894B-445F-88F1-9D808DB97534}|Default">
   <MonoDevelop.Ide.ItemProperties.CsharpAUV PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="CsharpAUV/SerialDataHandler.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="CsharpAUV/sensor1.csv">
     <Files>
-      <File FileName="CsharpAUV/SerialDataHandler.cs" Line="265" Column="43" />
-      <File FileName="../serial_data_handler.py" />
+      <File FileName="CsharpAUV/SerialDataHandler.cs" Line="33" Column="27" />
+      <File FileName="CsharpAUV/sensor2.csv" Line="6" Column="1" />
+      <File FileName="CsharpAUV/sensor1.csv" Line="3" Column="35" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="CsharpAUV" expanded="True">
             <Node name="CsharpAUV" expanded="True">
-              <Node name="baby.csv" selected="True" />
+              <Node name="sensor1.csv" selected="True" />
             </Node>
           </Node>
         </State>
