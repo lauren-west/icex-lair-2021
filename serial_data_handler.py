@@ -145,7 +145,7 @@ class Serial_Data_Handler():
                 previous_time_of_flight = float(previous_line[-2])
 
                 diff_time_of_flight = time_of_flight - previous_time_of_flight
-                if diff_time_of_flight > 0.00007:
+                if diff_time_of_flight > 0.0007:
                     self.additive = diff_time_of_flight
                     revised_initial_time = self.FIRST_TIMESTAMP + datetime.timedelta(0, handler.additive)
                     print("We are at timestamp: ", current_datetime)
@@ -607,7 +607,7 @@ def run_program_with_old_data(handler):
                 previous_time_of_flight = previous_line[-2]
 
                 diff_time_of_flight = time_of_flight - previous_time_of_flight
-                if diff_time_of_flight > 0.00007:
+                if diff_time_of_flight > 0.0007:
                     handler.additive = diff_time_of_flight
                     revised_initial_time = handler.FIRST_TIMESTAMP + datetime.timedelta(0, handler.additive)
                     print("\nBefore:", handler.FIRST_TIMESTAMP)
