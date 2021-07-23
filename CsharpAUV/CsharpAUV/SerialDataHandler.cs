@@ -44,7 +44,7 @@ namespace CsharpAUV
                     using (StreamReader sr2 = new StreamReader(@"../../../" + filename2 + ".csv"))
                     {
                         string headerLine = sr.ReadLine();
-                        headerLine = sr2.ReadLine();
+                        string headerLine2 = sr2.ReadLine();
                         string line;
                         //string headerLine = reader.ReadLine();
                         //while (!reader.EndOfStream)
@@ -56,6 +56,9 @@ namespace CsharpAUV
                             if (((line = sr.ReadLine()) != null) && (message != null))
                             {
                                 Tuple<DateTime, string, string> data = serialdatahandler.isolateInfoFromMessages(message);
+                                Console.WriteLine(data.Item1);
+                                Console.WriteLine(data.Item2);
+                                Console.WriteLine(data.Item3);
                                 // retrieve first datetime (this only happens once per run!!)
                                 if (serialdatahandler.firstDatetime)
                                 {
@@ -173,14 +176,6 @@ namespace CsharpAUV
                 transmitterID = tempArr[4];
                 dateTimes = DateTimeOffset.Parse(tempArr[2]).UtcDateTime;
             }
-
-            // because many files have extra items appended to it (ROMANNNNNN)
-            //if (tempArr.Length <= 10)
-            //{
-            //    sensorID = tempArr[0];
-            //    transmitterID = tempArr[4];
-            //    dateTimes = DateTimeOffset.Parse(tempArr[2]).UtcDateTime;
-            //}
 
             return Tuple.Create(dateTimes, transmitterID, sensorID);
         }
