@@ -146,7 +146,7 @@ class Serial_Data_Handler():
 
                 diff_time_of_flight = time_of_flight - previous_time_of_flight
                 if diff_time_of_flight > 0.00007:
-                    self.additive += diff_time_of_flight
+                    self.additive = diff_time_of_flight
                     revised_initial_time = self.FIRST_TIMESTAMP + datetime.timedelta(0, handler.additive)
                     print("We are at timestamp: ", current_datetime)
                     print("\nBefore:", self.FIRST_TIMESTAMP)
@@ -578,16 +578,20 @@ def run_program_with_old_data(handler):
     if new_dataset:
         index_of_first_raw_data = LoFiles.index("raw_serial_data_1.csv")
 
+    true_first_time_stamp = None
+
     for file in LoFiles[:index_of_first_raw_data]:
         df = pd.read_csv(path + "/" + file, engine='python', header=0, index_col=False)
         new_time_of_flight_list = []
         new_predicted_distance_list = []
+        handler.FIRST_TIMESTAMP = true_first_time_stamp
 
         for line in df.values:
             current_datetime = datetime.datetime.strptime(line[2], '%Y-%m-%d %H:%M:%S.%f')
 
             if counter == 0:
-                handler.FIRST_TIMESTAMP = current_datetime
+                true_first_time_stamp = current_datetime
+                handler.FIRST_TIMESTAMP = true_first_time_stamp
                 counter += 1
 
             diff_in_time = (current_datetime - handler.FIRST_TIMESTAMP).total_seconds()
@@ -604,7 +608,7 @@ def run_program_with_old_data(handler):
 
                 diff_time_of_flight = time_of_flight - previous_time_of_flight
                 if diff_time_of_flight > 0.00007:
-                    handler.additive += diff_time_of_flight
+                    handler.additive = diff_time_of_flight
                     revised_initial_time = handler.FIRST_TIMESTAMP + datetime.timedelta(0, handler.additive)
                     print("\nBefore:", handler.FIRST_TIMESTAMP)
                     handler.FIRST_TIMESTAMP = revised_initial_time
