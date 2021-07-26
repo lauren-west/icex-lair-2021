@@ -443,6 +443,8 @@ class Serial_Data_Handler():
         plt.ylim(None, None)
         plt.xlim(None, None)
         plt.title("Actual Distance versus Predicted Distance")
+        plt.xlabel("Actual Distance (m)")
+        plt.ylabel("Predicted Distance (m)")
         plt.savefig('time_of_flight_distance_predictions_all_data.png')
         plt.close()
 
@@ -460,6 +462,92 @@ class Serial_Data_Handler():
         plt.savefig("error_total_histogram.png")
         plt.close()
 
+    def create_step_plots(self, foldername):
+        AllFiles = list(os.walk("./Roberts_Pool_07_13_2021/"))
+        path, _, LoFiles = AllFiles[4]
+
+        LoFiles = [LoFiles[2], LoFiles[0], LoFiles[1], LoFiles[3], LoFiles[4]]
+
+        time_zero = "2021-07-08 23:56:45.626"
+        timestamp_0 = datetime.datetime.strptime(time_zero, '%Y-%m-%d %H:%M:%S.%f')
+
+        time_diffs = []
+        distances = []
+        num_ticks = []
+
+        for file in LoFiles:
+            csv_path = path + "/" + file
+            df = pd.read_csv(csv_path, engine='python', header=0, index_col=False)
+            num_ticks.append(len(df["Distance (m)"]))
+            distances.append(df["Distance (m)"][0])
+            
+            for current_datetime in df["Date/Time"]:
+                timestamp_x = datetime.datetime.strptime(current_datetime, '%Y-%m-%d %H:%M:%S.%f')
+                time_diffs.append((timestamp_x - timestamp_0).total_seconds())
+
+        distances.append(50)            
+        x_plot = []
+
+        for i in range(0, len(distances)-1):
+            x_plot.append(np.linspace(distances[i], distances[i+1], num_ticks[i]))
+            
+        x_plot = np.concatenate(x_plot)
+
+        plt.plot(x_plot, time_diffs) 
+        plt.title("Time Difference vs Time Elapsed")
+        plt.xlabel("Time (s)")
+        plt.ylabel("Time Difference (s)")
+        plt.show()
+
+        N = [i/8.17907142857143 for i in time_diffs]
+        m = [i%8.17907142857143 for i in time_diffs]
+
+        value_list = []
+
+        for value in m:
+            if value < 8:
+                value_list.append(value)
+            else:
+                value_list.append(8.17907142857143 - value)
+
+
+        m = value_list
+
+
+        multiplied = [i * 1460 for i in m]
+
+
+        plt.plot(x_plot, N) 
+        plt.title("N vs Distance")
+        plt.xlabel("Distance (m)")
+        plt.ylabel("N")
+        plt.show()
+
+        plt.plot(x_plot, m) 
+        plt.title("Mod vs Distance")
+        plt.xlabel("Distance (m)")
+        plt.ylabel("Mod")
+        #plt.xlim([0,3])
+        plt.show()
+
+        # predicted_dist_per_sec = 0.02367587849280499
+
+        # time_diffs_changed = [i * predicted_dist_per_sec for i in time_diffs]
+        # z = [a - b for a, b in zip(multiplied, time_diffs_changed)]
+
+        plt.plot(x_plot, multiplied) 
+        plt.title("Predicted Distance vs Distance")
+        plt.xlabel("Distance (m)")
+        plt.ylabel("Predicted Distance (m)")
+        #plt.xlim([0,3])
+        plt.show()
+
+
+        # predicted_dist_per_ping = multiplied[-1] / len(m)
+        # print("The predicted dist per ping is: ", predicted_dist_per_ping)
+
+        # predicted_dist_per_sec = multiplied[-1] / 58367
+        # print("The predicted dist per ping is: ", predicted_dist_per_sec)
 
     def organize_files(self, foldername):
         os.mkdir(os.path.join(".", foldername))
@@ -569,11 +657,13 @@ def run_program_with_old_data(handler):
     foldername = input("What is the name of the folder of data you want to use? (Case sensitive): ")
     path = os.path.join(".", foldername)
     AllFiles = list(os.walk(path))
+    print(AllFiles)
     path, _, LoFiles = AllFiles[4]    # Accesses the raw data from the dataset
     LoFiles.sort()
+    print("LoFiles: ", LoFiles, " And here is the path: ", path)
     counter = 0    # Used to make sure we can get handler.FIRST_TIMESTAMP
     index_of_first_raw_data = len(LoFiles)
-    new_dataset = ("raw_serial_data_1.csv") in LoFiles
+    new_dataset = ("raw_serial_data_1.csv") in LoFiles      # Older Datasets do not contain raw serial data
 
     if new_dataset:
         index_of_first_raw_data = LoFiles.index("raw_serial_data_1.csv")
@@ -581,10 +671,14 @@ def run_program_with_old_data(handler):
     true_first_time_stamp = None
 
     for file in LoFiles[:index_of_first_raw_data]:
+        if file == ".DS_Store":
+            continue
+        
         df = pd.read_csv(path + "/" + file, engine='python', header=0, index_col=False)
         new_time_of_flight_list = []
         new_predicted_distance_list = []
         handler.FIRST_TIMESTAMP = true_first_time_stamp
+        print("Timestamp:", handler.FIRST_TIMESTAMP, " Using  File: ", file)
 
         for line in df.values:
             current_datetime = datetime.datetime.strptime(line[2], '%Y-%m-%d %H:%M:%S.%f')
@@ -602,7 +696,7 @@ def run_program_with_old_data(handler):
 
             current_index = np.where(df.values == line)[0][0]
 
-            if current_index > 1:
+            if current_index > 1:   # First TOF seems to almost always be 0
                 previous_line = df.values[current_index -1]
                 previous_time_of_flight = previous_line[-2]
 
