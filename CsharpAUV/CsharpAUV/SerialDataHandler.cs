@@ -25,10 +25,16 @@ namespace CsharpAUV
 
         static void Main(string[] args)
         {
+            DateTime start_time_from_pf = new DateTime(2021, 7, 22, 4, 13, 58, 800);
+            Console.WriteLine(start_time_from_pf);
             Console.WriteLine("Welcome.");
             SerialDataHandler serialdatahandler = new SerialDataHandler();
             string message;
-            string message2;
+            string message1 = "";
+            string message2 = "";
+            string line1;
+            string line2;
+            int allowableTimeLapse = 4;
 
             if (serialdatahandler.runCSV()) {
                 // assume speed of sound for old data is a default 1500
@@ -45,44 +51,117 @@ namespace CsharpAUV
                     {
                         string headerLine = sr.ReadLine();
                         string headerLine2 = sr2.ReadLine();
-                        string line;
-                        //string headerLine = reader.ReadLine();
-                        //while (!reader.EndOfStream)
-                        while (((line = sr.ReadLine()) != null) || ((line = sr2.ReadLine()) != null))
+                        double tof1, tof2;
+                        double distance1, distance2;
+                        bool read_message1 = true;
+                        bool read_message2 = true;
+
+                        Tuple<DateTime, string, string> data1;
+                        Tuple<DateTime, string, string> data2;
+
+
+                        //while (!sr.EndOfStream && !sr2.EndOfStream) 
+                        while (read_message1 || read_message2)
                         {
-                            message = sr.ReadLine();
-                            message2 = sr2.ReadLine();
-
-                            if (((line = sr.ReadLine()) != null) && (message != null))
-                            {
-                                Tuple<DateTime, string, string> data = serialdatahandler.isolateInfoFromMessages(message);
-                                Console.WriteLine(data.Item1);
-                                Console.WriteLine(data.Item2);
-                                Console.WriteLine(data.Item3);
-                                // retrieve first datetime (this only happens once per run!!)
-                                if (serialdatahandler.firstDatetime)
+                            if (read_message1) {
+                                message1 = sr.ReadLine();
+                                message1 = sr.ReadLine();
+                                if (message1 == null || message1 == "")
                                 {
-                                    serialdatahandler.firstDateTimeVal = data.Item1;
-                                    serialdatahandler.firstDatetime = false;
+                                    Console.WriteLine("null/empty1 aware");
+                                    data1 = null;
                                 }
+                                else
+                                {
+                                    data1 = serialdatahandler.isolateInfoFromMessages(message1);
+                                    // retrieve first datetime (this only happens once per run!!)
+                                    Console.WriteLine(data1.Item1);
 
-                                double tof = serialdatahandler.makeTimeOfFlight(serialdatahandler.firstDateTimeVal, data.Item1);
-                                double distance = serialdatahandler.calcDistFromTOF(tof);
+                                    if (serialdatahandler.firstDatetime)
+                                    {
+                                        serialdatahandler.firstDateTimeVal = data1.Item1;
+                                        serialdatahandler.firstDatetime = false;
+                                    }
 
-                                //outputToParticleFilter = distance, datetime, transmitterID, sensorID
-                                serialdatahandler.outputToParticleFilter.Add(Tuple.Create(distance, data.Item1, data.Item2, data.Item3));
+                                    tof1 = serialdatahandler.makeTimeOfFlight(serialdatahandler.firstDateTimeVal, data1.Item1);
+                                    distance1 = serialdatahandler.calcDistFromTOF(tof1);
+                                }
                             }
-                            //if (((line = sr2.ReadLine()) != null) &&(message2 != null))
-                            //{
-                            //    Tuple<DateTime, string, string> data = serialdatahandler.isolateInfoFromMessages(message2);
-                            //    // retrieve first datetime (this only happens once per run!!)
+                            if (read_message2)
+                            {
+                                message2 = sr2.ReadLine();
+                                message2 = sr2.ReadLine();
+                                if (message2 == null || message2 == "")
+                                {
+                                    Console.WriteLine("empty/null2 aware");
+                                    data2 = null;
+                                }
+                                else
+                                {
+                                    data2 = serialdatahandler.isolateInfoFromMessages(message2);
+                                    // retrieve first datetime (this only happens once per run!!)
 
-                            //    double tof = serialdatahandler.makeTimeOfFlight(serialdatahandler.firstDateTimeVal, data.Item1);
-                            //    double distance = serialdatahandler.calcDistFromTOF(tof);
+                                    Console.WriteLine(data2.Item1);
+                                    tof2 = serialdatahandler.makeTimeOfFlight(serialdatahandler.firstDateTimeVal, data2.Item1);
+                                    distance2 = serialdatahandler.calcDistFromTOF(tof2);
+                                }
+                            }
+                            if ((Math.Abs((serialdatahandler.getDateTimeFromMessage(message1).Subtract(start_time_from_pf)).Seconds) <= allowableTimeLapse)
+                                && (Math.Abs((serialdatahandler.getDateTimeFromMessage(message2).Subtract(start_time_from_pf)).Seconds) <= allowableTimeLapse))
+                            {
 
-                            //    //outputToParticleFilter = distance, datetime, transmitterID, sensorID
-                            //    serialdatahandler.outputToParticleFilter.Add(Tuple.Create(distance, data.Item1, data.Item2, data.Item3));
-                            //}
+                                // return packet to PF (both message1 and 2)
+                                // return packet hypothetically
+                                read_message1 = false;
+                                read_message2 = false;
+                                Console.WriteLine("just message 1 and 2)");
+                            }
+                            else if ((Math.Abs((serialdatahandler.getDateTimeFromMessage(message1).Subtract(start_time_from_pf)).Seconds) <= allowableTimeLapse)
+                            && ((serialdatahandler.getDateTimeFromMessage(message2).Subtract(start_time_from_pf)).Seconds) > allowableTimeLapse)
+                            {
+                                // return packet to PF (message1 only)
+                                // return packet hypothetically
+                                read_message1 = false;
+                                read_message2 = false;
+                                Console.WriteLine("just message 1)");
+                            }
+                            else if ((Math.Abs((serialdatahandler.getDateTimeFromMessage(message2).Subtract(start_time_from_pf)).Seconds) <= allowableTimeLapse)
+                            && ((serialdatahandler.getDateTimeFromMessage(message1).Subtract(start_time_from_pf)).Seconds) > allowableTimeLapse)
+                            {
+                                // return packet to PF
+                                // return packet hypothetically (just message 2)
+                                read_message1 = false;
+                                read_message2 = false;
+                                Console.WriteLine("just message 2)");
+                            }
+                            else if ((serialdatahandler.getDateTimeFromMessage(message1) < start_time_from_pf) &&
+                                (serialdatahandler.getDateTimeFromMessage(message2) < start_time_from_pf))
+                            {
+                                read_message1 = true;
+                                read_message2 = true;
+                                //Console.WriteLine("truetrue");
+                            }
+                            else if (serialdatahandler.getDateTimeFromMessage(message1) < start_time_from_pf)
+                            {
+                                read_message1 = true;
+                                read_message2 = false;
+                                //Console.WriteLine("truefalse");
+                            }
+                            else if (serialdatahandler.getDateTimeFromMessage(message2) < start_time_from_pf)
+                            {
+                                read_message1 = false;
+                                read_message2 = true;
+                                //Console.WriteLine("falsetrue");
+                            }
+                            else
+                            {
+                                read_message1 = false;
+                                read_message2 = false;
+                                //Console.WriteLine("falsefalse");
+                            }
+                            //outputToParticleFilter = distance, datetime, transmitterID, sensorID
+                            //serialdatahandler.outputToParticleFilter.Add(Tuple.Create(distance, data.Item1, data.Item2, data.Item3));
+
                         }
                     }
                 }
@@ -156,6 +235,18 @@ namespace CsharpAUV
             
         }
 
+        public DateTime getDateTimeFromMessage(string message)
+        {   /* 
+             * Using raw serial data, we isolate dateTimes and transmitterIDs
+             * 
+             * returns: dateTime, transmitterID, and sensor id
+             */
+            //Console.WriteLine(message);
+            string[] tempArr = message.Split(',');
+
+            return DateTime.Parse(tempArr[2]).ToLocalTime();
+        }
+
         public Tuple<DateTime, string, string> isolateInfoFromMessages(string message)
         {   /* 
              * Using raw serial data, we isolate dateTimes and transmitterIDs
@@ -167,15 +258,11 @@ namespace CsharpAUV
             string transmitterID = "";
             string sensorID = "";
 
-            Console.WriteLine(message);
+            //Console.WriteLine(message);
             string[] tempArr = message.Split(',');
-
-            foreach (string s in tempArr)
-            {
-                sensorID = tempArr[0];
-                transmitterID = tempArr[4];
-                dateTimes = DateTimeOffset.Parse(tempArr[2]).UtcDateTime;
-            }
+            sensorID = tempArr[0];
+            transmitterID = tempArr[4];
+            dateTimes = DateTime.Parse(tempArr[2]).ToLocalTime(); //DateTimeOffset.Parse(tempArr[2]).UtcDateTime;
 
             return Tuple.Create(dateTimes, transmitterID, sensorID);
         }
