@@ -43,6 +43,7 @@ class Serial_Data_Handler():
     delta_t_avg = 8.17907142857143
 
     additive = 0
+    adjustment_threshold = 0.0007
 
 
     def __init__(self) -> None:
@@ -145,7 +146,7 @@ class Serial_Data_Handler():
                 previous_time_of_flight = float(previous_line[-2])
 
                 diff_time_of_flight = time_of_flight - previous_time_of_flight
-                if diff_time_of_flight > 0.0007:
+                if diff_time_of_flight > self.adjustment_threshold:
                     self.additive = diff_time_of_flight
                     revised_initial_time = self.FIRST_TIMESTAMP + datetime.timedelta(0, handler.additive)
                     print("We are at timestamp: ", current_datetime)
@@ -359,6 +360,7 @@ class Serial_Data_Handler():
         AllFiles = list(os.walk("."))  #Walks everything inside current directory
 
         df_list = []
+        data_file_list = []
         delta_t_values = np.array([])
         error_values = np.array([])
 
@@ -366,7 +368,8 @@ class Serial_Data_Handler():
 
         for filename in LoFiles:
             if filename[-3:] == "csv" and (len(filename) == 10 or len(filename) == 11):    
-                path = os.getcwd() + "/" + filename 
+                path = os.getcwd() + "/" + filename
+                data_file_list.append(filename)
                 df = pd.read_csv(path, engine='python', header=0, index_col=False)
                 df_list.append(df)
 
@@ -411,10 +414,9 @@ class Serial_Data_Handler():
         plt.savefig('all_data_noise_plot.png')
         plt.close()
 
-        self.create_final_plots_without_noise_signal(final_df = final_df, delta_t_values = delta_t_values, error_values = error_values)
+        self.create_final_plots_without_noise_signal(final_df = final_df, delta_t_values = delta_t_values, error_values = error_values, data_file_list = data_file_list)
 
-    def create_final_plots_without_noise_signal(self, final_df = None, delta_t_values = None, error_values = None ):
-
+    def create_final_plots_without_noise_signal(self, final_df = None, delta_t_values = None, error_values = None, data_file_list = []):
         if final_df is None or delta_t_values is None or error_values is None:
             AllFiles = list(os.walk("."))  #Walks everything inside current directory
 
@@ -423,10 +425,11 @@ class Serial_Data_Handler():
             error_values = np.array([])
 
             _, _, LoFiles = AllFiles[0] 
-
+            print(LoFiles)
             for filename in LoFiles:
                 if filename[-3:] == "csv" and (len(filename) == 10 or len(filename) == 11):    
                     path = os.getcwd() + "/" + filename 
+                    data_file_list.append(filename)
                     df = pd.read_csv(path, engine='python', header=0, index_col=False)
                     df_list.append(df)
 
@@ -462,45 +465,63 @@ class Serial_Data_Handler():
         plt.savefig("error_total_histogram.png")
         plt.close()
 
-    def create_step_plots(self, foldername):
-        AllFiles = list(os.walk("./Roberts_Pool_07_13_2021/"))
-        path, _, LoFiles = AllFiles[4]
+        self.create_step_plots(data_file_list)
 
-        LoFiles = [LoFiles[2], LoFiles[0], LoFiles[1], LoFiles[3], LoFiles[4]]
-
-        time_zero = "2021-07-08 23:56:45.626"
-        timestamp_0 = datetime.datetime.strptime(time_zero, '%Y-%m-%d %H:%M:%S.%f')
-
+    def create_step_plots(self, file_list):
+        # AllFiles = list(os.walk("./" + foldername))
+        # path, _, LoFiles = AllFiles[4]
+        file_list.sort()
         time_diffs = []
         distances = []
         num_ticks = []
+        first_datapoint = True
+        time_zero = None
+        timestamp_0 = None
+        tof = []
+        distances_and_tof = []
 
-        for file in LoFiles:
-            csv_path = path + "/" + file
+        for file in file_list:
+            csv_path = os.path.join(".", file)
             df = pd.read_csv(csv_path, engine='python', header=0, index_col=False)
+
+            if first_datapoint:
+                time_zero = df["Date/Time"][0]
+                timestamp_0 = datetime.datetime.strptime(time_zero, '%Y-%m-%d %H:%M:%S.%f')
             num_ticks.append(len(df["Distance (m)"]))
-            distances.append(df["Distance (m)"][0])
+            # distances.append(df["Distance (m)"][0])
+            # tof.append(df["Time of Flight (s)"])
+            distances_and_tof.append((df["Distance (m)"][0], df["Time of Flight (s)"]))
             
             for current_datetime in df["Date/Time"]:
                 timestamp_x = datetime.datetime.strptime(current_datetime, '%Y-%m-%d %H:%M:%S.%f')
                 time_diffs.append((timestamp_x - timestamp_0).total_seconds())
+        
+        distances_and_tof.sort(key=lambda pair: pair[0])
+        distances = [dist[0] for dist in distances_and_tof]
+        tof = [tof[1] for tof in distances_and_tof]
+        try:
+            distances.append(abs(distances[-1] - distances[-2]) + distances[-1])
+        except:
+            distances.append(distances[0] * 2)  
 
-        distances.append(50)            
         x_plot = []
 
         for i in range(0, len(distances)-1):
             x_plot.append(np.linspace(distances[i], distances[i+1], num_ticks[i]))
             
         x_plot = np.concatenate(x_plot)
+        tof = np.concatenate(tof)
 
         plt.plot(x_plot, time_diffs) 
         plt.title("Time Difference vs Time Elapsed")
         plt.xlabel("Time (s)")
         plt.ylabel("Time Difference (s)")
-        plt.show()
+        plt.savefig("time_diff_vs_elasped_step_plot.png")
+        plt.close()
 
-        N = [i/8.17907142857143 for i in time_diffs]
-        m = [i%8.17907142857143 for i in time_diffs]
+        N = [i/self.delta_t_avg for i in time_diffs]
+        # m = [i%self.delta_t_avg for i in time_diffs]
+        m = tof
 
         value_list = []
 
@@ -508,27 +529,26 @@ class Serial_Data_Handler():
             if value < 8:
                 value_list.append(value)
             else:
-                value_list.append(8.17907142857143 - value)
-
+                value_list.append(self.delta_t_avg - value)
 
         m = value_list
 
-
         multiplied = [i * 1460 for i in m]
-
 
         plt.plot(x_plot, N) 
         plt.title("N vs Distance")
         plt.xlabel("Distance (m)")
         plt.ylabel("N")
-        plt.show()
+        plt.savefig("n_vs_distance_step_plot.png")
+        plt.close()
 
         plt.plot(x_plot, m) 
         plt.title("Mod vs Distance")
         plt.xlabel("Distance (m)")
         plt.ylabel("Mod")
         #plt.xlim([0,3])
-        plt.show()
+        plt.savefig("mod_vs_distance_step_plot.png")
+        plt.close()
 
         # predicted_dist_per_sec = 0.02367587849280499
 
@@ -540,14 +560,9 @@ class Serial_Data_Handler():
         plt.xlabel("Distance (m)")
         plt.ylabel("Predicted Distance (m)")
         #plt.xlim([0,3])
-        plt.show()
+        plt.savefig("predicted_dist_vs_actual_dist_step_plot.png")
+        plt.close()
 
-
-        # predicted_dist_per_ping = multiplied[-1] / len(m)
-        # print("The predicted dist per ping is: ", predicted_dist_per_ping)
-
-        # predicted_dist_per_sec = multiplied[-1] / 58367
-        # print("The predicted dist per ping is: ", predicted_dist_per_sec)
 
     def organize_files(self, foldername):
         os.mkdir(os.path.join(".", foldername))
@@ -558,6 +573,7 @@ class Serial_Data_Handler():
         os.mkdir(os.path.join(path, "noise_plots"))
         os.mkdir(os.path.join(path, "raw_data"))
         os.mkdir(os.path.join(path, "signal_plots"))
+        os.mkdir(os.path.join(path, "step_plots"))
         os.mkdir(os.path.join(path, "summaries"))
         os.mkdir(os.path.join(path, "time_of_flight_plots"))
 
@@ -585,6 +601,8 @@ class Serial_Data_Handler():
             elif filename[-3:] == "png" and "signal" in filename:
                 shutil.move(filename, os.path.join(path, "signal_plots"))
             
+            elif filename[-3:] == "png" and "step_plot" in filename:
+                shutil.move(filename, os.path.join(path, "step_plots"))
             # elif filename[-3:] == "csv" and (len(filename) == 10 or len(filename) == 11):
             elif filename[-3:] == "csv":
                 shutil.move(filename, os.path.join(path, "raw_data"))
@@ -657,10 +675,8 @@ def run_program_with_old_data(handler):
     foldername = input("What is the name of the folder of data you want to use? (Case sensitive): ")
     path = os.path.join(".", foldername)
     AllFiles = list(os.walk(path))
-    print(AllFiles)
     path, _, LoFiles = AllFiles[4]    # Accesses the raw data from the dataset
     LoFiles.sort()
-    print("LoFiles: ", LoFiles, " And here is the path: ", path)
     counter = 0    # Used to make sure we can get handler.FIRST_TIMESTAMP
     index_of_first_raw_data = len(LoFiles)
     new_dataset = ("raw_serial_data_1.csv") in LoFiles      # Older Datasets do not contain raw serial data
@@ -678,7 +694,7 @@ def run_program_with_old_data(handler):
         new_time_of_flight_list = []
         new_predicted_distance_list = []
         handler.FIRST_TIMESTAMP = true_first_time_stamp
-        print("Timestamp:", handler.FIRST_TIMESTAMP, " Using  File: ", file)
+        # print("Timestamp:", handler.FIRST_TIMESTAMP, " Using  File: ", file)
 
         for line in df.values:
             current_datetime = datetime.datetime.strptime(line[2], '%Y-%m-%d %H:%M:%S.%f')
@@ -701,7 +717,7 @@ def run_program_with_old_data(handler):
                 previous_time_of_flight = previous_line[-2]
 
                 diff_time_of_flight = time_of_flight - previous_time_of_flight
-                if diff_time_of_flight > 0.0007:
+                if diff_time_of_flight > handler.adjustment_threshold:
                     handler.additive = diff_time_of_flight
                     revised_initial_time = handler.FIRST_TIMESTAMP + datetime.timedelta(0, handler.additive)
                     print("\nBefore:", handler.FIRST_TIMESTAMP)
