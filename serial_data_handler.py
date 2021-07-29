@@ -116,7 +116,7 @@ class Serial_Data_Handler():
             line = [s[s.find("=")+1:].strip() for s in line]
             self.FIRST_TIMESTAMP = datetime.datetime.strptime(line[2], '%Y-%m-%d %H:%M:%S.%f')
 
-    
+
         for line in output:
             
             line = line.split(',')

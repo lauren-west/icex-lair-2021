@@ -1,9 +1,10 @@
 ﻿<Properties StartupConfiguration="{21B54CBE-894B-445F-88F1-9D808DB97534}|Default">
   <MonoDevelop.Ide.ItemProperties.CsharpAUV PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="CsharpAUV/SerialDataHandler.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="CsharpAUV/sensor1.csv">
     <Files>
-      <File FileName="CsharpAUV/SerialDataHandler.cs" Line="5" Column="24" />
-      <File FileName="CsharpAUV/sensor1.csv" Line="3" Column="123" />
+      <File FileName="CsharpAUV/Simulator.cs" Line="14" Column="54" />
+      <File FileName="CsharpAUV/SerialDataHandler.cs" />
+      <File FileName="CsharpAUV/sensor1.csv" Line="225" Column="87" />
       <File FileName="CsharpAUV/sensor2.csv" />
       <File FileName="CsharpAUV/sensor2withMissedPing.csv" />
     </Files>
@@ -12,7 +13,7 @@
         <State name="__root__">
           <Node name="CsharpAUV" expanded="True">
             <Node name="CsharpAUV" expanded="True">
-              <Node name="SerialDataHandler.cs" selected="True" />
+              <Node name="sensor1.csv" selected="True" />
             </Node>
           </Node>
         </State>

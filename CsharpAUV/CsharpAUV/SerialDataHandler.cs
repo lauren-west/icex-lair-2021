@@ -4,6 +4,7 @@ using System.IO.Ports;
 using System.Collections.Generic;
 using System.Collections;
 using System.Diagnostics;
+using System.Linq;
 
 namespace CsharpAUV
 {
@@ -16,231 +17,205 @@ namespace CsharpAUV
         DateTime firstDateTimeVal;
         DateTime firstDateTimeVal1;
         DateTime firstDateTimeVal2;
+        string filename1;
+        string filename2;
+        double allowableTimeLapse = 4.0;
+        public bool _continue = true;
 
         // contains most recent measurement from serial port
         List<Tuple<double, DateTime, string, string>> outputToParticleFilter = new List<Tuple<double, DateTime, string, string>>();
 
-        public SerialDataHandler()
+        public SerialDataHandler(String file1, String file2)
         {
+            filename1 = file1;
+            filename2 = file2;
         }
 
-        static void Main(string[] args)
+        public List<Tuple<double, DateTime, string, string>> getMeasurements(DateTime startTimeFromSimulator)
         {
-            // 457049,148,2021-07-22 11:16:09.666
-            DateTime start_time_from_pf = new DateTime(2021, 7, 22, 4, 16, 9, 666);
-            Console.WriteLine(start_time_from_pf);
-            Console.WriteLine("Welcome.");
-            SerialDataHandler serialdatahandler = new SerialDataHandler();
-            string message;
-            string message1 = "";
-            string message2 = "";
-            string line1;
-            string line2;
-            int allowableTimeLapse = 4;
-            bool firstDatetime = true;
-            bool firstDatetime1 = true;
-            bool firstDatetime2 = true;
+            // assume speed of sound for old data is a default 1500
+            this.speedOfSound = 1500;
+            List<Tuple<double, DateTime, string, string>> outputToSimulator = new List<Tuple<double, DateTime, string, string>>();
 
-            if (serialdatahandler.runCSV())
+            using (StreamReader sr = new StreamReader(@"../../../" + this.filename1 + ".csv"))
             {
-                // assume speed of sound for old data is a default 1500
-                serialdatahandler.speedOfSound = 1500;
-                Console.WriteLine("Input csv file name without file type");
-                string filename1 = Console.ReadLine();
-                Console.WriteLine("Input csv file name without file type");
-                string filename2 = Console.ReadLine();
-
-//457049,148,2021-07-22 11:16:09.666,A69-1602,65477,80.5,37.5,0,#A4,"(34.109135, -117.71281)","(34.109172, -117.71241)",122.686929,38,0.0008575714285647962,1.2520542857046024
-
-
-                //(@"C:\" + filename + ".csv") old file path
-                using (StreamReader sr = new StreamReader(@"../../../" + filename1 + ".csv"))
+                using (StreamReader sr2 = new StreamReader(@"../../../" + this.filename2 + ".csv"))
                 {
-                    using (StreamReader sr2 = new StreamReader(@"../../../" + filename2 + ".csv"))
+                    string headerLine = sr.ReadLine();
+                    string headerLine2 = sr2.ReadLine();
+                    double tof1, tof2;
+                    double distance1 = -1.0;
+                    double distance2 = -1.0;
+                    bool read_message1 = true;
+                    bool read_message2 = true;
+                    string message1 = "";
+                    string message2 = "";
+
+
+                    Tuple<DateTime, string, string> data1 = Tuple.Create(new DateTime(), "", "");
+                    Tuple<DateTime, string, string> data2 = Tuple.Create(new DateTime(), "", "");
+
+                    //while (!sr.EndOfStream && !sr2.EndOfStream)
+                    
+                    while (read_message1 || read_message2)
                     {
-                        string headerLine = sr.ReadLine();
-                        string headerLine2 = sr2.ReadLine();
-                        double tof1, tof2;
-                        double distance1 = -1.0;
-                        double distance2 = -1.0;
-                        bool read_message1 = true;
-                        bool read_message2 = true;
-
-                        Tuple<DateTime, string, string> data1 = Tuple.Create(new DateTime(), "", "");
-                        Tuple<DateTime, string, string> data2 = Tuple.Create(new DateTime(), "", "");
-
-                        //while (!sr.EndOfStream && !sr2.EndOfStream) 
-                        while (read_message1 || read_message2)
+                        //if (sr.EndOfStream) {
+                        //    read_message1 = false;
+                        //}
+                        //if (sr2.EndOfStream)
+                        //{
+                        //    read_message2 = false;
+                        //}
+                        if (read_message1)
                         {
-                            if (read_message1)
+                            message1 = sr.ReadLine();
+                            message1 = sr.ReadLine();
+                            if (message1 == null || message1 == "")
                             {
-                                message1 = sr.ReadLine();
-                                message1 = sr.ReadLine();
-                                if (message1 == null || message1 == "")
-                                {
-                                    Console.WriteLine("null/empty1 aware");
-                                    data1 = null;
-                                }
-                                else
-                                {
-                                    data1 = serialdatahandler.isolateInfoFromMessages(message1);
-                                    // retrieve first datetime (this only happens once per run!!)
-                                    Console.WriteLine("Message 1:");
-                                    Console.WriteLine(data1.Item1);
-
-                                    if (firstDatetime1)
-                                    {
-                                        serialdatahandler.firstDateTimeVal1 = data1.Item1;
-                                        firstDatetime1 = false;
-                                    }
-
-                                    tof1 = serialdatahandler.makeTimeOfFlight(1, data1.Item1);
-                                    distance1 = serialdatahandler.calcDistFromTOF(tof1);
-                                    Console.Write("TOF1: ");
-                                    Console.WriteLine(tof1);
-                                    Console.Write("Distance1: ");
-                                    Console.WriteLine(distance1);
-                                }
-                            }
-                            if (read_message2)
-                            {
-                                message2 = sr2.ReadLine();
-                                message2 = sr2.ReadLine();
-                                if (message2 == null || message2 == "")
-                                {
-                                    Console.WriteLine("empty/null2 aware");
-                                    data2 = null;
-                                }
-                                else
-                                {
-                                    if (firstDatetime2)
-                                    {
-                                        serialdatahandler.firstDateTimeVal2 = serialdatahandler.getDateTimeFromMessage(message2);
-                                        firstDatetime2 = false;
-                                    }
-                                    data2 = serialdatahandler.isolateInfoFromMessages(message2);
-                                    // retrieve first datetime (this only happens once per run!!)
-                                    Console.WriteLine("Message 2:");
-                                    Console.WriteLine(data2.Item1);
-                                    tof2 = serialdatahandler.makeTimeOfFlight(2, data2.Item1);
-                                    Console.Write("TOF2: ");
-                                    Console.WriteLine(tof2);
-                                    distance2 = serialdatahandler.calcDistFromTOF(tof2);
-                                    Console.Write("Distance2: ");
-                                    Console.WriteLine(distance2);
-                                }
-                            }
-                            if ((Math.Abs((serialdatahandler.getDateTimeFromMessage(message1).Subtract(start_time_from_pf)).Seconds) <= allowableTimeLapse)
-                                && (Math.Abs((serialdatahandler.getDateTimeFromMessage(message2).Subtract(start_time_from_pf)).Seconds) <= allowableTimeLapse))
-                            {
-                                read_message1 = false;
-                                read_message2 = false;
-                                serialdatahandler.outputToParticleFilter.Add(Tuple.Create(distance1, data1.Item1, data1.Item2, data1.Item3));
-                                serialdatahandler.outputToParticleFilter.Add(Tuple.Create(distance2, data2.Item1, data2.Item2, data2.Item3));
-                           
-                                Console.WriteLine("return packet to PF (both message1 and 2)");
-                                Console.WriteLine(serialdatahandler.outputToParticleFilter[0].Item1);
-                                Console.WriteLine(serialdatahandler.outputToParticleFilter[1].Item1);
-                                Console.WriteLine(serialdatahandler.outputToParticleFilter[0].Item2);
-                                Console.WriteLine(serialdatahandler.outputToParticleFilter[1].Item2);
-                            }
-                            else if ((Math.Abs((serialdatahandler.getDateTimeFromMessage(message1).Subtract(start_time_from_pf)).Seconds) <= allowableTimeLapse)
-                            && ((serialdatahandler.getDateTimeFromMessage(message2).Subtract(start_time_from_pf)).Seconds) > allowableTimeLapse)
-                            {
-                                read_message1 = false;
-                                read_message2 = false;
-                                serialdatahandler.outputToParticleFilter.Add(Tuple.Create(distance1, data1.Item1, data1.Item2, data1.Item3));
-                                Console.WriteLine("return packet to PF, message1 only");
-                                Console.WriteLine(serialdatahandler.outputToParticleFilter[0].Item1);
-                                Console.WriteLine(serialdatahandler.outputToParticleFilter[0].Item2);
-                            }
-                            else if ((Math.Abs((serialdatahandler.getDateTimeFromMessage(message2).Subtract(start_time_from_pf)).Seconds) <= allowableTimeLapse)
-                            && ((serialdatahandler.getDateTimeFromMessage(message1).Subtract(start_time_from_pf)).Seconds) > allowableTimeLapse)
-                            {
-                                read_message1 = false;
-                                read_message2 = false;
-                                serialdatahandler.outputToParticleFilter.Add(Tuple.Create(distance2, data2.Item1, data2.Item2, data2.Item3));
-                                
-                                Console.WriteLine("return packet to PF, just message 2)");
-                                Console.WriteLine(serialdatahandler.outputToParticleFilter[0].Item1);
-                                Console.WriteLine(serialdatahandler.outputToParticleFilter[0].Item2);
-                            }
-                            else if ((serialdatahandler.getDateTimeFromMessage(message1) < start_time_from_pf) &&
-                                (serialdatahandler.getDateTimeFromMessage(message2) < start_time_from_pf))
-                            {
-                                read_message1 = true;
-                                read_message2 = true;
-                                //Console.WriteLine("truetrue");
-                            }
-                            else if (serialdatahandler.getDateTimeFromMessage(message1) < start_time_from_pf)
-                            {
-                                read_message1 = true;
-                                read_message2 = false;
-                                //Console.WriteLine("truefalse");
-                            }
-                            else if (serialdatahandler.getDateTimeFromMessage(message2) < start_time_from_pf)
-                            {
-                                read_message1 = false;
-                                read_message2 = true;
-                                //Console.WriteLine("falsetrue");
+                                Console.WriteLine("null/empty1 aware");
+                                data1 = null;
                             }
                             else
                             {
-                                read_message1 = false;
-                                read_message2 = false;
-                                //Console.WriteLine("falsefalse");
+                                data1 = this.isolateInfoFromMessages(message1);
+                                Console.WriteLine(data1.Item1);
+                                tof1 = this.makeTimeOfFlight(1, data1.Item1);
+                                distance1 = this.calcDistFromTOF(tof1);
                             }
+                        }
+                        if (read_message2)
+                        {
+                            message2 = sr2.ReadLine();
+                            message2 = sr2.ReadLine();
+                            if (message2 == null || message2 == "")
+                            {
+                                Console.WriteLine("empty/null2 aware");
+                                data2 = null;
+                            }
+                            else
+                            {
+                                
+                                data2 = this.isolateInfoFromMessages(message2);
+                                Console.WriteLine(data2.Item1);
+                                tof2 = this.makeTimeOfFlight(2, data2.Item1);
+                                distance2 = this.calcDistFromTOF(tof2);
+
+                            }
+                        }
+                        if ((Math.Abs((this.getDateTimeFromMessage(message1).Subtract(startTimeFromSimulator)).Seconds) <= this.allowableTimeLapse)
+                            && (Math.Abs((this.getDateTimeFromMessage(message2).Subtract(startTimeFromSimulator)).Seconds) <= this.allowableTimeLapse))
+                        {
+                            read_message1 = false;
+                            read_message2 = false;
+                            outputToSimulator.Add(Tuple.Create(distance1, data1.Item1, data1.Item2, data1.Item3));
+                            outputToSimulator.Add(Tuple.Create(distance2, data2.Item1, data2.Item2, data2.Item3));
+                        }
+                        else if ((Math.Abs((this.getDateTimeFromMessage(message1).Subtract(startTimeFromSimulator)).Seconds) <= this.allowableTimeLapse)
+                        && ((this.getDateTimeFromMessage(message2).Subtract(startTimeFromSimulator)).Seconds) > this.allowableTimeLapse)
+                        {
+                            read_message1 = false;
+                            read_message2 = false;
+                            outputToSimulator.Add(Tuple.Create(distance1, data1.Item1, data1.Item2, data1.Item3));
+                        }
+                        else if ((Math.Abs((this.getDateTimeFromMessage(message2).Subtract(startTimeFromSimulator)).Seconds) <= this.allowableTimeLapse)
+                        && ((this.getDateTimeFromMessage(message1).Subtract(startTimeFromSimulator)).Seconds) > this.allowableTimeLapse)
+                        {
+                            read_message1 = false;
+                            read_message2 = false;
+                            outputToSimulator.Add(Tuple.Create(distance2, data2.Item1, data2.Item2, data2.Item3));
+                        }
+                        else if ((this.getDateTimeFromMessage(message1) < startTimeFromSimulator) &&
+                            (this.getDateTimeFromMessage(message2) < startTimeFromSimulator))
+                        {
+                            read_message1 = true;
+                            read_message2 = true;
+                        }
+                        else if (this.getDateTimeFromMessage(message1) < startTimeFromSimulator)
+                        {
+                            read_message1 = true;
+                            read_message2 = false;
+                        }
+                        else if (this.getDateTimeFromMessage(message2) < startTimeFromSimulator)
+                        {
+                            read_message1 = false;
+                            read_message2 = true;
+                        }
+                        else
+                        {
+                            read_message1 = false;
+                            read_message2 = false;
                         }
                     }
                 }
             }
-            else
+            return outputToSimulator;
+        }
+
+        public DateTime getInitialTime()
+        {
+
+            using (StreamReader sr = new StreamReader(@"../../../" + filename1 + ".csv"))
             {
-                StringComparer stringComparer = StringComparer.OrdinalIgnoreCase;
-                serialdatahandler.speedOfSound = serialdatahandler.calcSpeedOfSound();
-                serialdatahandler.timeToRun = serialdatahandler.getTimeToRun();
-
-                // Create a new SerialPort object with default settings.
-                _serialPort = new SerialPort();
-
-                _serialPort.PortName = SetPortName(_serialPort.PortName);
-
-                //Set the read / write timeouts
-                _serialPort.ReadTimeout = 500;
-                _serialPort.WriteTimeout = 500;
-
-                Console.WriteLine("Beginning to listen to " + _serialPort.PortName + ".");
-
-                _serialPort.Open();
-
-                Stopwatch sw = new Stopwatch();
-                sw.Start();
-
-                while (sw.ElapsedMilliseconds < serialdatahandler.timeToRun)
+                using (StreamReader sr2 = new StreamReader(@"../../../" + filename2 + ".csv"))
                 {
-                    try
-                    {
-                        message = _serialPort.ReadLine();
-                        //serialdatahandler.rawSerialData.Add(message);
-                        if (message != null)
-                        {
-                            Tuple<DateTime, string, string> data = serialdatahandler.isolateInfoFromMessages(message);
-                            // retrieve first datetime (this only happens once per run!!)
-                            if (firstDatetime)
-                            {
-                                serialdatahandler.firstDateTimeVal = data.Item1;
-                                firstDatetime = false;
-                            }
-                            double tof = serialdatahandler.makeTimeOfFlight(0, data.Item1);
-                            double distance = serialdatahandler.calcDistFromTOF(tof);
+                    string headerLine = sr.ReadLine();
+                    string headerLine2 = sr2.ReadLine();
+                    string message1 = "";
+                    string message2 = "";
 
-                            //outputToParticleFilter = distance, datetime, transmitterID, sensorID
-                            serialdatahandler.outputToParticleFilter.Add(Tuple.Create(distance, data.Item1, data.Item2, data.Item3));
+                    while (!sr.EndOfStream && !sr2.EndOfStream)
+                    {
+                        message1 = sr.ReadLine();
+                        message1 = sr.ReadLine();
+
+                        message2 = sr2.ReadLine();
+                        message2 = sr2.ReadLine();
+
+
+                        this.firstDateTimeVal1 = this.getDateTimeFromMessage(message1);
+                        this.firstDateTimeVal2 = this.getDateTimeFromMessage(message2);
+
+                        if (this.firstDateTimeVal1 < this.firstDateTimeVal2)
+                        {
+                            return this.firstDateTimeVal1;
                         }
+
+                        return this.firstDateTimeVal2;
+
                     }
-                    catch (TimeoutException) { }
+                    return new DateTime();
                 }
-                _serialPort.Close();
+            }
+        }
+
+        public DateTime getFinalTime()
+        {
+            using (StreamReader sr = new StreamReader(@"../../../" + filename1 + ".csv"))
+            {
+                using (StreamReader sr2 = new StreamReader(@"../../../" + filename2 + ".csv"))
+                {
+                    string lastline1 = string.Empty;
+                    string lastline2 = string.Empty;
+                    string line;
+                    string headerLine = sr.ReadLine();
+                    string headerLine2 = sr2.ReadLine();
+
+                    while ((line = sr.ReadLine()) != null || line == "") {
+                        lastline1 = line;
+                    }
+                    while ((line = sr2.ReadLine()) != null || line == "") {
+                        lastline2 = line;
+                    }
+
+                    DateTime d1 = this.getDateTimeFromMessage(lastline1);
+                    DateTime d2 = this.getDateTimeFromMessage(lastline2);
+
+                    if (d1 > d2)
+                    {
+                        return d1;
+                    }
+                    return d2;
+                }
             }
         }
 
@@ -270,11 +245,12 @@ namespace CsharpAUV
             else if (sensor == 1)
             {
                 double diff1 = dateTimeCurrent.Subtract(this.firstDateTimeVal1).TotalSeconds;
-                tof =  diff1 % 8.179; ; // add total time % 8.179 to get tof
+                tof = diff1 % 8.179; ; // add total time % 8.179 to get tof
             }
-            else {
+            else
+            {
                 double diff2 = dateTimeCurrent.Subtract(this.firstDateTimeVal2).TotalSeconds;
-                tof =  diff2 % 8.179; ; // add total time % 8.179 to get tof}
+                tof = diff2 % 8.179; ; // add total time % 8.179 to get tof}
             }
 
             if (tof > 8)
@@ -282,9 +258,8 @@ namespace CsharpAUV
                 tof = 8.179 - tof;
             }
             return tof;
-            
+
         }
-            
 
         public DateTime getDateTimeFromMessage(string message)
         {   /* 
@@ -294,7 +269,6 @@ namespace CsharpAUV
              */
             //Console.WriteLine(message);
             string[] tempArr = message.Split(',');
-
             return DateTime.Parse(tempArr[2]).ToLocalTime();
         }
 
@@ -470,6 +444,7 @@ namespace CsharpAUV
 
             return (StopBits)Enum.Parse(typeof(StopBits), stopBits, true);
         }
+
         public static Handshake SetPortHandshake(Handshake defaultPortHandshake)
         {
             string handshake;
@@ -492,6 +467,9 @@ namespace CsharpAUV
         }
     }
 }
+    
+    
+
 
 
 // Have not used:
