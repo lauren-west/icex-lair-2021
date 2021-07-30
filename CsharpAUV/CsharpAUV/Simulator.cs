@@ -22,6 +22,11 @@ namespace CsharpAUV
                 // plan based on shark state
 
                 // control
+                foreach (Tuple<double, DateTime, string, string> item in measurements) {
+
+                    Console.WriteLine(item.Item2);
+
+                }
 
                 currentTime = currentTime.AddSeconds(1);
             }

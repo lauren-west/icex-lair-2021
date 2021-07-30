@@ -50,6 +50,8 @@ namespace CsharpAUV
                     bool read_message2 = true;
                     string message1 = "";
                     string message2 = "";
+                    bool end1 = false;
+                    bool end2 = false;
 
 
                     Tuple<DateTime, string, string> data1 = Tuple.Create(new DateTime(), "", "");
@@ -59,13 +61,16 @@ namespace CsharpAUV
                     
                     while (read_message1 || read_message2)
                     {
-                        //if (sr.EndOfStream) {
-                        //    read_message1 = false;
-                        //}
-                        //if (sr2.EndOfStream)
-                        //{
-                        //    read_message2 = false;
-                        //}
+                        if (sr.EndOfStream)
+                        {
+                            read_message1 = false;
+                            end1 = false;
+                        }
+                        if (sr2.EndOfStream)
+                        {
+                            read_message2 = false;
+                            end2 = true;
+                        }
                         if (read_message1)
                         {
                             message1 = sr.ReadLine();
@@ -78,7 +83,7 @@ namespace CsharpAUV
                             else
                             {
                                 data1 = this.isolateInfoFromMessages(message1);
-                                Console.WriteLine(data1.Item1);
+                                //Console.WriteLine(data1.Item1);
                                 tof1 = this.makeTimeOfFlight(1, data1.Item1);
                                 distance1 = this.calcDistFromTOF(tof1);
                             }
@@ -96,7 +101,7 @@ namespace CsharpAUV
                             {
                                 
                                 data2 = this.isolateInfoFromMessages(message2);
-                                Console.WriteLine(data2.Item1);
+                                //Console.WriteLine(data2.Item1);
                                 tof2 = this.makeTimeOfFlight(2, data2.Item1);
                                 distance2 = this.calcDistFromTOF(tof2);
 
@@ -109,6 +114,7 @@ namespace CsharpAUV
                             read_message2 = false;
                             outputToSimulator.Add(Tuple.Create(distance1, data1.Item1, data1.Item2, data1.Item3));
                             outputToSimulator.Add(Tuple.Create(distance2, data2.Item1, data2.Item2, data2.Item3));
+                            //Console.WriteLine("here0");
                         }
                         else if ((Math.Abs((this.getDateTimeFromMessage(message1).Subtract(startTimeFromSimulator)).Seconds) <= this.allowableTimeLapse)
                         && ((this.getDateTimeFromMessage(message2).Subtract(startTimeFromSimulator)).Seconds) > this.allowableTimeLapse)
@@ -116,6 +122,15 @@ namespace CsharpAUV
                             read_message1 = false;
                             read_message2 = false;
                             outputToSimulator.Add(Tuple.Create(distance1, data1.Item1, data1.Item2, data1.Item3));
+                            //Console.WriteLine("here1");
+                        } else if ((Math.Abs((this.getDateTimeFromMessage(message1).Subtract(startTimeFromSimulator)).Seconds) <= this.allowableTimeLapse)
+                        && end2)
+                        {
+                            read_message1 = false;
+                            read_message2 = false;
+                            outputToSimulator.Add(Tuple.Create(distance1, data1.Item1, data1.Item2, data1.Item3));
+                            //Console.WriteLine("here2");
+
                         }
                         else if ((Math.Abs((this.getDateTimeFromMessage(message2).Subtract(startTimeFromSimulator)).Seconds) <= this.allowableTimeLapse)
                         && ((this.getDateTimeFromMessage(message1).Subtract(startTimeFromSimulator)).Seconds) > this.allowableTimeLapse)
@@ -123,32 +138,47 @@ namespace CsharpAUV
                             read_message1 = false;
                             read_message2 = false;
                             outputToSimulator.Add(Tuple.Create(distance2, data2.Item1, data2.Item2, data2.Item3));
+                            //Console.WriteLine("here3");
+                        }
+                        else if ((Math.Abs((this.getDateTimeFromMessage(message2).Subtract(startTimeFromSimulator)).Seconds) <= this.allowableTimeLapse)
+                        && end1)
+                        {
+                            read_message1 = false;
+                            read_message2 = false;
+                            outputToSimulator.Add(Tuple.Create(distance2, data2.Item1, data2.Item2, data2.Item3));
+                            //Console.WriteLine("here3.5");
+
                         }
                         else if ((this.getDateTimeFromMessage(message1) < startTimeFromSimulator) &&
                             (this.getDateTimeFromMessage(message2) < startTimeFromSimulator))
                         {
                             read_message1 = true;
                             read_message2 = true;
+                            //Console.WriteLine("here4");
                         }
-                        else if (this.getDateTimeFromMessage(message1) < startTimeFromSimulator)
+                        else if (this.getDateTimeFromMessage(message1) < startTimeFromSimulator && !end1)
                         {
                             read_message1 = true;
                             read_message2 = false;
+                            //Console.WriteLine("here5");
                         }
-                        else if (this.getDateTimeFromMessage(message2) < startTimeFromSimulator)
+                        else if (this.getDateTimeFromMessage(message2) < startTimeFromSimulator && !end2)
                         {
                             read_message1 = false;
                             read_message2 = true;
+                            //Console.WriteLine("here6");
                         }
                         else
                         {
                             read_message1 = false;
                             read_message2 = false;
+                            //Console.WriteLine("here7");
                         }
                     }
+                    return outputToSimulator;
                 }
             }
-            return outputToSimulator;
+            
         }
 
         public DateTime getInitialTime()
