@@ -9,7 +9,7 @@ namespace CsharpAUV
         }
         static void Main(string[] args)
         {
-            SerialDataHandler handler = new SerialDataHandler("sensor1", "sensor2");
+            SerialDataHandler handler = new SerialDataHandler("sensor1", "sensor2withMissedPing");
             DateTime currentTime = handler.getInitialTime();
             DateTime finalTime = handler.getFinalTime();
 
