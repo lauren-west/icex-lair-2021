@@ -687,9 +687,10 @@ def run_program_with_old_data(handler):
     true_first_time_stamp = None
 
     for file in LoFiles[:index_of_first_raw_data]:
-        if file == ".DS_Store":
+        # num = int(file[file.index("_") + 1 : file.index(".")])
+        if file == ".DS_Store":  #  or num > 6:
             continue
-        
+        # print(f"Working on this file: {file}")
         df = pd.read_csv(path + "/" + file, engine='python', header=0, index_col=False)
         new_time_of_flight_list = []
         new_predicted_distance_list = []
