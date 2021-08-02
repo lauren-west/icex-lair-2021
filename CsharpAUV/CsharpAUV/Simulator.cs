@@ -17,15 +17,6 @@ namespace CsharpAUV
             {
                 // Step 1: Get Measurements
                 List<Tuple<double, DateTime, string, string>> measurements = handler.getMeasurements(currentTime);
-                foreach (Tuple<double, DateTime, string, string> item in measurements)
-                {
-                    Console.WriteLine(item.Item1);
-                    Console.WriteLine(item.Item2);
-                    Console.WriteLine(item.Item3);
-                    Console.WriteLine(item.Item4);
-                    Console.WriteLine();
-                }
-                Console.WriteLine();
 
                 // Step 2: Run pf to estimate shark state
 
@@ -40,3 +31,29 @@ namespace CsharpAUV
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+ * foreach (Tuple<double, DateTime, string, string> item in measurements)
+                {
+                    Console.WriteLine(item.Item1);
+                    Console.WriteLine(item.Item2);
+                    Console.WriteLine(item.Item3);
+                    Console.WriteLine(item.Item4);
+                    Console.WriteLine();
+                }
+                Console.WriteLine();
+*/

@@ -2,11 +2,11 @@
   <MonoDevelop.Ide.ItemProperties.CsharpAUV PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.Workbench ActiveDocument="CsharpAUV/Simulator.cs">
     <Files>
-      <File FileName="CsharpAUV/Simulator.cs" Line="18" Column="44" />
-      <File FileName="CsharpAUV/SerialDataHandler.cs" Line="560" Column="67" />
-      <File FileName="CsharpAUV/sensor1.csv" Line="214" Column="1" />
-      <File FileName="CsharpAUV/sensor2.csv" Line="3" Column="31" />
-      <File FileName="CsharpAUV/sensor2withMissedPing.csv" Line="221" Column="171" />
+      <File FileName="CsharpAUV/Simulator.cs" Line="20" Column="17" />
+      <File FileName="CsharpAUV/SerialDataHandler.cs" />
+      <File FileName="CsharpAUV/sensor1.csv" />
+      <File FileName="CsharpAUV/sensor2.csv" />
+      <File FileName="CsharpAUV/sensor2withMissedPing.csv" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
