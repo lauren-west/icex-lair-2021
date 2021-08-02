@@ -22,7 +22,7 @@ namespace CsharpAUV
         double allowableTimeLapse = 4.0;
         public bool _continue = true;
 
-        List<Tuple<double, DateTime, string, string>> outputToParticleFilter = new List<Tuple<double, DateTime, string, string>>();
+        List<Tuple<double, DateTime, int, int>> outputToParticleFilter = new List<Tuple<double, DateTime, int, int>>();
 
         public SerialDataHandler()
         {
@@ -35,10 +35,10 @@ namespace CsharpAUV
             filename2 = file2;
         }
         
-        public List<Tuple<double, DateTime, string, string>> getMeasurements(DateTime startTimeFromSimulator)
+        public List<Tuple<double, DateTime, int, int>> getMeasurements(DateTime startTimeFromSimulator)
         {
             this.speedOfSound = 1500;
-            List<Tuple<double, DateTime, string, string>> outputToSimulator = new List<Tuple<double, DateTime, string, string>>();
+            List<Tuple<double, DateTime, int, int>> outputToSimulator = new List<Tuple<double, DateTime, int, int>>();
 
             using (StreamReader sr = new StreamReader(@"../../../" + this.filename1 + ".csv"))
             {
@@ -56,8 +56,8 @@ namespace CsharpAUV
                     bool end1 = false;
                     bool end2 = false;
 
-                    Tuple<DateTime, string, string> data1 = Tuple.Create(new DateTime(), "", "");
-                    Tuple<DateTime, string, string> data2 = Tuple.Create(new DateTime(), "", "");
+                    Tuple<DateTime, int, int> data1 = Tuple.Create(new DateTime(), 0, 0);
+                    Tuple<DateTime, int, int> data2 = Tuple.Create(new DateTime(), 0, 0);
                     
                     while (read_message1 || read_message2)
                     {
@@ -246,10 +246,10 @@ namespace CsharpAUV
             }
         }
 
-        public Tuple<double, DateTime, string, string> getLiveMeasurements()
+        public Tuple<double, DateTime, int, int> getLiveMeasurements()
         {
             string message = "";
-            Tuple<double, DateTime, string, string> outputToPF = Tuple.Create(0.0,new DateTime(), "", "");
+            Tuple<double, DateTime, int, int> outputToPF = Tuple.Create(0.0,new DateTime(), 0, 0);
 
             _serialPort = new SerialPort();
             _serialPort.PortName = SetPortName(_serialPort.PortName);
@@ -271,7 +271,7 @@ namespace CsharpAUV
                     //serialdatahandler.rawSerialData.Add(message);
                     if (message != null)
                     {
-                        Tuple<DateTime, string, string> data = this.isolateInfoFromMessages(message);
+                        Tuple<DateTime, int, int> data = this.isolateInfoFromMessages(message);
                         // retrieve first datetime (this only happens once per run!!)
                         if (this.firstLiveDateTime)
                         {
@@ -343,7 +343,7 @@ namespace CsharpAUV
             return DateTime.Parse(tempArr[2]);
         }
 
-        public Tuple<DateTime, string, string> isolateInfoFromMessages(string message)
+        public Tuple<DateTime, int, int> isolateInfoFromMessages(string message)
         {   /* 
              * Using raw serial data, we isolate dateTimes and transmitterIDs
              * 
@@ -355,7 +355,7 @@ namespace CsharpAUV
             string transmitterID = tempArr[4];
             string sensorID = tempArr[0];
 
-            return Tuple.Create(dateTimes, transmitterID, sensorID);
+            return Tuple.Create(dateTimes, Convert.ToInt32(transmitterID), Convert.ToInt32(sensorID));
         }
 
         public double calcSpeedOfSound()
