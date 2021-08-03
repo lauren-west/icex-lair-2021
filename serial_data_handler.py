@@ -688,8 +688,9 @@ def run_program_with_old_data(handler):
 
     for file in LoFiles[:index_of_first_raw_data]:
         # num = int(file[file.index("_") + 1 : file.index(".")])
-        if file == ".DS_Store":  #  or num > 6:
+        if file == ".DS_Store" or file == "data_13.csv":  #  or num > 6:
             continue
+
         # print(f"Working on this file: {file}")
         df = pd.read_csv(path + "/" + file, engine='python', header=0, index_col=False)
         new_time_of_flight_list = []
