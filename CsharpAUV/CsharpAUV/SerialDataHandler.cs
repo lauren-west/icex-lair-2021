@@ -11,10 +11,10 @@ namespace CsharpAUV
     class SerialDataHandler
     {
         static SerialPort _serialPort;
-        //public List<string> rawSerialData = new List<string>();
         double speedOfSound;
         int timeToRun;
-        DateTime firstDateTimeVal;
+        bool firstLiveDateTime = true;
+        DateTime firstLiveDateTimeVal;
         DateTime firstDateTimeVal1;
         DateTime firstDateTimeVal2;
         string filename1;
@@ -22,20 +22,23 @@ namespace CsharpAUV
         double allowableTimeLapse = 4.0;
         public bool _continue = true;
 
-        // contains most recent measurement from serial port
-        List<Tuple<double, DateTime, string, string>> outputToParticleFilter = new List<Tuple<double, DateTime, string, string>>();
+        List<Tuple<double, DateTime, int, int>> outputToParticleFilter = new List<Tuple<double, DateTime, int, int>>();
+
+        public SerialDataHandler()
+        {
+            // empty constructor for live serial data
+        }
 
         public SerialDataHandler(String file1, String file2)
         {
             filename1 = file1;
             filename2 = file2;
         }
-
-        public List<Tuple<double, DateTime, string, string>> getMeasurements(DateTime startTimeFromSimulator)
+        
+        public List<Tuple<double, DateTime, int, int>> getMeasurements(DateTime startTimeFromSimulator)
         {
-            // assume speed of sound for old data is a default 1500
             this.speedOfSound = 1500;
-            List<Tuple<double, DateTime, string, string>> outputToSimulator = new List<Tuple<double, DateTime, string, string>>();
+            List<Tuple<double, DateTime, int, int>> outputToSimulator = new List<Tuple<double, DateTime, int, int>>();
 
             using (StreamReader sr = new StreamReader(@"../../../" + this.filename1 + ".csv"))
             {
@@ -53,11 +56,8 @@ namespace CsharpAUV
                     bool end1 = false;
                     bool end2 = false;
 
-
-                    Tuple<DateTime, string, string> data1 = Tuple.Create(new DateTime(), "", "");
-                    Tuple<DateTime, string, string> data2 = Tuple.Create(new DateTime(), "", "");
-
-                    //while (!sr.EndOfStream && !sr2.EndOfStream)
+                    Tuple<DateTime, int, int> data1 = Tuple.Create(new DateTime(), 0, 0);
+                    Tuple<DateTime, int, int> data2 = Tuple.Create(new DateTime(), 0, 0);
                     
                     while (read_message1 || read_message2)
                     {
@@ -178,7 +178,6 @@ namespace CsharpAUV
                     return outputToSimulator;
                 }
             }
-            
         }
 
         public DateTime getInitialTime()
@@ -209,9 +208,7 @@ namespace CsharpAUV
                         {
                             return this.firstDateTimeVal1;
                         }
-
                         return this.firstDateTimeVal2;
-
                     }
                     return new DateTime();
                 }
@@ -249,6 +246,51 @@ namespace CsharpAUV
             }
         }
 
+        public Tuple<double, DateTime, int, int> getLiveMeasurements()
+        {
+            string message = "";
+            Tuple<double, DateTime, int, int> outputToPF = Tuple.Create(0.0,new DateTime(), 0, 0);
+
+            _serialPort = new SerialPort();
+            _serialPort.PortName = SetPortName(_serialPort.PortName);
+            _serialPort.ReadTimeout = 500;
+            _serialPort.WriteTimeout = 500;
+
+            Console.WriteLine("Beginning to listen to " + _serialPort.PortName + ".");
+
+            _serialPort.Open();
+
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
+            while (sw.ElapsedMilliseconds < 40) // give 40 ms to listen into serial port for data --> check this with Clark...
+            {
+                try
+                {
+                    message = _serialPort.ReadLine();
+                    //serialdatahandler.rawSerialData.Add(message);
+                    if (message != null)
+                    {
+                        Tuple<DateTime, int, int> data = this.isolateInfoFromMessages(message);
+                        // retrieve first datetime (this only happens once per run!!)
+                        if (this.firstLiveDateTime)
+                        {
+                            this.firstLiveDateTimeVal = data.Item1;
+                            this.firstLiveDateTime = false;
+                        }
+                        double tof = this.makeTimeOfFlight(0, data.Item1);
+                        double distance = this.calcDistFromTOF(tof);
+
+                        outputToPF = Tuple.Create(distance, data.Item1, data.Item2, data.Item3);
+                        return outputToPF;
+                    }
+                }
+                catch (TimeoutException) { }
+            }
+            _serialPort.Close();
+            return outputToPF;
+        }
+
         public double calcDistFromTOF(double tof)
         {  /* getting predicted distance from TOF
             * 
@@ -267,20 +309,20 @@ namespace CsharpAUV
              * returns: timeOfFlight
              */
             double tof;
-            if (sensor == 0)
+            if (sensor == 0) // 0 means live serial data,
             {
-                double diff1 = dateTimeCurrent.Subtract(this.firstDateTimeVal).TotalSeconds;
-                tof = diff1 % 8.179; ; // add total time % 8.179 to get tof
+                double diff1 = dateTimeCurrent.Subtract(this.firstLiveDateTimeVal).TotalSeconds;
+                tof = diff1 % 8.179;
             }
             else if (sensor == 1)
             {
                 double diff1 = dateTimeCurrent.Subtract(this.firstDateTimeVal1).TotalSeconds;
-                tof = diff1 % 8.179; ; // add total time % 8.179 to get tof
+                tof = diff1 % 8.179;
             }
             else
             {
                 double diff2 = dateTimeCurrent.Subtract(this.firstDateTimeVal2).TotalSeconds;
-                tof = diff2 % 8.179; ; // add total time % 8.179 to get tof}
+                tof = diff2 % 8.179;;
             }
 
             if (tof > 8)
@@ -297,29 +339,23 @@ namespace CsharpAUV
              * 
              * returns: dateTime, transmitterID, and sensor id
              */
-            //Console.WriteLine(message);
             string[] tempArr = message.Split(',');
-            return DateTime.Parse(tempArr[2]).ToLocalTime();
+            return DateTime.Parse(tempArr[2]);
         }
 
-        public Tuple<DateTime, string, string> isolateInfoFromMessages(string message)
+        public Tuple<DateTime, int, int> isolateInfoFromMessages(string message)
         {   /* 
              * Using raw serial data, we isolate dateTimes and transmitterIDs
              * 
              * returns: dateTime, transmitterID, and sensor id
              */
-
-            DateTime dateTimes = new DateTime();
-            string transmitterID = "";
-            string sensorID = "";
-
-            //Console.WriteLine(message);
             string[] tempArr = message.Split(',');
-            sensorID = tempArr[0];
-            transmitterID = tempArr[4];
-            dateTimes = DateTime.Parse(tempArr[2]).ToLocalTime(); //DateTimeOffset.Parse(tempArr[2]).UtcDateTime;
 
-            return Tuple.Create(dateTimes, transmitterID, sensorID);
+            DateTime dateTimes = DateTime.Parse(tempArr[2]); //DateTimeOffset.Parse(tempArr[2]).UtcDateTime;
+            string transmitterID = tempArr[4];
+            string sensorID = tempArr[0];
+
+            return Tuple.Create(dateTimes, Convert.ToInt32(transmitterID), Convert.ToInt32(sensorID));
         }
 
         public double calcSpeedOfSound()
@@ -437,6 +473,7 @@ namespace CsharpAUV
 
             return (Parity)Enum.Parse(typeof(Parity), parity, true);
         }
+
         // Display DataBits values and prompt user to enter a value.
         public static int SetPortDataBits(int defaultPortDataBits)
         {
@@ -452,6 +489,7 @@ namespace CsharpAUV
 
             return int.Parse(dataBits.ToUpperInvariant());
         }
+
         // Display StopBits values and prompt user to enter a value.
         public static StopBits SetPortStopBits(StopBits defaultPortStopBits)
         {
@@ -498,11 +536,7 @@ namespace CsharpAUV
     }
 }
     
-    
-
-
-
-// Have not used:
+// Useful GeoCoord:
 //Tuple<double, double> tagCoord =
 //    new Tuple<double, double>(33.57676, -43.52746);
 //Tuple<double, double> sensorCoord =
@@ -513,7 +547,7 @@ namespace CsharpAUV
 //var yourLocation = new GeoCoordinate(-29.83245, 31.04034);
 //double distance = myLocation.GetDistanceTo(yourLocation);
 
-// deviate from default serialport settings
+// Deviate from default serialport settings?
 // More info
 // @ https://docs.microsoft.com/en-us/dotnet/api/system.io.ports.serialport?view=dotnet-plat-ext-5.0
 //SerialPort _serialPort = new SerialPort();
