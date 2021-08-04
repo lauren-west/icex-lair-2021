@@ -630,15 +630,18 @@ def run_program_with_new_data(handler):
         while time.perf_counter() - t1_start < handler.TIME_TO_RUN:
             if serialInst.in_waiting:
                 packet = serialInst.readline()
-                time_elapsed = time.perf_counter()-t1_start
-                handler.INTERNAL_CLOCK_TIMES.append(time_elapsed)
                 print(packet.decode('utf').rstrip('\n'))
                 output.append(packet.decode('utf').rstrip('\n'))
 
                 row = output[-1]
                 line = row.split(',')
                 line = [s[s.find("=")+1:].strip() for s in line]
-                line.append(time_elapsed)
+
+                if len(line) > 13:
+                    time_elapsed = time.perf_counter()-t1_start
+                    handler.INTERNAL_CLOCK_TIMES.append(time_elapsed)
+                    line.append(time_elapsed)
+
                 writer.writerow(line)
 
 
