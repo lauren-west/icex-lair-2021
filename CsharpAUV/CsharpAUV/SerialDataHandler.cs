@@ -19,8 +19,14 @@ namespace CsharpAUV
         DateTime firstDateTimeVal2;
         string filename1;
         string filename2;
-        double allowableTimeLapse = 4.2;
+        public List<string> file1List;
+        public List<string> file2List;
+        int file1ListIndexPointer;
+        int file2ListIndexPointer;
+        double allowableTimeLapse = 4.179;
         public bool _continue = true;
+        DateTime firstfile1dt;
+        DateTime firstfile2dt;
 
         List<Tuple<double, DateTime, int, int>> outputToParticleFilter = new List<Tuple<double, DateTime, int, int>>();
 
@@ -33,6 +39,10 @@ namespace CsharpAUV
         {
             filename1 = file1;
             filename2 = file2;
+            file1List = this.getFileList(file1);
+            file2List = this.getFileList(file2);
+            file1ListIndexPointer = 0;
+            file2ListIndexPointer = 0;
         }
         
         public List<Tuple<double, DateTime, int, int>> getMeasurements(DateTime startTimeFromSimulator)
@@ -114,7 +124,7 @@ namespace CsharpAUV
                             read_message2 = false;
                             outputToSimulator.Add(Tuple.Create(distance1, data1.Item1, data1.Item2, data1.Item3));
                             outputToSimulator.Add(Tuple.Create(distance2, data2.Item1, data2.Item2, data2.Item3));
-                            //Console.WriteLine("here0");
+                            Console.WriteLine("here0");
                         }
                         else if ((Math.Abs((this.getDateTimeFromMessage(message1).Subtract(startTimeFromSimulator)).Seconds) <= this.allowableTimeLapse)
                         && ((this.getDateTimeFromMessage(message2).Subtract(startTimeFromSimulator)).Seconds) > this.allowableTimeLapse)
@@ -122,14 +132,14 @@ namespace CsharpAUV
                             read_message1 = false;
                             read_message2 = false;
                             outputToSimulator.Add(Tuple.Create(distance1, data1.Item1, data1.Item2, data1.Item3));
-                            //Console.WriteLine("here1");
+                            Console.WriteLine("here1");
                         } else if ((Math.Abs((this.getDateTimeFromMessage(message1).Subtract(startTimeFromSimulator)).Seconds) <= this.allowableTimeLapse)
                         && end2)
                         {
                             read_message1 = false;
                             read_message2 = false;
                             outputToSimulator.Add(Tuple.Create(distance1, data1.Item1, data1.Item2, data1.Item3));
-                            //Console.WriteLine("here2");
+                            Console.WriteLine("here2");
 
                         }
                         else if ((Math.Abs((this.getDateTimeFromMessage(message2).Subtract(startTimeFromSimulator)).Seconds) <= this.allowableTimeLapse)
@@ -138,7 +148,7 @@ namespace CsharpAUV
                             read_message1 = false;
                             read_message2 = false;
                             outputToSimulator.Add(Tuple.Create(distance2, data2.Item1, data2.Item2, data2.Item3));
-                            //Console.WriteLine("here3");
+                            Console.WriteLine("here3");
                         }
                         else if ((Math.Abs((this.getDateTimeFromMessage(message2).Subtract(startTimeFromSimulator)).Seconds) <= this.allowableTimeLapse)
                         && end1)
@@ -146,7 +156,7 @@ namespace CsharpAUV
                             read_message1 = false;
                             read_message2 = false;
                             outputToSimulator.Add(Tuple.Create(distance2, data2.Item1, data2.Item2, data2.Item3));
-                            //Console.WriteLine("here3.5");
+                            Console.WriteLine("here3.5");
 
                         }
                         else if ((this.getDateTimeFromMessage(message1) < startTimeFromSimulator) &&
@@ -154,30 +164,121 @@ namespace CsharpAUV
                         {
                             read_message1 = true;
                             read_message2 = true;
-                            //Console.WriteLine("here4");
+                            Console.WriteLine("here4");
                         }
                         else if (this.getDateTimeFromMessage(message1) < startTimeFromSimulator && !end1)
                         {
                             read_message1 = true;
                             read_message2 = false;
-                            //Console.WriteLine("here5");
+                            Console.WriteLine("here5");
                         }
                         else if (this.getDateTimeFromMessage(message2) < startTimeFromSimulator && !end2)
                         {
                             read_message1 = false;
                             read_message2 = true;
-                            //Console.WriteLine("here6");
+                            Console.WriteLine("here6");
                         }
                         else
                         {
                             read_message1 = false;
                             read_message2 = false;
-                            //Console.WriteLine("here7");
+                            Console.WriteLine("here7");
                         }
                     }
                     return outputToSimulator;
                 }
             }
+        }
+
+        public List<string> getFileList(string filename) {
+            List<string> csvLines = new List<string>();
+            using (var reader = new StreamReader(@"../../../" + filename + ".csv"))
+            {
+                string headerLine = reader.ReadLine();
+
+                while (!reader.EndOfStream)
+                {
+                    var line = reader.ReadLine();
+                    var values = line.Split(';');
+
+                    if (!String.IsNullOrEmpty(line)) {
+                        csvLines.Add(line);
+                    }
+                }
+            }
+
+            return csvLines;
+        }
+
+        public List<Tuple<double, DateTime, int, int>> getMeasurements1(DateTime currentTimeFromSimulator)
+        {
+            this.speedOfSound = 1460;
+            bool found1 = false;
+            bool found2 = false;
+            List<Tuple<double, DateTime, int, int>> outputToSimulator = new List<Tuple<double, DateTime, int, int>>();
+            DateTime pointer1dt = this.getDateTimeFromMessage(file1List[this.file1ListIndexPointer]);
+            DateTime pointer2dt = this.getDateTimeFromMessage(file2List[this.file2ListIndexPointer]);
+
+            while (!found1 || !found2)
+            {
+                // equivalent logic for file1
+                if (pointer1dt > currentTimeFromSimulator && Math.Abs((pointer1dt - currentTimeFromSimulator).TotalSeconds) > this.allowableTimeLapse)
+                {
+                    found1 = true;
+                }
+                else if (pointer1dt <= currentTimeFromSimulator && Math.Abs((pointer1dt - currentTimeFromSimulator).TotalSeconds) < this.allowableTimeLapse)
+                {
+                    outputToSimulator.Add(this.isolateInfoFromMessages1(1, file1List[this.file1ListIndexPointer]));
+                    found1 = true;
+                }
+                else
+                {
+                    if (this.file1ListIndexPointer < this.file1List.Count - 1)
+                    {
+                        if (this.getDateTimeFromMessage(file1List[this.file1ListIndexPointer + 1]) <= currentTimeFromSimulator)
+                        {
+                            this.file1ListIndexPointer = this.file1ListIndexPointer + 1;
+                            pointer1dt = this.getDateTimeFromMessage(file1List[this.file1ListIndexPointer]);
+                        }
+                        found1 = true;
+                        outputToSimulator.Add(this.isolateInfoFromMessages1(1, file1List[this.file1ListIndexPointer]));
+                    }
+                    else
+                    {
+                        found1 = true;
+                    }
+
+                }
+                // equivalent logic for file2
+                if (pointer2dt > currentTimeFromSimulator && Math.Abs((pointer2dt - currentTimeFromSimulator).TotalSeconds) > this.allowableTimeLapse)
+                { 
+                    found2 = true;
+                }
+                else if (pointer2dt <= currentTimeFromSimulator && Math.Abs((pointer2dt - currentTimeFromSimulator).TotalSeconds) < this.allowableTimeLapse)
+                {
+                    outputToSimulator.Add(this.isolateInfoFromMessages1(2, file2List[this.file2ListIndexPointer]));
+                    found2 = true;
+                }
+                else
+                {
+                    if (this.file2ListIndexPointer < this.file2List.Count - 1)
+                    {
+                        if (this.getDateTimeFromMessage(file2List[this.file2ListIndexPointer + 1]) <= currentTimeFromSimulator) {
+                            this.file2ListIndexPointer = this.file2ListIndexPointer + 1;
+                            pointer2dt = this.getDateTimeFromMessage(file2List[this.file2ListIndexPointer]);
+                        }
+                        found2 = true;
+                        outputToSimulator.Add(this.isolateInfoFromMessages1(2, file2List[this.file2ListIndexPointer]));
+                    }
+                    else
+                    {
+                        found2 = true;
+                    }
+
+                }
+            }
+
+            return outputToSimulator;
         }
 
         public DateTime getInitialTime()
@@ -244,6 +345,34 @@ namespace CsharpAUV
                     return d2;
                 }
             }
+        }
+
+
+        public DateTime getInitialTime1()
+        {
+            string firstline1 = this.file1List[0];
+            string firstline2 = this.file2List[0];
+            DateTime d1 = this.getDateTimeFromMessage(firstline1);
+            DateTime d2 = this.getDateTimeFromMessage(firstline2);
+            if (d1 < d2)
+            {
+                return d1;
+            }
+            return d2;
+        }
+
+        public DateTime getFinalTime1()
+        {
+            string lastline1 = this.file1List[this.file1List.Count - 1];
+            string lastline2 = this.file2List[this.file1List.Count - 1];
+            DateTime d1 = this.getDateTimeFromMessage(lastline1);
+            DateTime d2 = this.getDateTimeFromMessage(lastline2);
+
+            if (d1 > d2)
+            {
+                return d1;
+            }
+            return d2;
         }
 
         public Tuple<double, DateTime, int, int> getLiveMeasurements()
@@ -333,6 +462,35 @@ namespace CsharpAUV
 
         }
 
+        public double makeTimeOfFlight1(int file, DateTime dateTimeCurrent)
+        {   /* 
+             * param: sensor 0, 1, or 2
+             * 0 means live serial date,
+             * 1 means csv sensor 1
+             * 2 means csv sensor2
+             * returns: timeOfFlight
+             */
+            double tof;
+            if (file == 1)
+            {
+                double diff1 = dateTimeCurrent.Subtract(this.getDateTimeFromMessage(this.file1List[0])).TotalSeconds;
+                tof = diff1 % 8.179;
+            }
+            else
+            {
+                double diff2 = dateTimeCurrent.Subtract(this.getDateTimeFromMessage(this.file2List[0])).TotalSeconds;
+                tof = diff2 % 8.179; ;
+            }
+            Console.WriteLine("tof: {0}", tof);
+
+            if (tof > 8)
+            {
+                tof = 8.179 - tof;
+            }
+            return tof;
+
+        }
+
         public DateTime getDateTimeFromMessage(string message)
         {   /* 
              * Using raw serial data, we isolate dateTimes and transmitterIDs
@@ -355,6 +513,24 @@ namespace CsharpAUV
             string transmitterID = tempArr[4];
             string sensorID = tempArr[0];
             return Tuple.Create(dateTimes, Convert.ToInt32(transmitterID), Convert.ToInt32(sensorID));
+        }
+
+        public Tuple<double, DateTime, int, int> isolateInfoFromMessages1(int filenum, string message)
+        {   /* 
+             * Using raw serial data, we isolate dateTimes and transmitterIDs
+             * 
+             * returns: dateTime, transmitterID, and sensor id
+             */
+            string[] tempArr = message.Split(',');
+
+            DateTime dateTime = DateTime.Parse(tempArr[2]); //DateTimeOffset.Parse(tempArr[2]).UtcDateTime;
+            string transmitterID = tempArr[4];
+            string sensorID = tempArr[0];
+
+            double tof1 = this.makeTimeOfFlight1(filenum, dateTime);
+            double distance = this.calcDistFromTOF(tof1);
+
+            return Tuple.Create(distance, dateTime, Convert.ToInt32(transmitterID), Convert.ToInt32(sensorID));
         }
 
         public double calcSpeedOfSound()
