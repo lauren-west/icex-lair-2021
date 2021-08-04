@@ -9,8 +9,9 @@ namespace CsharpAUV
         }
         static void Main(string[] args)
         {
-            SerialDataHandler handler = new SerialDataHandler("fake1", "fake2");
+            SerialDataHandler handler = new SerialDataHandler("fake1 copy", "fake2 copy");
             DateTime currentTime = handler.getInitialTime();
+            
             DateTime finalTime = handler.getFinalTime();
 
             while (currentTime < finalTime)
@@ -19,11 +20,11 @@ namespace CsharpAUV
                 List<Tuple<double, DateTime, int, int>> measurements = handler.getMeasurements(currentTime);
                 foreach (Tuple<double, DateTime, int, int> item in measurements)
                 {
-                    Console.WriteLine(item.Item1);
+                    //Console.WriteLine(item.Item1);
                     Console.WriteLine(item.Item2);
-                    Console.WriteLine(item.Item3);
-                    Console.WriteLine(item.Item4);
-                    Console.WriteLine();
+                    //Console.WriteLine(item.Item3);
+                    //Console.WriteLine(item.Item4);
+                    //Console.WriteLine();
                 }
 
                 // Step 2: Run pf to estimate shark state

@@ -19,7 +19,7 @@ namespace CsharpAUV
         DateTime firstDateTimeVal2;
         string filename1;
         string filename2;
-        double allowableTimeLapse = 4.0;
+        double allowableTimeLapse = 4.2;
         public bool _continue = true;
 
         List<Tuple<double, DateTime, int, int>> outputToParticleFilter = new List<Tuple<double, DateTime, int, int>>();
@@ -37,7 +37,7 @@ namespace CsharpAUV
         
         public List<Tuple<double, DateTime, int, int>> getMeasurements(DateTime startTimeFromSimulator)
         {
-            this.speedOfSound = 1500;
+            this.speedOfSound = 1460;
             List<Tuple<double, DateTime, int, int>> outputToSimulator = new List<Tuple<double, DateTime, int, int>>();
 
             using (StreamReader sr = new StreamReader(@"../../../" + this.filename1 + ".csv"))
@@ -354,7 +354,6 @@ namespace CsharpAUV
             DateTime dateTimes = DateTime.Parse(tempArr[2]); //DateTimeOffset.Parse(tempArr[2]).UtcDateTime;
             string transmitterID = tempArr[4];
             string sensorID = tempArr[0];
-
             return Tuple.Create(dateTimes, Convert.ToInt32(transmitterID), Convert.ToInt32(sensorID));
         }
 
