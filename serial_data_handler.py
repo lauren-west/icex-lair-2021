@@ -135,10 +135,7 @@ class Serial_Data_Handler():
             line.append(self.SENSOR_COORDINATES)   #Adds sensor coords for now
 
             current_datetime = datetime.datetime.strptime(line[2], '%Y-%m-%d %H:%M:%S.%f')
-            print("Curr ts: ", current_datetime)
-            print("First_TS: ", self.FIRST_TIMESTAMP)
             diff_in_time = (current_datetime - self.FIRST_TIMESTAMP).total_seconds()
-            print(diff_in_time)
             time_of_flight = diff_in_time % self.delta_t_avg
 
             if time_of_flight > 8:
@@ -719,6 +716,11 @@ def run_program_with_old_data(handler):
 
     true_first_time_stamp = None
 
+    with open(path + "/calibration/calibration.txt", "r") as f:
+        lines = f.readlines()
+        handler.ratio_pred_act = float(lines[0][:-1])
+        handler.slope = float(lines[1])
+
     for file in LoFiles[:index_of_first_raw_data]:
         # num = int(file[file.index("_") + 1 : file.index(".")])
         if file == ".DS_Store":  #  or num > 6:
@@ -744,7 +746,8 @@ def run_program_with_old_data(handler):
 
             if time_of_flight > 8:
                 time_of_flight = handler.delta_t_avg - time_of_flight
-
+            
+            time_of_flight = time_of_flight/handler.ratio_pred_act - handler.slope * (int(line[-4]) - int(df.values[0][-4]))
             current_index = np.where(df.values == line)[0][0]
 
             if current_index > 1:   # First TOF seems to almost always be 0
