@@ -20,7 +20,7 @@ from geopy.distance import geodesic
 
 class Serial_Data_Handler():
 
-    TIME_TO_RUN = 480 # seconds
+    TIME_TO_RUN = 30 # seconds
     NUM_OF_BINS = 10 # Anywhere from 5-20 with 20 being with at least 1000 data points
 
     # allows user to input the temp., salinity, and depth the sensor is at when taking data
@@ -105,14 +105,16 @@ class Serial_Data_Handler():
         
         # initial_time = None        # Used to calculate time elapsed
         counter = 0
-
+        
         try:
             with open('data_1.csv', "r") as f:
                 reader = csv.reader(f)
-                _ = next(reader)
                 row1 = next(reader)
+                row1 = next(reader)
+                if row1 == []:
+                    row1 = next(reader)
                 self.FIRST_TIMESTAMP = datetime.datetime.strptime(row1[2], '%Y-%m-%d %H:%M:%S.%f')
-                print("In the data_1.csv")
+                
         except:
             line = output[0].split(',')
             line = [s[s.find("=")+1:].strip() for s in line]
@@ -133,9 +135,10 @@ class Serial_Data_Handler():
             line.append(self.SENSOR_COORDINATES)   #Adds sensor coords for now
 
             current_datetime = datetime.datetime.strptime(line[2], '%Y-%m-%d %H:%M:%S.%f')
-
+            print("Curr ts: ", current_datetime)
+            print("First_TS: ", self.FIRST_TIMESTAMP)
             diff_in_time = (current_datetime - self.FIRST_TIMESTAMP).total_seconds()
-
+            print(diff_in_time)
             time_of_flight = diff_in_time % self.delta_t_avg
 
             if time_of_flight > 8:
@@ -684,7 +687,9 @@ def run_program_with_new_data(handler):
         tof_list = df["Time of Flight (s)"]
         desired_tof = df["Distance (m)"][0] / handler.SPEED_OF_SOUND
         handler.ratio_pred_act = tof_list[0] / desired_tof
-        handler.slope = (df["Time of Flight (s)"][-1] - df["Time of Flight (s)"][0]) / (df["Time (s)"][-1] - df["Time (s)"][0])
+        tof_list = df["Time of Flight (s)"]
+        time_list = df["Time (s)"]
+        handler.slope = (tof_list[len(tof_list) -1] - tof_list[0]) / (time_list[len(time_list) -1] - time_list[0])
         with open("calibration.txt", "w") as f:
             f.write(str(handler.ratio_pred_act)+ "\n")
             f.write(str(handler.slope))
