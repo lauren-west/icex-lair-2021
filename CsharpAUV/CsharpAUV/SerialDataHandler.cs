@@ -449,26 +449,3 @@ namespace CsharpAUV
         }
     }
 }
-    
-// Useful GeoCoord:
-//Tuple<double, double> tagCoord =
-//    new Tuple<double, double>(33.57676, -43.52746);
-//Tuple<double, double> sensorCoord =
-//    new Tuple<double, double>(0, 0);
-
-// get Distance w/ C# equivalent to python's geopy
-//var myLocation = new GeoCoordinate(-51.39792, -0.12084);
-//var yourLocation = new GeoCoordinate(-29.83245, 31.04034);
-//double distance = myLocation.GetDistanceTo(yourLocation);
-
-// Deviate from default serialport settings?
-// More info
-// @ https://docs.microsoft.com/en-us/dotnet/api/system.io.ports.serialport?view=dotnet-plat-ext-5.0
-//SerialPort _serialPort = new SerialPort();
-// Allow the user to set the appropriate properties.
-//_serialPort.PortName = SetPortName(_serialPort.PortName);
-//_serialPort.BaudRate = SetPortBaudRate(_serialPort.BaudRate);
-//_serialPort.Parity = SetPortParity(_serialPort.Parity);
-//_serialPort.DataBits = SetPortDataBits(_serialPort.DataBits);
-//_serialPort.StopBits = SetPortStopBits(_serialPort.StopBits);
-//_serialPort.Handshake = SetPortHandshake(_serialPort.Handshake);
