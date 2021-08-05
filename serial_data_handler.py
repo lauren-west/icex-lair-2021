@@ -518,7 +518,7 @@ class Serial_Data_Handler():
         tof = np.concatenate(tof)
 
         plt.plot(x_plot, time_diffs) 
-        plt.title("Time Difference vs Time Elapsed")
+        plt.title("Time Difference vs Time Elapsed Step Plot")
         plt.xlabel("Time (s)")
         plt.ylabel("Time Difference (s)")
         plt.savefig("time_diff_vs_elapsed_step_plot.png")
@@ -541,14 +541,14 @@ class Serial_Data_Handler():
         multiplied = [i * 1460 for i in m]
 
         plt.plot(x_plot, N) 
-        plt.title("N vs Distance")
+        plt.title("N vs Distance Step Plot")
         plt.xlabel("Distance (m)")
         plt.ylabel("N")
         plt.savefig("n_vs_distance_step_plot.png")
         plt.close()
 
         plt.plot(x_plot, m) 
-        plt.title("Mod vs Distance")
+        plt.title("Mod vs Distance Step Plot")
         plt.xlabel("Distance (m)")
         plt.ylabel("Mod")
         #plt.xlim([0,3])
@@ -561,7 +561,7 @@ class Serial_Data_Handler():
         # z = [a - b for a, b in zip(multiplied, time_diffs_changed)]
 
         plt.plot(x_plot, multiplied) 
-        plt.title("Predicted Distance vs Distance")
+        plt.title("Predicted Distance vs Distance Step Plot")
         plt.xlabel("Distance (m)")
         plt.ylabel("Predicted Distance (m)")
         #plt.xlim([0,3])
