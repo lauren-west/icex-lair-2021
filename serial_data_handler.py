@@ -20,7 +20,7 @@ from geopy.distance import geodesic
 
 class Serial_Data_Handler():
 
-    TIME_TO_RUN = 5460 # seconds
+    TIME_TO_RUN = 480 # seconds
     NUM_OF_BINS = 10 # Anywhere from 5-20 with 20 being with at least 1000 data points
 
     # allows user to input the temp., salinity, and depth the sensor is at when taking data
@@ -141,7 +141,7 @@ class Serial_Data_Handler():
             if time_of_flight > 8:
                 time_of_flight = self.delta_t_avg - time_of_flight
 
-            time_of_flight = time_of_flight/self.ratio_pred_act - self.slope * (line[-4] - data_list[1][-4])
+            time_of_flight = time_of_flight/self.ratio_pred_act - self.slope * (int(line[-4]) - int(data_list[1][-4]))
 
             if current_index > 2:
                 previous_line = data_list[current_index - 1]
@@ -629,7 +629,12 @@ def run_program_with_new_data(handler):
     iteration = "data_" + str(input("Iteration of data collection (Enter a number to not overwrite files): "))
     
     output = []
-
+    if not iteration == "data_1" and not iteration == "data_calibration":
+        with open("calibration.txt", "r") as f:
+            handler.ratio_pred_act, handler.slope = f.readlines()
+            handler.ratio_pred_act = float(handler.ratio_pred_act[:-1])
+            handler.slope = float(handler.slope)
+            f.close()
     #Starts the stopwatch/counter
     t1_start = time.perf_counter()
 
@@ -680,6 +685,10 @@ def run_program_with_new_data(handler):
         desired_tof = df["Distance (m)"][0] / handler.SPEED_OF_SOUND
         handler.ratio_pred_act = tof_list[0] / desired_tof
         handler.slope = (df["Time of Flight (s)"][-1] - df["Time of Flight (s)"][0]) / (df["Time (s)"][-1] - df["Time (s)"][0])
+        with open("calibration.txt", "w") as f:
+            f.write(str(handler.ratio_pred_act)+ "\n")
+            f.write(str(handler.slope))
+            f.close()
 
 
     finished = input("Are you finished collecting data for the day? (Y or N): ")
