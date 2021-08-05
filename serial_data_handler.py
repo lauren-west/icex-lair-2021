@@ -45,6 +45,8 @@ class Serial_Data_Handler():
     additive = 0
     adjustment_threshold = 0.0007
 
+    ratio_pred_act = 1
+    slope = 0
 
     def __init__(self) -> None:
         pass
@@ -104,21 +106,19 @@ class Serial_Data_Handler():
         # initial_time = None        # Used to calculate time elapsed
         counter = 0
 
-        
         try:
             with open('data_1.csv', "r") as f:
                 reader = csv.reader(f)
                 _ = next(reader)
                 row1 = next(reader)
                 self.FIRST_TIMESTAMP = datetime.datetime.strptime(row1[2], '%Y-%m-%d %H:%M:%S.%f')
+                print("In the data_1.csv")
         except:
             line = output[0].split(',')
             line = [s[s.find("=")+1:].strip() for s in line]
             self.FIRST_TIMESTAMP = datetime.datetime.strptime(line[2], '%Y-%m-%d %H:%M:%S.%f')
 
-
         for line in output:
-            
             line = line.split(',')
             line = [s[s.find("=")+1:].strip() for s in line]
             
@@ -126,7 +126,6 @@ class Serial_Data_Handler():
                 summaries_list.append(line)
             else:
                 data_list.append(line)
-            
         
         for line in data_list[1:]:
             current_index = data_list.index(line)
@@ -136,10 +135,13 @@ class Serial_Data_Handler():
             current_datetime = datetime.datetime.strptime(line[2], '%Y-%m-%d %H:%M:%S.%f')
 
             diff_in_time = (current_datetime - self.FIRST_TIMESTAMP).total_seconds()
+
             time_of_flight = diff_in_time % self.delta_t_avg
 
             if time_of_flight > 8:
                 time_of_flight = self.delta_t_avg - time_of_flight
+
+            time_of_flight = time_of_flight/self.ratio_pred_act - self.slope * (line[-4] - data_list[1][-4])
 
             if current_index > 2:
                 previous_line = data_list[current_index - 1]
@@ -425,7 +427,7 @@ class Serial_Data_Handler():
             error_values = np.array([])
 
             _, _, LoFiles = AllFiles[0] 
-            print(LoFiles)
+            
             for filename in LoFiles:
                 if filename[-3:] == "csv" and (len(filename) == 10 or len(filename) == 11):    
                     path = os.getcwd() + "/" + filename 
@@ -516,7 +518,7 @@ class Serial_Data_Handler():
         plt.title("Time Difference vs Time Elapsed")
         plt.xlabel("Time (s)")
         plt.ylabel("Time Difference (s)")
-        plt.savefig("time_diff_vs_elasped_step_plot.png")
+        plt.savefig("time_diff_vs_elapsed_step_plot.png")
         plt.close()
 
         N = [i/self.delta_t_avg for i in time_diffs]
@@ -569,6 +571,7 @@ class Serial_Data_Handler():
         path = os.path.join(".", foldername)
 
         os.mkdir(os.path.join(path, "calculated_error_data"))
+        os.mkdir(os.path.join(path, "calibration"))
         os.mkdir(os.path.join(path, "delta_t_histograms"))
         os.mkdir(os.path.join(path, "noise_plots"))
         os.mkdir(os.path.join(path, "raw_data"))
@@ -583,7 +586,10 @@ class Serial_Data_Handler():
 
 
         for filename in LoFiles:
-            if filename[-3:] == "csv" and "calculated_error" in filename:
+            if "calibration" in filename:
+                shutil.move(filename, os.path.join(path, "calibration"))
+
+            elif filename[-3:] == "csv" and "calculated_error" in filename:
                 shutil.move(filename, os.path.join(path, "calculated_error_data"))
 
             elif filename[-3:] == "png" and "time_of_flight" in filename:
@@ -606,6 +612,8 @@ class Serial_Data_Handler():
             # elif filename[-3:] == "csv" and (len(filename) == 10 or len(filename) == 11):
             elif filename[-3:] == "csv":
                 shutil.move(filename, os.path.join(path, "raw_data"))
+            
+
 
 
 # consider this to make program more user-friendly. Otherwise, we will code in settings manually
@@ -644,7 +652,6 @@ def run_program_with_new_data(handler):
 
                 writer.writerow(line)
 
-
     # data_list is 2D array of strings of data
     # rows are lines, and cols are the specific measurements
     data_list, summaries_list = handler.make_data_and_summaries_lists(output, distance)
@@ -665,6 +672,15 @@ def run_program_with_new_data(handler):
     # create csvs and plot
     handler.create_csvs(iteration, data_list, summaries_list, times_list)
     handler.create_plots(iteration)
+
+    if iteration == "data_calibration":
+        csv_path = os.path.join(".", iteration + ".csv")
+        df = pd.read_csv(csv_path, engine='python', header=0, index_col=False)
+        tof_list = df["Time of Flight (s)"]
+        desired_tof = df["Distance (m)"][0] / handler.SPEED_OF_SOUND
+        handler.ratio_pred_act = tof_list[0] / desired_tof
+        handler.slope = (df["Time of Flight (s)"][-1] - df["Time of Flight (s)"][0]) / (df["Time (s)"][-1] - df["Time (s)"][0])
+
 
     finished = input("Are you finished collecting data for the day? (Y or N): ")
     if finished == "Y" or finished == "YES" or finished == "y" or finished == "yes":
@@ -691,7 +707,7 @@ def run_program_with_old_data(handler):
 
     for file in LoFiles[:index_of_first_raw_data]:
         # num = int(file[file.index("_") + 1 : file.index(".")])
-        if file == ".DS_Store" or file == "data_13.csv":  #  or num > 6:
+        if file == ".DS_Store":  #  or num > 6:
             continue
 
         # print(f"Working on this file: {file}")
