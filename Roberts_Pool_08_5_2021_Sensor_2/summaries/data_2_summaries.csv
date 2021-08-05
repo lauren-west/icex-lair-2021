@@ -1,0 +1,6 @@
+Receiver Serial Number,Three-Digit Line-Counter,Date/Time,Scheduled Status (STS),Detection Count (DC),Ping Count (PC),Line Voltage (LV) [V],Internal Receiver Temperature,Detection Memory Used,Raw Memory Used,Tilt Information [G],Output Noise,Output PPM Noise,Tag GPS Coords,Sensor GPS Coords,Time (s),Distance (m),Time of Flight (s),Predicted Distance (m)
+457049,273,2021-07-23 04:04:07.204,STS,8142,68079,12.4,28.1,0.3,0.5,-0.88:0.09:-0.53,78.0,41.5,#0E
+457049,282,2021-07-23 04:05:07.926,STS,8150,68138,12.4,28.1,0.3,0.5,-0.88:0.09:-0.53,62.5,43.5,#15
+457049,290,2021-07-23 04:06:07.565,STS,8157,68194,12.6,28.1,0.3,0.5,-0.88:0.09:-0.53,51.0,26.0,#14
+457049,298,2021-07-23 04:07:07.200,STS,8164,68255,12.4,28.1,0.3,0.5,-0.88:0.09:-0.53,76.5,42.5,#18
+457049,307,2021-07-23 04:08:07.927,STS,8172,68314,12.4,28.1,0.3,0.5,-0.88:0.09:-0.53,60.5,43.5,#15
