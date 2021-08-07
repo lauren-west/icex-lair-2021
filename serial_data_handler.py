@@ -20,7 +20,7 @@ from geopy.distance import geodesic
 
 class Serial_Data_Handler():
 
-    TIME_TO_RUN = 300 # seconds
+    TIME_TO_RUN = 480 # seconds
     NUM_OF_BINS = 10 # Anywhere from 5-20 with 20 being with at least 1000 data points
 
     # allows user to input the temp., salinity, and depth the sensor is at when taking data
@@ -33,9 +33,13 @@ class Serial_Data_Handler():
 
     SPEED_OF_SOUND = 1460
 
-    TAG_COORDINATES = (33.750672,-118.122642)
-    SENSOR_COORDINATES = (33.752228,-118.12863)
+    TAG_COORDINATES = (33.75197,-118.12675)
+<<<<<<< HEAD
+    SENSOR_COORDINATES = (33.752438,-118.128942)
 
+=======
+    SENSOR_COORDINATES = (33.750672,-118.128558)
+>>>>>>> 9660da51121389f8c6fb3081ff04c246c2e16ab6
     INTERNAL_CLOCK_TIMES = ["Internal Computer Clock"]
 
     FIRST_TIMESTAMP = None
