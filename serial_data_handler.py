@@ -20,7 +20,7 @@ from geopy.distance import geodesic
 
 class Serial_Data_Handler():
 
-    TIME_TO_RUN = 480 # seconds
+    TIME_TO_RUN = 180 # seconds
     NUM_OF_BINS = 10 # Anywhere from 5-20 with 20 being with at least 1000 data points
 
     # allows user to input the temp., salinity, and depth the sensor is at when taking data
@@ -136,6 +136,11 @@ class Serial_Data_Handler():
 
             current_datetime = datetime.datetime.strptime(line[2], '%Y-%m-%d %H:%M:%S.%f')
             diff_in_time = (current_datetime - self.FIRST_TIMESTAMP).total_seconds()
+
+            print(f"\n Current time: {current_datetime}")
+            print(f"First timestamp: {self.FIRST_TIMESTAMP}")
+            print(f"Difference in time: {diff_in_time}\n")
+
             time_of_flight = diff_in_time % self.delta_t_avg
 
             if time_of_flight > 8:
