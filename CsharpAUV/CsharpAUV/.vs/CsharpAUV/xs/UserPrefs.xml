@@ -1,18 +1,18 @@
 ﻿<Properties StartupConfiguration="{8BAFA130-273C-49FA-B764-FC228A81A98F}|Default">
   <MonoDevelop.Ide.ItemProperties.CsharpAUV PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workbench ActiveDocument="Simulator.cs">
+    <Files>
+      <File FileName="Simulator.cs" Line="42" Column="31" />
+    </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="CsharpAUV" expanded="True">
             <Node name="CsharpAUV" expanded="True">
-              <Node name="SerialDataHandler.cs" selected="True" />
+              <Node name="Simulator.cs" selected="True" />
             </Node>
           </Node>
         </State>
-      </Pad>
-      <Pad Id="MonoDevelop.Debugger.WatchPad">
-        <State />
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>
