@@ -86,3 +86,4 @@ C:/Users/Caitlyn Ossa/Documents/GitHub/icex-lair-2021/CsharpAUV/CsharpAUV/obj/De
 /Users/hannahkyme/Desktop/integration/CsharpAUV/CsharpAUV/obj/Debug/netcoreapp3.1/CsharpAUV.dll
 /Users/hannahkyme/Desktop/integration/CsharpAUV/CsharpAUV/obj/Debug/netcoreapp3.1/CsharpAUV.pdb
 /Users/hannahkyme/Desktop/integration/CsharpAUV/CsharpAUV/obj/Debug/netcoreapp3.1/CsharpAUV.genruntimeconfig.cache
+/Users/hannahkyme/Desktop/integration/CsharpAUV/CsharpAUV/obj/Debug/netcoreapp3.1/CsharpAUV.GeneratedMSBuildEditorConfig.editorconfig
