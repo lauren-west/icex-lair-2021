@@ -20,8 +20,10 @@ namespace CsharpAUV
         public List<string> file2List;
         int file1ListIndexPointer;
         int file2ListIndexPointer;
-
         double allowableTimeLapse = 4.0;
+
+        public DateTime previousDTfile1 = new DateTime();
+        public DateTime previousDTfile2 = new DateTime();
 
         List<Tuple<double, DateTime, int, int, double, double>> outputToParticleFilter = new List<Tuple<double, DateTime, int, int, double, double>>();
 
@@ -109,7 +111,16 @@ namespace CsharpAUV
                             pointer1dt = this.getDateTimeFromMessage(file1List[this.file1ListIndexPointer]);
                         }
                         found1 = true;
-                        outputToSimulator.Add(this.isolateInfoFromMessages(1, file1List[this.file1ListIndexPointer]));
+
+                        if (this.getDateTimeFromMessage(this.file1List[this.file1ListIndexPointer]) != this.previousDTfile1)
+                        {
+                            outputToSimulator.Add(this.isolateInfoFromMessages(1, file1List[this.file1ListIndexPointer]));
+                            this.previousDTfile1 = this.getDateTimeFromMessage(this.file1List[this.file1ListIndexPointer]);
+                        }
+                        else {
+                            Console.WriteLine("previous dt1:", this.previousDTfile1);
+                        }
+                        
                     }
                     else
                     {
@@ -136,7 +147,16 @@ namespace CsharpAUV
                             pointer2dt = this.getDateTimeFromMessage(file2List[this.file2ListIndexPointer]);
                         }
                         found2 = true;
-                        outputToSimulator.Add(this.isolateInfoFromMessages(2, file2List[this.file2ListIndexPointer]));
+                        if (this.getDateTimeFromMessage(this.file1List[this.file1ListIndexPointer]) != this.previousDTfile1)
+                        {
+                            outputToSimulator.Add(this.isolateInfoFromMessages(2, file2List[this.file2ListIndexPointer]));
+                            this.previousDTfile2 = this.getDateTimeFromMessage(this.file2List[this.file2ListIndexPointer]);
+                        }
+                        else
+                        {
+                            Console.WriteLine("previous dt2:", this.previousDTfile2);
+                        }
+
                     }
                     else
                     {

@@ -20,7 +20,7 @@ from geopy.distance import geodesic
 
 class Serial_Data_Handler():
 
-    TIME_TO_RUN = 480 # seconds
+    TIME_TO_RUN = 180 # seconds
     NUM_OF_BINS = 10 # Anywhere from 5-20 with 20 being with at least 1000 data points
 
     # allows user to input the temp., salinity, and depth the sensor is at when taking data
@@ -34,12 +34,8 @@ class Serial_Data_Handler():
     SPEED_OF_SOUND = 1460
 
     TAG_COORDINATES = (33.75197,-118.12675)
-<<<<<<< HEAD
     SENSOR_COORDINATES = (33.752438,-118.128942)
 
-=======
-    SENSOR_COORDINATES = (33.750672,-118.128558)
->>>>>>> 9660da51121389f8c6fb3081ff04c246c2e16ab6
     INTERNAL_CLOCK_TIMES = ["Internal Computer Clock"]
 
     FIRST_TIMESTAMP = None
@@ -140,6 +136,11 @@ class Serial_Data_Handler():
 
             current_datetime = datetime.datetime.strptime(line[2], '%Y-%m-%d %H:%M:%S.%f')
             diff_in_time = (current_datetime - self.FIRST_TIMESTAMP).total_seconds()
+
+            print(f"\n Current time: {current_datetime}")
+            print(f"First timestamp: {self.FIRST_TIMESTAMP}")
+            print(f"Difference in time: {diff_in_time}\n")
+
             time_of_flight = diff_in_time % self.delta_t_avg
 
             if time_of_flight > 8:
@@ -457,6 +458,7 @@ class Serial_Data_Handler():
         plt.savefig('time_of_flight_distance_predictions_all_data.png')
         plt.close()
 
+        delta_t_values = [float(i) for i in delta_t_values]
         plt.hist(delta_t_values, self.NUM_OF_BINS)
         plt.title("Total Data: Times of Transmission")
         plt.xlabel("Time (s)")
@@ -464,6 +466,7 @@ class Serial_Data_Handler():
         plt.savefig("time_of_flight_total_histogram.png")
         plt.close()
 
+        error_values = [float(i) for i in error_values]
         plt.hist(error_values, self.NUM_OF_BINS)
         plt.title("Total Data: Error")
         plt.xlabel("Time (s)")
@@ -709,7 +712,7 @@ def run_program_with_old_data(handler):
     foldername = input("What is the name of the folder of data you want to use? (Case sensitive): ")
     path = os.path.join(".", foldername)
     AllFiles = list(os.walk(path))
-    path, _, LoFiles = AllFiles[4]    # Accesses the raw data from the dataset
+    file_path, _, LoFiles = AllFiles[5]    # Accesses the raw data from the dataset
     LoFiles.sort()
     counter = 0    # Used to make sure we can get handler.FIRST_TIMESTAMP
     index_of_first_raw_data = len(LoFiles)
@@ -731,7 +734,7 @@ def run_program_with_old_data(handler):
             continue
 
         # print(f"Working on this file: {file}")
-        df = pd.read_csv(path + "/" + file, engine='python', header=0, index_col=False)
+        df = pd.read_csv(file_path + "/" + file, engine='python', header=0, index_col=False)
         new_time_of_flight_list = []
         new_predicted_distance_list = []
         handler.FIRST_TIMESTAMP = true_first_time_stamp
@@ -745,13 +748,27 @@ def run_program_with_old_data(handler):
                 handler.FIRST_TIMESTAMP = true_first_time_stamp
                 counter += 1
 
+            # print(f"Current datetime: {current_datetime}")
+            # print(f"handler.FIRST_TIMESTAMP: {handler.FIRST_TIMESTAMP}")
             diff_in_time = (current_datetime - handler.FIRST_TIMESTAMP).total_seconds()
             time_of_flight = diff_in_time % handler.delta_t_avg
 
             if time_of_flight > 8:
                 time_of_flight = handler.delta_t_avg - time_of_flight
             
-            time_of_flight = time_of_flight/handler.ratio_pred_act - handler.slope * (int(line[-4]) - int(df.values[0][-4]))
+            # print()
+            # print(f"Time of flight before changes: {time_of_flight}")
+            # print(f"Ratio: {handler.ratio_pred_act}")
+            # print(f"Slope: {handler.slope}")
+            # print(f"Time difference: {float(line[-4]) - float(df.values[0][-4])}")
+            # print(f"Slope subtraction value: {handler.slope * (float(line[-4]) - float(df.values[0][-4]))}")
+            # print(f"Time of flight with ratio change: {time_of_flight/handler.ratio_pred_act}")
+            
+            
+
+            time_of_flight = time_of_flight/handler.ratio_pred_act #- handler.slope * (float(line[-4]) - float(df.values[0][-4]))
+            # print(f"Final time of flight: {time_of_flight}")
+            # print()
             current_index = np.where(df.values == line)[0][0]
 
             if current_index > 1:   # First TOF seems to almost always be 0
@@ -791,7 +808,7 @@ def run_program_with_old_data(handler):
         clock_times = []
 
         if new_dataset:
-            datafile = open(path + '/raw_serial_' + file, 'r')
+            datafile = open(file_path + '/raw_serial_' + file, 'r')
             datareader = csv.reader(datafile, delimiter=',')
             for row in datareader:
                 if row == []:
