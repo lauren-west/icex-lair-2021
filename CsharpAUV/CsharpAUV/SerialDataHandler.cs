@@ -20,10 +20,7 @@ namespace CsharpAUV
         public List<string> file2List;
         int file1ListIndexPointer;
         int file2ListIndexPointer;
-        double allowableTimeLapse = 4.0;
-
-        public DateTime previousDTfile1 = new DateTime();
-        public DateTime previousDTfile2 = new DateTime();
+        double allowableTimeLapse = 1.0;
 
         List<Tuple<double, DateTime, int, int, double, double>> outputToParticleFilter = new List<Tuple<double, DateTime, int, int, double, double>>();
 
@@ -92,10 +89,13 @@ namespace CsharpAUV
             while (!found1 || !found2)
             {
                 // equivalent logic for file1
-                if (pointer1dt > currentTimeFromSimulator && Math.Abs((pointer1dt - currentTimeFromSimulator).TotalSeconds) > this.allowableTimeLapse)
+                if (pointer1dt > currentTimeFromSimulator)
                 {
                     found1 = true;
                 }
+                // pointer1dt = grabbed time: 07/22/2021 11:14:51.858 AM
+                // current time: 07/22/2021 11:14:48.800 AM
+
                 else if (pointer1dt <= currentTimeFromSimulator && Math.Abs((pointer1dt - currentTimeFromSimulator).TotalSeconds) < this.allowableTimeLapse)
                 {
                     outputToSimulator.Add(this.isolateInfoFromMessages(1, file1List[this.file1ListIndexPointer]));
@@ -105,31 +105,32 @@ namespace CsharpAUV
                 {
                     if (this.file1ListIndexPointer < this.file1List.Count - 1)
                     {
-                        if (this.getDateTimeFromMessage(file1List[this.file1ListIndexPointer + 1]) <= currentTimeFromSimulator)
+                        if (this.getDateTimeFromMessage(file1List[this.file1ListIndexPointer + 1]) > currentTimeFromSimulator)
+                        {
+                            found1 = true;
+                        }
+                        else if (this.getDateTimeFromMessage(file1List[this.file1ListIndexPointer + 1]) <= currentTimeFromSimulator)
                         {
                             this.file1ListIndexPointer = this.file1ListIndexPointer + 1;
                             pointer1dt = this.getDateTimeFromMessage(file1List[this.file1ListIndexPointer]);
-                        }
-                        found1 = true;
-
-                        if (this.getDateTimeFromMessage(this.file1List[this.file1ListIndexPointer]) != this.previousDTfile1)
-                        {
+                            found1 = true;
                             outputToSimulator.Add(this.isolateInfoFromMessages(1, file1List[this.file1ListIndexPointer]));
-                            this.previousDTfile1 = this.getDateTimeFromMessage(this.file1List[this.file1ListIndexPointer]);
                         }
-                        else {
-                            Console.WriteLine("previous dt1:", this.previousDTfile1);
+                        else
+                        {
+                            found1 = true;
+                            outputToSimulator.Add(this.isolateInfoFromMessages(1, file1List[this.file1ListIndexPointer]));
                         }
-                        
                     }
                     else
                     {
                         found1 = true;
+                
                     }
 
                 }
                 // equivalent logic for file2
-                if (pointer2dt > currentTimeFromSimulator && Math.Abs((pointer2dt - currentTimeFromSimulator).TotalSeconds) > this.allowableTimeLapse)
+                if (pointer2dt > currentTimeFromSimulator)
                 { 
                     found2 = true;
                 }
@@ -142,21 +143,26 @@ namespace CsharpAUV
                 {
                     if (this.file2ListIndexPointer < this.file2List.Count - 1)
                     {
-                        if (this.getDateTimeFromMessage(file2List[this.file2ListIndexPointer + 1]) <= currentTimeFromSimulator) {
+      
+                        if (this.getDateTimeFromMessage(file2List[this.file2ListIndexPointer + 1]) > currentTimeFromSimulator)
+                        {
+               
+                            found2 = true;
+                        }
+                        else if (this.getDateTimeFromMessage(file2List[this.file2ListIndexPointer + 1]) <= currentTimeFromSimulator)
+                        {
+          
                             this.file2ListIndexPointer = this.file2ListIndexPointer + 1;
                             pointer2dt = this.getDateTimeFromMessage(file2List[this.file2ListIndexPointer]);
-                        }
-                        found2 = true;
-                        if (this.getDateTimeFromMessage(this.file1List[this.file1ListIndexPointer]) != this.previousDTfile1)
-                        {
+                            found2 = true;
                             outputToSimulator.Add(this.isolateInfoFromMessages(2, file2List[this.file2ListIndexPointer]));
-                            this.previousDTfile2 = this.getDateTimeFromMessage(this.file2List[this.file2ListIndexPointer]);
                         }
                         else
                         {
-                            Console.WriteLine("previous dt2:", this.previousDTfile2);
+             
+                            found2 = true;
+                            outputToSimulator.Add(this.isolateInfoFromMessages(2, file2List[this.file2ListIndexPointer]));
                         }
-
                     }
                     else
                     {
