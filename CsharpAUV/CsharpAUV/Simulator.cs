@@ -235,13 +235,10 @@ namespace CsharpAUV
                 ////sim.update_robots();
                 Console.WriteLine("current time: {0}",
                            currentTime.ToString("MM/dd/yyyy hh:mm:ss.fff tt"));
-<<<<<<< HEAD
                 List<Tuple<double, DateTime, int, int, double, double>> measurements = handler.getMeasurements1(currentTime);
                 foreach (Tuple<double, DateTime, int, int, double, double> item in measurements)
                 {
                     Console.WriteLine("current time: {0}", item.Item2.ToString("MM/dd/yyyy hh:mm:ss.fff tt"));
-
-=======
                 // keep track of information based on the shark
                 //          sort based on which transmitterID --> assigns rangeError to them
                 Console.WriteLine("Predicted Distance");
@@ -267,7 +264,6 @@ namespace CsharpAUV
                 }
                 else {
                      Console.WriteLine("measurements null");
->>>>>>> 173373751ef26b5b418546b6468c8871c48f2fc4
                 }
                 Console.WriteLine();
 
