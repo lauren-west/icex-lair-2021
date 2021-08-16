@@ -1,30 +1,18 @@
 ﻿<Properties StartupConfiguration="{8BAFA130-273C-49FA-B764-FC228A81A98F}|Default">
   <MonoDevelop.Ide.ItemProperties.CsharpAUV PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="SerialDataHandler.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Simulator.cs">
     <Files>
-      <File FileName="SerialDataHandler.cs" Line="187" Column="17" IsPinned="True" />
-      <File FileName="Simulator.cs" Line="255" Column="26" />
-      <File FileName="ParticleFilter.cs" />
-      <File FileName="Particle.cs" />
-      <File FileName="Robot.cs" />
-      <File FileName="Shark.cs" />
-      <File FileName="SimulationGenerator.cs" />
-      <File FileName="sensor1.csv" />
-      <File FileName="lb_data_1_sensor1_ copy.csv" />
-      <File FileName="CsharpAUV.csproj" />
+      <File FileName="Simulator.cs" Line="303" Column="1" />
+      <File FileName="SerialDataHandler.cs" />
       <File FileName="fake1.csv" />
       <File FileName="fake2.csv" />
-      <File FileName="Simulator.cs" Line="38" Column="60" />
-      <File FileName="SerialDataHandler.cs" Line="121" Column="70" />
-      <File FileName="fake1.csv" Line="1" Column="1" />
-      <File FileName="fake2.csv" Line="1" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="CsharpAUV" expanded="True">
             <Node name="CsharpAUV" expanded="True">
-              <Node name="SerialDataHandler.cs" selected="True" />
+              <Node name="Simulator.cs" selected="True" />
             </Node>
           </Node>
         </State>
