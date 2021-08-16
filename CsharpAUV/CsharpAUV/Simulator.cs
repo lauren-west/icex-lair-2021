@@ -235,11 +235,39 @@ namespace CsharpAUV
                 ////sim.update_robots();
                 Console.WriteLine("current time: {0}",
                            currentTime.ToString("MM/dd/yyyy hh:mm:ss.fff tt"));
+<<<<<<< HEAD
                 List<Tuple<double, DateTime, int, int, double, double>> measurements = handler.getMeasurements1(currentTime);
                 foreach (Tuple<double, DateTime, int, int, double, double> item in measurements)
                 {
                     Console.WriteLine("current time: {0}", item.Item2.ToString("MM/dd/yyyy hh:mm:ss.fff tt"));
 
+=======
+                // keep track of information based on the shark
+                //          sort based on which transmitterID --> assigns rangeError to them
+                Console.WriteLine("Predicted Distance");
+                
+                if (measurements != null)
+                {
+                    // hand over to particle filter
+                    foreach (Tuple<double, DateTime, int, int, double, double> item in measurements)
+                    {
+                        sim.create_and_update_sharks(item.Item3, item.Item4, item.Item1);
+                        sim.update_real_range_list(item.Item3, item.Item4);
+                        Console.WriteLine(item.Item1);
+                    
+                        //Console.WriteLine(item.Item1);
+                        Console.WriteLine("grabbed time: {0}",
+                               item.Item2.ToString("MM/dd/yyyy hh:mm:ss.fff tt"));
+                        //Console.WriteLine(item.Item3);
+                        //Console.WriteLine(item.Item4);
+                        //Console.WriteLine(item.Item5);
+                        //Console.WriteLine(item.Item6);
+                    }
+                    Console.WriteLine();
+                }
+                else {
+                     Console.WriteLine("measurements null");
+>>>>>>> 173373751ef26b5b418546b6468c8871c48f2fc4
                 }
                 Console.WriteLine();
 
