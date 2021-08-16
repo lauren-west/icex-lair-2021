@@ -3,9 +3,9 @@
   <MonoDevelop.Ide.Workbench ActiveDocument="Simulator.cs">
     <Files>
       <File FileName="Simulator.cs" Line="220" Column="1" />
-      <File FileName="SerialDataHandler.cs" Line="162" Column="29" />
-      <File FileName="fake1.csv" Line="1" Column="1" />
-      <File FileName="fake2.csv" Line="3" Column="31" />
+      <File FileName="SerialDataHandler.cs" />
+      <File FileName="fake1.csv" />
+      <File FileName="fake2.csv" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
