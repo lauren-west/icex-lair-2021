@@ -114,14 +114,11 @@ namespace CsharpAUV
 
                         if (this.getDateTimeFromMessage(this.file1List[this.file1ListIndexPointer]) != this.previousDTfile1)
                         {
-                            Console.WriteLine("previous dt1", this.previousDTfile1);
-                            Console.WriteLine("dt1 from pointer", this.getDateTimeFromMessage(this.file1List[this.file1ListIndexPointer]));
                             outputToSimulator.Add(this.isolateInfoFromMessages(1, file1List[this.file1ListIndexPointer]));
                             this.previousDTfile1 = this.getDateTimeFromMessage(this.file1List[this.file1ListIndexPointer]);
-                            Console.WriteLine("new previous dt1", this.previousDTfile1);
                         }
                         else {
-                            Console.WriteLine("no dt1 output:", this.previousDTfile1);
+                            Console.WriteLine("previous dt1:", this.previousDTfile1);
                         }
                         
                     }
@@ -152,16 +149,12 @@ namespace CsharpAUV
                         found2 = true;
                         if (this.getDateTimeFromMessage(this.file1List[this.file1ListIndexPointer]) != this.previousDTfile1)
                         {
-                            
-                            Console.WriteLine("previous dt2", this.previousDTfile1);
-                            Console.WriteLine("dt2 from pointer", this.getDateTimeFromMessage(this.file1List[this.file1ListIndexPointer]));
                             outputToSimulator.Add(this.isolateInfoFromMessages(2, file2List[this.file2ListIndexPointer]));
                             this.previousDTfile2 = this.getDateTimeFromMessage(this.file2List[this.file2ListIndexPointer]);
-                            Console.WriteLine("new previous dt2", this.previousDTfile1);
                         }
                         else
                         {
-                            Console.WriteLine("no dt2 output:", this.previousDTfile2);
+                            Console.WriteLine("previous dt2:", this.previousDTfile2);
                         }
 
                     }

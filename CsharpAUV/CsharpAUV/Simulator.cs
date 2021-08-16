@@ -200,45 +200,42 @@ namespace CsharpAUV
         
         static void Main(string[] args)
         {
-            //Simulator sim = new Simulator();
+            Simulator sim = new Simulator();
             SerialDataHandler handler = new SerialDataHandler("fake1", "fake2");
 
-            //sim.NUMBER_OF_SHARKS = 1;
-            //sim.NUMBER_OF_ROBOTS = 2;
-            //sim.NUMBER_OF_PARTICLEFILTERS = sim.NUMBER_OF_ROBOTS * sim.NUMBER_OF_SHARKS;
+            sim.NUMBER_OF_SHARKS = 1;
+            sim.NUMBER_OF_ROBOTS = 2;
+            sim.NUMBER_OF_PARTICLEFILTERS = sim.NUMBER_OF_ROBOTS * sim.NUMBER_OF_SHARKS;
 
-            //int sensor1 = handler.getSensorSerialNum(1);
-            //MyGlobals.sensor_list.Add(sensor1);// list of all the sensors
-            //List<double> current1 = handler.getLatitude(1);
+            int sensor1 = handler.getSensorSerialNum(1);
+            MyGlobals.sensor_list.Add(sensor1);// list of all the sensors
+            List<double> current1 = handler.getLatitude(1);
             
-            //MyGlobals.coordinate_list.Add(current1); // list of all the initial GPS coords
+            MyGlobals.coordinate_list.Add(current1); // list of all the initial GPS coords
 
-            //int sensor2 = handler.getSensorSerialNum(2);
-            //MyGlobals.sensor_list.Add(sensor2);
-            //List<double> current = handler.getLatitude(2);
-            //MyGlobals.coordinate_list.Add(current);
+            int sensor2 = handler.getSensorSerialNum(2);
+            MyGlobals.sensor_list.Add(sensor2);
+            List<double> current = handler.getLatitude(2);
+            MyGlobals.coordinate_list.Add(current);
 
-            //foreach(List<double> coordinateList in MyGlobals.coordinate_list)
-            //{
-            //    List<double> currentCartesian = sim.convertToCartesian(coordinateList[0], coordinateList[1]);
-            //    sim.cartesianList.Add(currentCartesian);
-            //}
-            //sim.create_and_initialize_robots();
-            //sim.create_real_range_list();
-            //sim.create_and_initialize_particle_filter();
+            foreach(List<double> coordinateList in MyGlobals.coordinate_list)
+            {
+                List<double> currentCartesian = sim.convertToCartesian(coordinateList[0], coordinateList[1]);
+                sim.cartesianList.Add(currentCartesian);
+            }
+            sim.create_and_initialize_robots();
+            sim.create_real_range_list();
+            sim.create_and_initialize_particle_filter();
            
             DateTime currentTime = handler.getInitialTime();
             DateTime finalTime = handler.getFinalTime();
             
             while (currentTime < finalTime)
             {
-                ////sim.update_robots();
+                //sim.update_robots();
+                List<Tuple<double, DateTime, int, int, double, double>> measurements = handler.getMeasurements1(currentTime);
                 Console.WriteLine("current time: {0}",
                            currentTime.ToString("MM/dd/yyyy hh:mm:ss.fff tt"));
-                List<Tuple<double, DateTime, int, int, double, double>> measurements = handler.getMeasurements1(currentTime);
-                foreach (Tuple<double, DateTime, int, int, double, double> item in measurements)
-                {
-                    Console.WriteLine("current time: {0}", item.Item2.ToString("MM/dd/yyyy hh:mm:ss.fff tt"));
                 // keep track of information based on the shark
                 //          sort based on which transmitterID --> assigns rangeError to them
                 Console.WriteLine("Predicted Distance");
@@ -265,33 +262,46 @@ namespace CsharpAUV
                 else {
                      Console.WriteLine("measurements null");
                 }
-                Console.WriteLine();
+               
 
-                // keep track of information based on the shark
-                //          sort based on which transmitterID --> assigns rangeError to them
-                //Console.WriteLine("Predicted Distance");
-                //foreach (Tuple<double, DateTime, int, int, double, double> item in measurements)
-                //{    
-                //    sim.create_and_update_sharks(item.Item3, item.Item4, item.Item1);
-                //    sim.update_real_range_list(item.Item3, item.Item4);
-                //    Console.WriteLine(item.Item1);
+                // if new measurement
+                // hand measurement over
+                // else
+                // not measurement
+                // best way to do this?
+                //create a member variable in handler named
+                // previousPingDT
+                // if dt in measurements is the same as the previousPingDT
+                //  this is NOT new data, do not give to particle filter
+                // else:
+                //  new data, hand it over!
 
-                //}
 
-                //// Step 2: Run pf to estimate shark state
-                //sim.update_pfs();
-                //// Step 3: Plan based on shark state
 
-                //// Step 4: Control
-                //sim.clear_real_range_list();
-                //List<List<double>> simList = sim.mean_pfs();
-                //Console.WriteLine("PF's distance");
-                //Console.WriteLine(simList[0][0]);
-                //Console.WriteLine(simList[0][1]);
+
+                //Console.WriteLine();
+
+
+
+                // Step 2: Run pf to estimate shark state
+                sim.update_pfs();
+                // Step 3: Plan based on shark state
+                
+                // Step 4: Control
+                sim.clear_real_range_list();
+                List<List<double>> simList = sim.mean_pfs();
+                Console.WriteLine("PF's distance");
+                Console.WriteLine(simList[0][0]);
+                Console.WriteLine(simList[0][1]);
                 currentTime = currentTime.AddSeconds(1);
                 
             }
- 
+            
+            Console.WriteLine();
+            Console.WriteLine("Done");
+            //ToDo: need moving distances, whether it be moving AUV, stationary shark
+            // for the distance, give the real distnace
+            // 
         }
     }
 }
