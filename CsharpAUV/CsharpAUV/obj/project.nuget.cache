@@ -1,10 +1,14 @@
 {
   "version": 2,
 <<<<<<< HEAD
+<<<<<<< HEAD
   "dgSpecHash": "3KSMhlMIahSxGy7lLfeGND22lUHvcImOLtYKg+btxi+Y2jMiQGmP9tuxF3IdYb1y9qBwsRgvWPTAx6ihkCDgTQ==",
 =======
   "dgSpecHash": "ERFSrxTGuhTG6fQ9VcJsDjnqSfPLrtXHWM0YbSoWT6hqGNmIlVtbsTdfbt+hj7ew2U23fcS4211hsHTePzoXGA==",
 >>>>>>> 173373751ef26b5b418546b6468c8871c48f2fc4
+=======
+  "dgSpecHash": "oucjQpjIjVbdZnBoJdkCKQbbOW3dAjORel3uF3QISz0AZKtZ34L5yHfY3F17YGENIU+sq+wilfZ//+DcEppFGQ==",
+>>>>>>> parent of 1733737... new stuff
   "success": true,
   "projectFilePath": "/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpAUV/CsharpAUV/CsharpAUV.csproj",
   "expectedPackageFiles": [
