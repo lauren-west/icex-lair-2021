@@ -148,7 +148,57 @@ namespace CsharpAUV
 
             return outputToSimulator;
         }
+        public int getSensorSerialNum(int sensor)
+        {
+            /* Get the smallest datetime of two csv files
+             * 
+             */
+            if (sensor == 1)
+            {
+                string firstline1 = this.file1List[0];
+                string[] tempArr1 = firstline1.Split(',');
+                return Convert.ToInt32(tempArr1[0]);
+            }
+            else {
+                string firstline2 = this.file2List[0];
+                string[] tempArr2 = firstline2.Split(',');
+                return Convert.ToInt32(tempArr2[0]);
+            }
+        }
+        public List<double> getLatitude(int sensor)
+        {
+            /* Get the latitude of 
+             * 
+             */
 
+            if (sensor == 1)
+            {
+                List<double> coordinates = new List<double>();
+                string firstline1 = this.file1List[0];
+                string[] tempArr1 = firstline1.Split(',');
+                tempArr1[11] = tempArr1[11].Replace("(", "").Replace("\"", "").Trim();
+                tempArr1[12] = tempArr1[12].Replace(")", "").Replace("\"", "").Trim();
+                double sensorLat = Convert.ToDouble(tempArr1[11]);
+                double sensorLong = Convert.ToDouble(tempArr1[12]);
+                coordinates.Add(sensorLat);
+                coordinates.Add(sensorLong);
+                return coordinates;
+            }
+            else
+            {
+                List<double> coordinates = new List<double>();
+                string firstline2 = this.file2List[0];
+                string[] tempArr2 = firstline2.Split(',');
+                tempArr2[11] = tempArr2[11].Replace("(", "").Replace("\"", "").Trim();
+                tempArr2[12] = tempArr2[12].Replace(")", "").Replace("\"", "").Trim();
+                double sensorLat = Convert.ToDouble(tempArr2[11]);
+                double sensorLong = Convert.ToDouble(tempArr2[12]);
+                coordinates.Add(sensorLat);
+                coordinates.Add(sensorLong);
+                return coordinates;
+            }
+            
+        }
         public DateTime getInitialTime()
         {
             /* Get the smallest datetime of two csv files
@@ -171,7 +221,7 @@ namespace CsharpAUV
              * 
              */
             string lastline1 = this.file1List[this.file1List.Count - 1];
-            string lastline2 = this.file2List[this.file1List.Count - 1];
+            string lastline2 = this.file2List[this.file2List.Count - 1];
             DateTime d1 = this.getDateTimeFromMessage(lastline1);
             DateTime d2 = this.getDateTimeFromMessage(lastline2);
 
@@ -233,6 +283,8 @@ namespace CsharpAUV
             */
             return this.speedOfSound * tof;
         }
+
+        
 
         public double makeTimeOfFlight(int file, DateTime dateTimeCurrent)
         {   /* 

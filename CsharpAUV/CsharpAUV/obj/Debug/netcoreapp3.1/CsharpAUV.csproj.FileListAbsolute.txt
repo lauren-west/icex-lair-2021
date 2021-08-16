@@ -57,3 +57,32 @@ C:/Users/Caitlyn Ossa/Documents/GitHub/icex-lair-2021/CsharpAUV/CsharpAUV/obj/De
 C:/Users/Caitlyn Ossa/Documents/GitHub/icex-lair-2021/CsharpAUV/CsharpAUV/obj/Debug/netcoreapp3.1/CsharpAUV.pdb
 C:/Users/Caitlyn Ossa/Documents/GitHub/icex-lair-2021/CsharpAUV/CsharpAUV/obj/Debug/netcoreapp3.1/CsharpAUV.genruntimeconfig.cache
 /Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpAUV/CsharpAUV/bin/Debug/netcoreapp3.1/System.Device.Portable.dll
+/Users/hannahkyme/Desktop/integration/CsharpAUV/CsharpAUV/bin/Debug/netcoreapp3.1/CsharpAUV.deps.json
+/Users/hannahkyme/Desktop/integration/CsharpAUV/CsharpAUV/bin/Debug/netcoreapp3.1/CsharpAUV.runtimeconfig.json
+/Users/hannahkyme/Desktop/integration/CsharpAUV/CsharpAUV/bin/Debug/netcoreapp3.1/CsharpAUV.runtimeconfig.dev.json
+/Users/hannahkyme/Desktop/integration/CsharpAUV/CsharpAUV/bin/Debug/netcoreapp3.1/CsharpAUV.dll
+/Users/hannahkyme/Desktop/integration/CsharpAUV/CsharpAUV/bin/Debug/netcoreapp3.1/CsharpAUV.pdb
+/Users/hannahkyme/Desktop/integration/CsharpAUV/CsharpAUV/bin/Debug/netcoreapp3.1/Microsoft.Win32.Registry.dll
+/Users/hannahkyme/Desktop/integration/CsharpAUV/CsharpAUV/bin/Debug/netcoreapp3.1/System.Device.Portable.dll
+/Users/hannahkyme/Desktop/integration/CsharpAUV/CsharpAUV/bin/Debug/netcoreapp3.1/System.IO.Ports.dll
+/Users/hannahkyme/Desktop/integration/CsharpAUV/CsharpAUV/bin/Debug/netcoreapp3.1/System.Security.AccessControl.dll
+/Users/hannahkyme/Desktop/integration/CsharpAUV/CsharpAUV/bin/Debug/netcoreapp3.1/System.Security.Principal.Windows.dll
+/Users/hannahkyme/Desktop/integration/CsharpAUV/CsharpAUV/bin/Debug/netcoreapp3.1/runtimes/win/lib/netstandard2.0/Microsoft.Win32.Registry.dll
+/Users/hannahkyme/Desktop/integration/CsharpAUV/CsharpAUV/bin/Debug/netcoreapp3.1/runtimes/linux-arm/native/libSystem.IO.Ports.Native.so
+/Users/hannahkyme/Desktop/integration/CsharpAUV/CsharpAUV/bin/Debug/netcoreapp3.1/runtimes/linux-arm64/native/libSystem.IO.Ports.Native.so
+/Users/hannahkyme/Desktop/integration/CsharpAUV/CsharpAUV/bin/Debug/netcoreapp3.1/runtimes/linux-x64/native/libSystem.IO.Ports.Native.so
+/Users/hannahkyme/Desktop/integration/CsharpAUV/CsharpAUV/bin/Debug/netcoreapp3.1/runtimes/osx-x64/native/libSystem.IO.Ports.Native.dylib
+/Users/hannahkyme/Desktop/integration/CsharpAUV/CsharpAUV/bin/Debug/netcoreapp3.1/runtimes/linux/lib/netstandard2.0/System.IO.Ports.dll
+/Users/hannahkyme/Desktop/integration/CsharpAUV/CsharpAUV/bin/Debug/netcoreapp3.1/runtimes/osx/lib/netstandard2.0/System.IO.Ports.dll
+/Users/hannahkyme/Desktop/integration/CsharpAUV/CsharpAUV/bin/Debug/netcoreapp3.1/runtimes/win/lib/netstandard2.0/System.IO.Ports.dll
+/Users/hannahkyme/Desktop/integration/CsharpAUV/CsharpAUV/bin/Debug/netcoreapp3.1/runtimes/win/lib/netcoreapp2.0/System.Security.AccessControl.dll
+/Users/hannahkyme/Desktop/integration/CsharpAUV/CsharpAUV/bin/Debug/netcoreapp3.1/runtimes/unix/lib/netcoreapp2.1/System.Security.Principal.Windows.dll
+/Users/hannahkyme/Desktop/integration/CsharpAUV/CsharpAUV/bin/Debug/netcoreapp3.1/runtimes/win/lib/netcoreapp2.1/System.Security.Principal.Windows.dll
+/Users/hannahkyme/Desktop/integration/CsharpAUV/CsharpAUV/obj/Debug/netcoreapp3.1/CsharpAUV.csproj.AssemblyReference.cache
+/Users/hannahkyme/Desktop/integration/CsharpAUV/CsharpAUV/obj/Debug/netcoreapp3.1/CsharpAUV.AssemblyInfoInputs.cache
+/Users/hannahkyme/Desktop/integration/CsharpAUV/CsharpAUV/obj/Debug/netcoreapp3.1/CsharpAUV.AssemblyInfo.cs
+/Users/hannahkyme/Desktop/integration/CsharpAUV/CsharpAUV/obj/Debug/netcoreapp3.1/CsharpAUV.csproj.CoreCompileInputs.cache
+/Users/hannahkyme/Desktop/integration/CsharpAUV/CsharpAUV/obj/Debug/netcoreapp3.1/CsharpAUV.csproj.CopyComplete
+/Users/hannahkyme/Desktop/integration/CsharpAUV/CsharpAUV/obj/Debug/netcoreapp3.1/CsharpAUV.dll
+/Users/hannahkyme/Desktop/integration/CsharpAUV/CsharpAUV/obj/Debug/netcoreapp3.1/CsharpAUV.pdb
+/Users/hannahkyme/Desktop/integration/CsharpAUV/CsharpAUV/obj/Debug/netcoreapp3.1/CsharpAUV.genruntimeconfig.cache
