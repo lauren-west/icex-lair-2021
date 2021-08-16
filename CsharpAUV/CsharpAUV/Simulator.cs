@@ -242,19 +242,16 @@ namespace CsharpAUV
                 // keep track of information based on the shark
                 //          sort based on which transmitterID --> assigns rangeError to them
                 Console.WriteLine("Predicted Distance");
-                foreach (Tuple<double, DateTime, int, int, double, double> item in measurements)
-                {    
-                    sim.create_and_update_sharks(item.Item3, item.Item4, item.Item1);
-                    sim.update_real_range_list(item.Item3, item.Item4);
-                    Console.WriteLine(item.Item1);
-                    
-                }
+                
                 if (measurements != null)
                 {
                     // hand over to particle filter
                     foreach (Tuple<double, DateTime, int, int, double, double> item in measurements)
                     {
-
+                        sim.create_and_update_sharks(item.Item3, item.Item4, item.Item1);
+                        sim.update_real_range_list(item.Item3, item.Item4);
+                        Console.WriteLine(item.Item1);
+                    
                         //Console.WriteLine(item.Item1);
                         Console.WriteLine("grabbed time: {0}",
                                item.Item2.ToString("MM/dd/yyyy hh:mm:ss.fff tt"));
