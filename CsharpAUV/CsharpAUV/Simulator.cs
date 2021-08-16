@@ -232,7 +232,7 @@ namespace CsharpAUV
             
             while (currentTime < finalTime)
             {
-                //sim.update_robots();
+                sim.update_robots();
                 List<Tuple<double, DateTime, int, int, double, double>> measurements = handler.getMeasurements1(currentTime);
                 Console.WriteLine("current time: {0}",
                            currentTime.ToString("MM/dd/yyyy hh:mm:ss.fff tt"));
@@ -249,8 +249,6 @@ namespace CsharpAUV
                         sim.create_and_update_sharks(item.Item3, item.Item4, item.Item1);
                         sim.update_real_range_list(item.Item3, item.Item4);
                         Console.WriteLine(item.Item1);
-
-                        //Console.WriteLine(item.Item1);
                         Console.WriteLine("grabbed time: {0}",
                         item.Item2.ToString("MM/dd/yyyy hh:mm:ss.fff tt"));
                         //Console.WriteLine(item.Item3);
@@ -272,9 +270,7 @@ namespace CsharpAUV
                 //// Step 4: Control
                 sim.clear_real_range_list();
                 List<List<double>> simList = sim.mean_pfs();
-                Console.WriteLine("PF's distance");
-                Console.WriteLine(simList[0][0]);
-                Console.WriteLine(simList[0][1]);
+                
                 currentTime = currentTime.AddSeconds(1);
 
             }
