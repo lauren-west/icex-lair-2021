@@ -249,6 +249,7 @@ namespace CsharpAUV
                         sim.create_and_update_sharks(item.Item3, item.Item4, item.Item1);
                         sim.update_real_range_list(item.Item3, item.Item4);
                         Console.WriteLine(item.Item1);
+                        Console.WriteLine("new nramch?");
                         Console.WriteLine("grabbed time: {0}",
                         item.Item2.ToString("MM/dd/yyyy hh:mm:ss.fff tt"));
                         //Console.WriteLine(item.Item3);
