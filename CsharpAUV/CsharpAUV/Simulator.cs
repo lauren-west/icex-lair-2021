@@ -261,7 +261,7 @@ namespace CsharpAUV
                     {
                         sim.create_and_update_sharks(item.Item3, item.Item4, item.Item1);
                         sim.update_real_range_list(item.Item3, item.Item4);
-                        Console.WriteLine(item.Item1);
+                        
                         Console.WriteLine("grabbed time: {0}",
                         item.Item2.ToString("MM/dd/yyyy hh:mm:ss.fff tt"));
                         //ToDo: update the Shark's 
@@ -280,9 +280,9 @@ namespace CsharpAUV
                 //// Step 4: Control
                 sim.clear_real_range_list();
                 List<List<double>> simList = sim.mean_pfs(SharkCoords);
-                Console.WriteLine("range Error");
-                Console.WriteLine(simList[0][0]);
-                Console.WriteLine(simList[0][1]);
+                //Console.WriteLine("range Error");
+                //Console.WriteLine(simList[0][0]);
+                //Console.WriteLine(simList[0][1]);
 
                 currentTime = currentTime.AddSeconds(1);
             }
