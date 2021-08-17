@@ -371,7 +371,7 @@ namespace CsharpAUV
             double sensorLong = Convert.ToDouble(tempArr[12]);
             string sensorID = tempArr[0];
             double tof1 = this.makeTimeOfFlight(filenum, dateTime);
-            double distance = this.calcDistFromTOF(tof1);
+            double distance = Convert.ToDouble(tempArr[tempArr.Length -3]);
 
             return Tuple.Create(distance, dateTime, Convert.ToInt32(transmitterID), Convert.ToInt32(sensorID), sensorLat, sensorLong);
         }

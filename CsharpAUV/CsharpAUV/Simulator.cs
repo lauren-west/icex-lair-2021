@@ -113,14 +113,13 @@ namespace CsharpAUV
                 sharkNum += 1;
             }
         }
-        public double CALC_RANGE_ERROR(List<double> meanP, int robotNUM)// msg
+        public double CALC_RANGE_ERROR(List<double> meanP, List<double> SharkCoords)// msg
         {
-            Robot currentR = MyGlobals.robot_list[robotNUM];
-            //calculates the range from the particle to the auv
-            double particleRange = Math.Sqrt(Math.Pow((meanP[1] - currentR.Y), 2) + Math.Pow((meanP[0] - currentR.X), 2));
+            //calculates the range from the Shark to the Mean
+            double particleRange = Math.Sqrt(Math.Pow((meanP[1] - SharkCoords[1]), 2) + Math.Pow((meanP[0] - SharkCoords[0]), 2));
             return particleRange;
         }
-        public List<List<double>> mean_pfs()
+        public List<List<double>> mean_pfs(List<double> SharkCoords)
         {
             List<List<double>> rangeList = new List<List<double>>();
             foreach (List<ParticleFilter> pflist in particleFilterList)
@@ -131,7 +130,7 @@ namespace CsharpAUV
                 {
                     List<double> meanP = pf.predicting_shark_location();
                     
-                    rangeList1.Add(CALC_RANGE_ERROR(meanP, robotNum));
+                    rangeList1.Add(CALC_RANGE_ERROR(meanP, SharkCoords));
                     robotNum += 1;
                 }
                 rangeList.Add(rangeList1);
@@ -158,8 +157,8 @@ namespace CsharpAUV
         public List<double> convertToCartesian(double lat2, double lon2)
         {
             List<double> cartesianList = new List<double>();
-            double lat1 = 33.75098160984202;
-            double lon1 = -118.12262477936241;
+            double lat1 = 34.1091647929366;
+            double lon1 = -117.71247096375129;
             double EarthRadius = 6271000;
             double phi1 = lat1 * Math.PI / 180;
             double phi2 = lat2 * Math.PI / 180;
@@ -193,6 +192,7 @@ namespace CsharpAUV
             cartesianList.Add(y_real);
             return cartesianList;
         }
+        
         public Simulator()
         {
           
@@ -223,6 +223,20 @@ namespace CsharpAUV
                 List<double> currentCartesian = sim.convertToCartesian(coordinateList[0], coordinateList[1]);
                 sim.cartesianList.Add(currentCartesian);
             }
+            // sensor 1
+            Console.WriteLine("Sensor Cartesian");
+            Console.WriteLine(sim.cartesianList[0][0]);
+            Console.WriteLine(sim.cartesianList[0][1]);
+
+            Console.WriteLine("creating Shark coordinates");
+            List<double> SharkCoords = new List<double>();
+            SharkCoords.Add(sim.cartesianList[0][0]);
+            SharkCoords.Add(sim.cartesianList[0][1] + 10);
+
+            // updating sensor 2's cartesian coordinates
+            sim.cartesianList[1][0] = SharkCoords[0] + 38;
+            sim.cartesianList[1][1] = SharkCoords[1];
+
             sim.create_and_initialize_robots();
             sim.create_real_range_list();
             sim.create_and_initialize_particle_filter();
@@ -232,7 +246,7 @@ namespace CsharpAUV
             
             while (currentTime < finalTime)
             {
-                //sim.update_robots();
+                sim.update_robots();
                 List<Tuple<double, DateTime, int, int, double, double>> measurements = handler.getMeasurements1(currentTime);
                 Console.WriteLine("current time: {0}",
                            currentTime.ToString("MM/dd/yyyy hh:mm:ss.fff tt"));
@@ -249,8 +263,6 @@ namespace CsharpAUV
                         sim.create_and_update_sharks(item.Item3, item.Item4, item.Item1);
                         sim.update_real_range_list(item.Item3, item.Item4);
                         Console.WriteLine(item.Item1);
-
-                        //Console.WriteLine(item.Item1);
                         Console.WriteLine("grabbed time: {0}",
                         item.Item2.ToString("MM/dd/yyyy hh:mm:ss.fff tt"));
                         //Console.WriteLine(item.Item3);
@@ -268,22 +280,20 @@ namespace CsharpAUV
                 //// Step 2: Run pf to estimate shark state
                 sim.update_pfs();
                 //// Step 3: Plan based on shark state
-
+                
                 //// Step 4: Control
                 sim.clear_real_range_list();
-                List<List<double>> simList = sim.mean_pfs();
-                Console.WriteLine("PF's distance");
+                List<List<double>> simList = sim.mean_pfs(SharkCoords);
+                Console.WriteLine("range Error");
                 Console.WriteLine(simList[0][0]);
                 Console.WriteLine(simList[0][1]);
-                currentTime = currentTime.AddSeconds(1);
 
+                currentTime = currentTime.AddSeconds(1);
             }
             
             Console.WriteLine();
             Console.WriteLine("Done");
-            //ToDo: need moving distances, whether it be moving AUV, stationary shark
-            // for the distance, give the real distnace
-            // 
+ 
         }
     }
 }
