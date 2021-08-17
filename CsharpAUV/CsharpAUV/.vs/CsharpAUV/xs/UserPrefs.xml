@@ -2,7 +2,7 @@
   <MonoDevelop.Ide.ItemProperties.CsharpAUV PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Simulator.cs">
     <Files>
-      <File FileName="Simulator.cs" Line="239" Column="41" />
+      <File FileName="Simulator.cs" Line="239" Column="1" />
       <File FileName="SerialDataHandler.cs" />
       <File FileName="fake1.csv" />
       <File FileName="fake2.csv" />
