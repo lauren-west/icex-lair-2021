@@ -247,7 +247,7 @@ namespace CsharpAUV
             while (currentTime < finalTime)
             {
                 sim.update_robots();
-                List<Tuple<double, DateTime, int, int, double, double>> measurements = handler.getMeasurements1(currentTime);
+                List<Tuple<double, DateTime, int, int, double, double, double, double>> measurements = handler.getMeasurements1(currentTime);
                 Console.WriteLine("current time: {0}",
                            currentTime.ToString("MM/dd/yyyy hh:mm:ss.fff tt"));
 
@@ -258,7 +258,7 @@ namespace CsharpAUV
                 if (measurements != null)
                 {
                     // hand over to particle filter
-                    foreach (Tuple<double, DateTime, int, int, double, double> item in measurements)
+                    foreach (Tuple<double, DateTime, int, int, double, double, double, double> item in measurements)
                     {
                         sim.create_and_update_sharks(item.Item3, item.Item4, item.Item1);
                         sim.update_real_range_list(item.Item3, item.Item4);
