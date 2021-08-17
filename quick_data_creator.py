@@ -20,16 +20,16 @@ data_list.append(["Receiver Serial Number", "Three-Digit Line-Counter", "Date/Ti
 receiver_serial_num = "457012"
 transmitter_id = "65477"
 distance = 0
-# sensor 1
-sensor_lat = 33.480503
-sensor_long = -117.733113
+# sensor_lat = 33.480503
+# sensor_long = -117.733113
 tag_lat = 33.480447
 tag_long = -117.734242
-# sensor 2
-# sensor_lat = 33.481380
-# sensor_long = -117.734245
+
+sensor_lat = 33.481380
+sensor_long = -117.734245
 
 time_change = datetime.timedelta(0,8, 179000)
+tof = datetime.timedelta(0,0,0)
 
 dt =  datetime.datetime.strptime('2021-07-22 11:00:00.000', '%Y-%m-%d %H:%M:%S.%f')
 end_dt = dt + datetime.timedelta(0, 0, 0, 0, 10) 
@@ -43,6 +43,7 @@ end_dt = dt + datetime.timedelta(0, 0, 0, 0, 10)
 # ...     weeks=2
 # ... )
 while dt < end_dt:
+    print(dt)
     line = []
     line.append(receiver_serial_num) # receiver serial num (changes with each csv)
     line.append("000")
@@ -56,6 +57,7 @@ while dt < end_dt:
     data_list.append(line)
     tof = datetime.timedelta(0,0, 100000) # change this to make this more accurate
     dt = dt + datetime.timedelta(0,8, 179000) + tof # (days, seconds, microseconds, milliseconds, minutes, hours, weeks)
+    print(dt)
 
 
     # MAKE SHARK MOVE:
@@ -65,12 +67,10 @@ while dt < end_dt:
     # get distance 
     distance = geodesic((tag_lat, tag_long), (sensor_lat, sensor_long)).m
     # create new dt (8.179 + tof ) # tof calculated from ^ distance
-    tof = distance / 1500 
-    dt = dt + time_change + datetime.timedelta(seconds=tof)
-    print(dt)
-    print(datetime.timedelta(seconds=tof))
+    dt = dt + time_change
+
 # rename other to be "sensor2_fake_collab.csv"
-with open("sensor1_fake_collab.csv", "w") as f:
+with open("sensor2_fake_collab.csv", "w") as f:
     writer = csv.writer(f)
     writer.writerows(data_list)
 
