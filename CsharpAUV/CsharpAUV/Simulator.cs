@@ -280,7 +280,7 @@ namespace CsharpAUV
                 //// Step 4: Control
                 sim.clear_real_range_list();
                 List<List<double>> simList = sim.mean_pfs(SharkCoords);
-                //Console.WriteLine("range Error");
+                Console.WriteLine("new branch???");
                 //Console.WriteLine(simList[0][0]);
                 //Console.WriteLine(simList[0][1]);
 
