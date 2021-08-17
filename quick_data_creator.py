@@ -19,6 +19,7 @@ data_list.append(["Receiver Serial Number", "Three-Digit Line-Counter", "Date/Ti
 
 receiver_serial_num = "457012"
 transmitter_id = "65477"
+distance = 0
 # sensor 1
 # sensor_lat = 33.480503
 # sensor_long = -117.733113
@@ -31,13 +32,10 @@ sensor_lat = 33.481380
 sensor_long = -117.734245
 
 time_change = datetime.timedelta(0,8, 179000)
-
-distance = geodesic((tag_lat, tag_long), (sensor_lat, sensor_long)).m
-tof = datetime.timedelta(seconds=distance/1500)
-print("distance", distance)
-
-dt =  datetime.datetime.strptime('2021-07-22 11:00:00.000', '%Y-%m-%d %H:%M:%S.%f') + tof
-end_dt = dt + datetime.timedelta(0, 0, 0, 0, 30) 
+tof = datetime.timedelta(0,0,0)
+original_dt =  datetime.datetime.strptime('2021-07-22 11:00:00.000', '%Y-%m-%d %H:%M:%S.%f')
+dt =  datetime.datetime.strptime('2021-07-22 11:00:00.000', '%Y-%m-%d %H:%M:%S.%f')
+end_dt = dt + datetime.timedelta(0, 0, 0, 0, 20) 
 # delta = timedelta(
 # ...     days=50,
 # ...     seconds=27,
@@ -47,37 +45,35 @@ end_dt = dt + datetime.timedelta(0, 0, 0, 0, 30)
 # ...     hours=8,
 # ...     weeks=2
 # ... )
-# count = 0 
-# while dt < end_dt:
-#     print(dt)
-#     line = []
-#     line.append(receiver_serial_num) # receiver serial num (changes with each csv)
-#     line.append("000")
-#     line.append(dt) # needs to (change according to shark movement)
-#     line.append("A69-1602")
-#     line.append(transmitter_id) # tag id
-#     line.extend(["82.0", "38.5", "#97"]) # dont change
-#     line.append(str(distance))  # actual distance (accurate and contrived for PF?)
-#     line.append("("+ str(sensor_lat)+ "," + str(sensor_long) + ")") # "Sensor GPS Coords" (given once?, must be accurate, not right next to each other)
-#     line.append("("+ str(tag_lat)+ "," + str(tag_long) + ")") # "tag GPS Coords" (given once?, must be accurate)
-#     data_list.append(line)
+count = 0
+while dt < end_dt:
+    line = []
+    line.append(receiver_serial_num) # receiver serial num (changes with each csv)
+    line.append("000")
+    line.append(dt) # needs to (change according to shark movement)
+    line.append("A69-1602")
+    line.append(transmitter_id) # tag id
+    line.extend(["82.0", "38.5", "#97"]) # dont change
+    line.append(str(distance))  # actual distance (accurate and contrived for PF?)
+    line.append("("+ str(sensor_lat)+ "," + str(sensor_long) + ")") # "Sensor GPS Coords" (given once?, must be accurate, not right next to each other)
+    line.append("("+ str(tag_lat)+ "," + str(tag_long) + ")") # "tag GPS Coords" (given once?, must be accurate)
+    data_list.append(line)
 
-#     # MAKE SHARK MOVE:
+    # MAKE SHARK MOVE:
 
-#     # edit gps tag coord lat by small value
-#     tag_lat += 0.00008
-#     # get distance 
-#     distance = geodesic((tag_lat, tag_long), (sensor_lat, sensor_long)).m
-#     # create new dt (8.179 + tof ) # tof calculated from ^ distance
-#     tof = distance/1500
-#     dt = time_change * count + datetime.timedelta(seconds=tof) 
-#     count += 1
-#     print(dt)
-#     print(tof)
+    # edit gps tag coord lat by small value
+    tag_lat += 0.00008
+    # get distance 
+    distance = geodesic((tag_lat, tag_long), (sensor_lat, sensor_long)).m
+    # create new dt (8.179 + tof ) # tof calculated from ^ distance
+    tof = distance / 1500
+    dt = original_dt + time_change * count + datetime.timedelta(seconds=tof) 
+    count += 1
+
 # rename other to be "sensor2_fake_collab.csv"
-# with open("sensor2_fake_collab.csv", "w") as f:
-#     writer = csv.writer(f)
-#     writer.writerows(data_list)
+with open("sensor2_fake_collab.csv", "w") as f:
+    writer = csv.writer(f)
+    writer.writerows(data_list)
 
 #############################################################################
 # t01  = datetime.datetime.strptime('2021-07-22 11:14:51.858', '%Y-%m-%d %H:%M:%S.%f')
