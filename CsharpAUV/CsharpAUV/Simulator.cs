@@ -157,8 +157,8 @@ namespace CsharpAUV
         public List<double> convertToCartesian(double lat2, double lon2)
         {
             List<double> cartesianList = new List<double>();
-            double lat1 = 33.480467;
-            double lon1 = -117.735645;
+            double lat1 = 34.1091647929366;
+            double lon1 = -117.71247096375129;
             double EarthRadius = 6271000;
             double phi1 = lat1 * Math.PI / 180;
             double phi2 = lat2 * Math.PI / 180;
@@ -229,12 +229,13 @@ namespace CsharpAUV
             Console.WriteLine(sim.cartesianList[0][1]);
 
             Console.WriteLine("creating Shark coordinates");
-            double SharkLat = 33.480447;
-            double SharkLong = -117.734242;
-            List<double> SharkCoords = sim.convertToCartesian(SharkLat, SharkLong);
+            List<double> SharkCoords = new List<double>();
+            SharkCoords.Add(sim.cartesianList[0][0]);
+            SharkCoords.Add(sim.cartesianList[0][1] + 10);
 
             // updating sensor 2's cartesian coordinates
-            
+            sim.cartesianList[1][0] = SharkCoords[0] + 38;
+            sim.cartesianList[1][1] = SharkCoords[1];
 
             sim.create_and_initialize_robots();
             sim.create_real_range_list();
@@ -264,7 +265,10 @@ namespace CsharpAUV
                         Console.WriteLine(item.Item1);
                         Console.WriteLine("grabbed time: {0}",
                         item.Item2.ToString("MM/dd/yyyy hh:mm:ss.fff tt"));
-                        //ToDo: update the Shark's 
+                        //Console.WriteLine(item.Item3);
+                        //Console.WriteLine(item.Item4);
+                        //Console.WriteLine(item.Item5);
+                        //Console.WriteLine(item.Item6);
                     }
                     Console.WriteLine();
                 }
