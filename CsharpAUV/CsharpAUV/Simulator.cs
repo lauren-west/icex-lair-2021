@@ -217,25 +217,19 @@ namespace CsharpAUV
             MyGlobals.sensor_list.Add(sensor2);
             List<double> current = handler.getLatitude(2);
             MyGlobals.coordinate_list.Add(current);
-
+            // creates cartesian list of all sensors
             foreach (List<double> coordinateList in MyGlobals.coordinate_list)
             {
                 List<double> currentCartesian = sim.convertToCartesian(coordinateList[0], coordinateList[1]);
                 sim.cartesianList.Add(currentCartesian);
             }
-            // sensor 1
-            Console.WriteLine("Sensor Cartesian");
-            Console.WriteLine(sim.cartesianList[0][0]);
-            Console.WriteLine(sim.cartesianList[0][1]);
+         
 
             Console.WriteLine("creating Shark coordinates");
-            List<double> SharkCoords = new List<double>();
-            SharkCoords.Add(sim.cartesianList[0][0]);
-            SharkCoords.Add(sim.cartesianList[0][1] + 10);
-
-            // updating sensor 2's cartesian coordinates
-            sim.cartesianList[1][0] = SharkCoords[0] + 38;
-            sim.cartesianList[1][1] = SharkCoords[1];
+            double SharkLat = 33.480444;
+            double SharkLon = -117.734250;
+            List<double> SharkCoords = sim.convertToCartesian(SharkLat, SharkLon);
+            
 
             sim.create_and_initialize_robots();
             sim.create_real_range_list();
@@ -247,7 +241,7 @@ namespace CsharpAUV
             while (currentTime < finalTime)
             {
                 sim.update_robots();
-                List<Tuple<double, DateTime, int, int, double, double, double, double>> measurements = handler.getMeasurements1(currentTime);
+                List<Tuple<double, DateTime, int, int, List<double>, List<double>>> measurements = handler.getMeasurements1(currentTime);
                 Console.WriteLine("current time: {0}",
                            currentTime.ToString("MM/dd/yyyy hh:mm:ss.fff tt"));
 
@@ -258,17 +252,15 @@ namespace CsharpAUV
                 if (measurements != null)
                 {
                     // hand over to particle filter
-                    foreach (Tuple<double, DateTime, int, int, double, double, double, double> item in measurements)
+                    foreach (Tuple<double, DateTime, int, int, List<double>, List<double>> item in measurements)
                     {
                         sim.create_and_update_sharks(item.Item3, item.Item4, item.Item1);
                         sim.update_real_range_list(item.Item3, item.Item4);
-                        //Console.WriteLine(item.Item1);
+                        //update Shark's cartesian coordinate
+                        SharkCoords = sim.convertToCartesian(item.Item5[1], item.Item6[1]);
                         Console.WriteLine("grabbed time: {0}",
                         item.Item2.ToString("MM/dd/yyyy hh:mm:ss.fff tt"));
-                        //Console.WriteLine(item.Item3);
-                        //Console.WriteLine(item.Item4);
-                        //Console.WriteLine(item.Item5);
-                        //Console.WriteLine(item.Item6);
+                        
                     }
                     Console.WriteLine();
                 }
@@ -283,10 +275,10 @@ namespace CsharpAUV
                 
                 //// Step 4: Control
                 sim.clear_real_range_list();
-                //List<List<double>> simList = sim.mean_pfs(SharkCoords);
-                //Console.WriteLine("range Error");
-                //Console.WriteLine(simList[0][0]);
-                //Console.WriteLine(simList[0][1]);
+                List<List<double>> simList = sim.mean_pfs(SharkCoords);
+                Console.WriteLine("range Error");
+                Console.WriteLine(simList[0][0]);
+                Console.WriteLine(simList[0][1]);
 
                 currentTime = currentTime.AddSeconds(1);
             }

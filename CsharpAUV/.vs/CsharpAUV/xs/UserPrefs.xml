@@ -1,37 +1,18 @@
-﻿<Properties GitUserInfo="UsingGIT" StartupConfiguration="{21B54CBE-894B-445F-88F1-9D808DB97534}|Default">
+﻿<Properties StartupConfiguration="{21B54CBE-894B-445F-88F1-9D808DB97534}|Default">
   <MonoDevelop.Ide.ItemProperties.CsharpAUV PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="CsharpAUV/Simulator.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="CsharpAUV/sensor1_fake_collab.csv">
     <Files>
-      <File FileName="CsharpAUV/Robot.cs" Line="75" Column="44" />
+      <File FileName="CsharpAUV/SerialDataHandler.cs" Line="383" Column="42" />
       <File FileName="CsharpAUV/SimulationGenerator.cs" Line="1" Column="1" />
-      <File FileName="CsharpAUV/SerialDataHandler.cs" Line="529" Column="14" />
-      <File FileName="CsharpAUV/Simulator.cs" Line="278" Column="1" />
-      <File FileName="CsharpAUV/fake1.csv" Line="20" Column="1" />
-      <File FileName="CsharpAUV/Shark.cs" Line="1" Column="1" />
-      <File FileName="CsharpAUV/fake2.csv" Line="5" Column="127" />
-      <File FileName="CsharpAUV/ParticleFilter.cs" Line="205" Column="34" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="CsharpAUV/ParticleFilter.cs">
-    <Files>
-      <File FileName="CsharpAUV/Robot.cs" Line="97" Column="1" />
-      <File FileName="CsharpAUV/SimulationGenerator.cs" Line="1" Column="1" />
-      <File FileName="CsharpAUV/SerialDataHandler.cs" Line="378" Column="1" />
-      <File FileName="CsharpAUV/Simulator.cs" Line="287" Column="58" />
-      <File FileName="CsharpAUV/fake1.csv" Line="3" Column="89" />
-      <File FileName="CsharpAUV/Shark.cs" Line="1" Column="1" />
-      <File FileName="CsharpAUV/fake2.csv" Line="3" Column="125" />
-      <File FileName="CsharpAUV/ParticleFilter.cs" Line="1" Column="1" />
+      <File FileName="CsharpAUV/Simulator.cs" Line="282" Column="1" />
+      <File FileName="CsharpAUV/sensor1_fake_collab.csv" Line="3" Column="133" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="CsharpAUV" expanded="True">
             <Node name="CsharpAUV" expanded="True">
-<<<<<<< HEAD
-              <Node name="Dependencies" expanded="True" />
-              <Node name="Particle.cs" selected="True" />
-=======
-              <Node name="ParticleFilter.cs" selected="True" />
->>>>>>> hannahbranch
+              <Node name="sensor1_fake_collab.csv" selected="True" />
             </Node>
           </Node>
         </State>
