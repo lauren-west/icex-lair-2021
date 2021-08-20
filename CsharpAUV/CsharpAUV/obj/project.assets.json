@@ -919,19 +919,19 @@
     ]
   },
   "packageFolders": {
-    "/Users/laurenwest/.nuget/packages/": {}
+    "/Users/hannahkyme/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpAUV/CsharpAUV/CsharpAUV.csproj",
+      "projectUniqueName": "/Users/hannahkyme/Desktop/integration/CsharpAUV/CsharpAUV/CsharpAUV.csproj",
       "projectName": "CsharpAUV",
-      "projectPath": "/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpAUV/CsharpAUV/CsharpAUV.csproj",
-      "packagesPath": "/Users/laurenwest/.nuget/packages/",
-      "outputPath": "/Users/laurenwest/code/ICEX Research/icex-lair-2021/CsharpAUV/CsharpAUV/obj/",
+      "projectPath": "/Users/hannahkyme/Desktop/integration/CsharpAUV/CsharpAUV/CsharpAUV.csproj",
+      "packagesPath": "/Users/hannahkyme/.nuget/packages/",
+      "outputPath": "/Users/hannahkyme/Desktop/integration/CsharpAUV/CsharpAUV/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/Users/laurenwest/.config/NuGet/NuGet.Config"
+        "/Users/hannahkyme/.config/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "netcoreapp3.1"
@@ -987,7 +987,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/5.0.302/RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/5.0.400/RuntimeIdentifierGraph.json"
       }
     }
   },
