@@ -12,6 +12,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from scipy import stats
 sns.set(style="darkgrid")
 
 
@@ -421,7 +422,8 @@ class Serial_Data_Handler():
         plt.savefig('all_data_noise_plot.png')
         plt.close()
 
-        self.create_final_plots_without_noise_signal(final_df = final_df, delta_t_values = delta_t_values, error_values = error_values, data_file_list = data_file_list)
+        #self.create_final_plots_without_noise_signal(final_df = final_df, delta_t_values = delta_t_values, error_values = error_values, data_file_list = data_file_list)
+        self.create_final_plots_without_noise_signal()
 
     def create_final_plots_without_noise_signal(self, final_df = None, delta_t_values = None, error_values = None, data_file_list = []):
         if final_df is None or delta_t_values is None or error_values is None:
@@ -433,6 +435,46 @@ class Serial_Data_Handler():
 
             _, _, LoFiles = AllFiles[0] 
             
+            ############# Calibration testing #############
+            # df = pd.read_csv(AllFiles[0][0] + "/Long_Beach_08_06_2021_Sensor_1/calibration/data_calibration.csv", engine='python', header=0, index_col=False)
+            # true_first_time_stamp =  datetime.datetime.strptime("2021-07-23 06:13:53.825", '%Y-%m-%d %H:%M:%S.%f')
+            # new_time_of_flight_list = []
+            # new_predicted_distance_list = []
+
+            # for line in df.values:
+            #     current_datetime = datetime.datetime.strptime(line[2], '%Y-%m-%d %H:%M:%S.%f')
+
+            #     diff_in_time = (current_datetime - true_first_time_stamp).total_seconds()
+            #     time_of_flight = diff_in_time % handler.delta_t_avg
+
+            #     if time_of_flight > 8:
+            #         time_of_flight = handler.delta_t_avg - time_of_flight
+             
+            #     time_of_flight = time_of_flight/handler.ratio_pred_act - handler.slope * (float(line[-4]) - float(df.values[0][-4]))
+             
+            #     current_index = np.where(df.values == line)[0][0]
+
+            #     if current_index > 1:   # First TOF seems to almost always be 0
+            #         previous_line = df.values[current_index -1]
+            #         previous_time_of_flight = previous_line[-2]
+
+            #         diff_time_of_flight = time_of_flight - previous_time_of_flight
+            #         if diff_time_of_flight > handler.adjustment_threshold:
+            #             handler.additive = diff_time_of_flight
+            #             revised_initial_time = handler.FIRST_TIMESTAMP + datetime.timedelta(0, handler.additive)
+            #             print("\nBefore:", handler.FIRST_TIMESTAMP)
+            #             handler.FIRST_TIMESTAMP = revised_initial_time
+            #             print("After:", handler.FIRST_TIMESTAMP, "\n")
+                
+            #     new_time_of_flight_list.append(time_of_flight)
+            #     new_predicted_distance_list.append(time_of_flight * handler.SPEED_OF_SOUND)
+            
+            # df['Time of Flight (s)'] = new_time_of_flight_list
+            # df['Predicted Distance (m)'] = new_predicted_distance_list            
+            # print(df)
+            # df_list.append(df)
+            ###############################################
+
             for filename in LoFiles:
                 if filename[-3:] == "csv" and (len(filename) == 10 or len(filename) == 11):    
                     path = os.getcwd() + "/" + filename 
@@ -449,7 +491,13 @@ class Serial_Data_Handler():
             final_df = pd.concat(df_list)
 
         # sns.lmplot(x='Distance (m)', y='Predicted Distance (m)', fit_reg = True, data=final_df, hue='Transmitter ID Number')
+
+        slope, intercept, r_value, p_value, std_err = stats.linregress(final_df['Distance (m)'],final_df['Predicted Distance (m)'])
+        #m, b = np.polyfit(final_df['Distance (m)'], final_df['Predicted Distance (m)'], 1)
+        print(f"r_value: {r_value}\nr2_value: {r_value**2}\np_value: {p_value}\nstd_err: {std_err}\n")
         plt.scatter(final_df['Distance (m)'], final_df['Predicted Distance (m)'])
+        plt.plot(final_df['Distance (m)'], slope * final_df['Distance (m)'] + intercept, label='y={:.2f}x+{:.2f}'.format(slope,intercept))
+        plt.legend(fontsize=9)
         plt.ylim(None, None)
         plt.xlim(None, None)
         plt.title("Actual Distance versus Predicted Distance")
@@ -766,7 +814,7 @@ def run_program_with_old_data(handler):
             
             
 
-            time_of_flight = time_of_flight/handler.ratio_pred_act #- handler.slope * (float(line[-4]) - float(df.values[0][-4]))
+            time_of_flight = time_of_flight/1.96 #handler.ratio_pred_act #- handler.slope * (float(line[-4]) - float(df.values[0][-4]))
             # print(f"Final time of flight: {time_of_flight}")
             # print()
             current_index = np.where(df.values == line)[0][0]
