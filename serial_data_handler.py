@@ -147,7 +147,7 @@ class Serial_Data_Handler():
             if time_of_flight > 8:
                 time_of_flight = self.delta_t_avg - time_of_flight
 
-            time_of_flight = time_of_flight/self.ratio_pred_act - self.slope * (int(line[-4]) - int(data_list[1][-4]))
+            time_of_flight = time_of_flight/self.ratio_pred_act #- self.slope * (int(line[-4]) - int(data_list[1][-4]))
 
             if current_index > 2:
                 previous_line = data_list[current_index - 1]
@@ -665,7 +665,7 @@ class Serial_Data_Handler():
             elif filename[-3:] == "png" and "step_plot" in filename:
                 shutil.move(filename, os.path.join(path, "step_plots"))
             # elif filename[-3:] == "csv" and (len(filename) == 10 or len(filename) == 11):
-            elif filename[-3:] == "csv":
+            elif filename[-3:] == "csv" and not "fake" in filename:
                 shutil.move(filename, os.path.join(path, "raw_data"))
             
 
@@ -814,7 +814,7 @@ def run_program_with_old_data(handler):
             
             
 
-            time_of_flight = time_of_flight/1.96 #handler.ratio_pred_act #- handler.slope * (float(line[-4]) - float(df.values[0][-4]))
+            time_of_flight = time_of_flight/ handler.ratio_pred_act #- handler.slope * (float(line[-4]) - float(df.values[0][-4]))
             # print(f"Final time of flight: {time_of_flight}")
             # print()
             current_index = np.where(df.values == line)[0][0]
